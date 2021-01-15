@@ -4,9 +4,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from zyx_helpers import set_diamond_style
-from zyx_shapes import draw_rectangle
-from zyx_settings import set_shape_style, set_line_style
+from zyxxy_helpers import set_diamond_style
+from zyxxy_shapes import draw_rectangle
+from zyxxy_settings import set_shape_style, set_line_style
 
 _default_image_format = "png"
 _default_title_font_size = 20
