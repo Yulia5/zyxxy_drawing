@@ -95,7 +95,8 @@ def show_drawing_and_save_if_needed(filename=None,
     figure.set_size_inches(figsize4saving)
     plt.savefig(fname = filename, 
                 format = filename[last_dot_position+1:],
-                dpi = dpi)
+                dpi = dpi4saving)
+  figure.set_dpi(dpi) 
   figure.set_size_inches(figsize)
   plt.subplots_adjust(**margin_adjustments)
   plt.show()
