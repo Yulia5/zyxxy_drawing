@@ -2,9 +2,9 @@
 ## don't change this file, please                  ##
 #####################################################
 
-from zyx_helpers import fill_in_outline, vertices_qty_in_circle
-from zyx_settings import set_fill_in_outline_kwarg_defaults
-from zyx_outlines import build_smile, build_star, build_polygon
+from zyxxy_helpers import fill_in_outline, vertices_qty_in_circle
+from zyxxy_settings import set_fill_in_outline_kwarg_defaults
+from zyxxy_outlines import build_smile, build_star, build_polygon
 
 # this function draws a rectangle
 # diamond point is at the bottom left vertice
