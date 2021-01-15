@@ -6,7 +6,6 @@ import math
 import random
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from my_colours import my_colour_palette
 from zyxxy_settings import set_outline_kwarg_default
 
 ##################################################################
@@ -55,18 +54,14 @@ def __draw_diamond(ax, diamond_location):
 ##################################################################
 
 # Find colour that should be used. 
-# If the name is in the custom_color dictionary, use its value
+# Assume that it's a name of a standard colour.
 # Attention, names are case-sensitive
-# If not, assume that is it the name of a standard colour
 def find_colour_code(colour_name):
-  if colour_name in my_colour_palette:
-    return my_colour_palette[colour_name] 
   if colour_name in mcolors.CSS4_COLORS:
     return colour_name
   # if we are here, the colour name has not been recognised
-  all_colour_names = (my_colour_palette.keys().sort() + 
-  mcolors.CSS4_COLORS.keys().sort())
-  raise Exception("Colour name is not recognised. It should be one of the following names: " + ', '.join(all_colour_names))
+  all_colour_names = mcolors.CSS4_COLORS.keys().sort()
+  raise Exception("Colour name is not recognised. Colour names are case-sensitive. Colour name should be one of the following names: " + ', '.join(all_colour_names))
 
 ##################################################################
 ## SHAPES AND LINES HELPERS                                     ## 

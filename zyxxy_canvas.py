@@ -71,7 +71,7 @@ def create_model_and_result_axes(method1, method2):
 # more information in the document below
 # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.savefig.html#matplotlib.pyplot.savefig 
 def show_drawing_and_save_if_needed(filename=None):
-  if filename is not None:
+  if (filename is not None) and (filename != ""):
     last_dot_position = filename.rfind(".")
     if last_dot_position < 0:
       filename += '.' + _default_image_format
