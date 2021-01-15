@@ -7,6 +7,7 @@ import random
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from zyxxy_settings import set_outline_kwarg_default
+from zyxxy_MY_SETTINGS import my_default_diamond_size,my_default_diamond_colour, my_colour_palette
 
 ##################################################################
 ## MATHS HELPERS                                                ## 
@@ -27,8 +28,8 @@ def random_element(list_to_choose_from):
 _default_diamond_arguments = {
   'show' : False,
   'zorder' : 1000, 
-  'size' : 15,
-  'colour' : 'green'
+  'size' : my_default_diamond_size,
+  'colour' : my_default_diamond_colour
 }
 
 def set_diamond_style(show=None, size=None, colour=None, zorder=None):
@@ -57,10 +58,13 @@ def __draw_diamond(ax, diamond_location):
 # Assume that it's a name of a standard colour.
 # Attention, names are case-sensitive
 def find_colour_code(colour_name):
+  if colour_name in my_colour_palette:
+    return my_colour_palette[colour_name] 
   if colour_name in mcolors.CSS4_COLORS:
     return colour_name
   # if we are here, the colour name has not been recognised
-  all_colour_names = mcolors.CSS4_COLORS.keys().sort()
+  all_colour_names = (my_colour_palette.keys().sort() + 
+  mcolors.CSS4_COLORS.keys().sort())
   raise Exception("Colour name is not recognised. Colour names are case-sensitive. Colour name should be one of the following names: " + ', '.join(all_colour_names))
 
 ##################################################################
@@ -128,8 +132,6 @@ def fill_in_outline(ax, all_x, all_y, colour, diamond, turn, zorder, alpha, outl
 
 def _draw_broken_line(ax, contour, colour, linewidth, joinstyle, zorder, diamond=None, turn=None):
   if (contour is None) or (linewidth is None) or (colour is None) or (zorder is None) or (joinstyle is None) or (linewidth == 0):
-    if colour is None:
-      raise Exception('none')
     return contour
   if (diamond is not None) and (turn is not None):
     contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
