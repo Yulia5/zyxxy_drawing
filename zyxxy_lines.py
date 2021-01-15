@@ -1,76 +1,42 @@
 #####################################################
 ## don't change this file, please                  ##
 #####################################################
-_default_arguments = {"line" : {}, 
-                      "shape" : {'turn' : 0, 'alpha' : 1.0},
-                      "shape_outline" : {}}
 
-def _set_line_style(colour, linewidth, joinstyle, zorder, _target):
-  global _count
-  if colour is not None:
-    _target['colour'] = colour
-  if linewidth is not None:
-    _target['linewidth'] = linewidth
-  if joinstyle is not None:
-    _target['joinstyle'] = joinstyle
-  if zorder is not None:
-    _target['zorder'] = zorder
-  return _target
+from zyxxy_helpers import _draw_broken_line, rotate_point
+from zyxxy_settings import set_line_kwarg_default
+from zyxxy_outlines import build_arc, build_smile, build_half_ellipse, build_ellipse_different_speeds
 
-def new_layer():
-  old_layer_nb = max(_default_arguments['line']['zorder'],
-                     _default_arguments['shape']['zorder'],
-                     _default_arguments['shape_outline']['zorder'])
-  new_layer_nb = old_layer_nb + 1
-  _default_arguments['line']['zorder'] = new_layer_nb
-  _default_arguments['shape']['zorder'] = new_layer_nb
-  _default_arguments['shape_outline']['zorder'] = new_layer_nb
+def draw_broken_line(ax, points, diamond=None, turn=0, **kwargs):
+  _draw_broken_line(ax=ax, contour=points, turn=turn, diamond=diamond, **set_line_kwarg_default(kwargs))
 
-def set_line_style(colour=None, linewidth=None, joinstyle=None, zorder=None):
-  global _default_arguments
-  _set_line_style(colour=colour, linewidth=linewidth, joinstyle=joinstyle, zorder=zorder, _target=_default_arguments['line'])
+# this function draws a line of a given length in a given turn
+# of a given width starting from the diamond point
+def draw_line_between_two_points(ax, point_1_x, point_1_y, point_2_x, point_2_y, **kwargs):
+  _draw_broken_line(ax=ax, contour=[[point_1_x, point_1_y], 
+                                   [point_2_x, point_2_y]],
+                   **set_line_kwarg_default(kwargs))
 
-def get_shape_zorder():
-  return _default_arguments['shape']['zorder']
+def draw_line(ax, start_x, start_y, length, turn, **kwargs):
+  rotated_centre = rotate_point(point=(start_x, start_y+length),
+                                diamond=(start_x, start_y), 
+                                turn = turn)
+  _draw_broken_line(ax=ax, 
+                   contour=[[start_x, start_y], 
+                            [rotated_centre[0], rotated_centre[1]]],
+                   **set_line_kwarg_default(kwargs))
 
-def set_shape_style(outline_colour=None, outline_width=None, outline_joinstyle=None, outline_zorder=None, shape_colour=None,
-shape_turn=None, shape_zorder=None, shape_alpha=None):
-  global _default_arguments
-  if shape_alpha is not None:
-    _default_arguments['shape']['alpha'] = shape_alpha
-  if shape_zorder is not None:
-    _default_arguments['shape']['zorder'] = shape_zorder
-  if shape_turn is not None:
-    _default_arguments['shape']['turn'] = shape_turn
-  if shape_colour is not None:
-    _default_arguments['shape']['colour'] = shape_colour
+def draw_arc(ax, centre_x, centre_y, radius_x, radius_y, angle_start, angle_end, **kwargs):
+  contour = build_arc(centre_x=centre_x, centre_y=centre_y, radius_x=radius_x, radius_y=radius_y, angle_start=angle_start, angle_end=angle_end)
+  _draw_broken_line(ax=ax, contour=contour, **set_line_kwarg_default(kwargs))
 
-  if outline_zorder is None:
-    outline_zorder = _default_arguments['shape']['zorder']
+def draw_smile(ax, centre_x, bottom_y, top_y, width, **kwargs):
+  contour = build_smile(centre_x=centre_x, bottom_y=bottom_y, top_y=top_y, width=width)
+  _draw_broken_line(ax=ax, contour=contour, diamond=[centre_x, top_y], **set_line_kwarg_default(kwargs))
 
-  _set_line_style(colour=outline_colour, linewidth=outline_width, joinstyle=outline_joinstyle, zorder=outline_zorder, 
-  _target=_default_arguments['shape_outline'])
+def draw_half_ellipse_line(ax, centre_x, bottom_y, top_y, width, **kwargs):
+  contour = build_half_ellipse(centre_x=centre_x, bottom_y=bottom_y, top_y=top_y, width=width)
+  _draw_broken_line(ax=ax, contour=contour, diamond=[centre_x, top_y], **set_line_kwarg_default(kwargs))
 
-
-def _fill_in_missing_values(target, default_values, target_prefix=''):
-  for key in default_values.keys():
-    if (target_prefix + key) not in target:
-      target[target_prefix + key] = default_values[key]
-
-def set_fill_in_outline_kwarg_defaults(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape'])
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape_outline'], 
-                          target_prefix='outline_') 
-  return kwargs
-
-def set_line_kwarg_default(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['line'])
-  return kwargs
-
-def set_outline_kwarg_default(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape_outline'])
-  return kwargs
+def draw_ellipse_line_different_speeds(ax, centre_x, centre_y, radius_x, radius_y, start_hour, end_hour, speed_x=1.0, speed_y=1.0, **kwargs):
+  contour = build_ellipse_different_speeds(centre_x=centre_x, centre_y=centre_y, radius_x=radius_x, radius_y=radius_y, start_hour=start_hour, end_hour=end_hour, speed_x=speed_x, speed_y=speed_x)
+  _draw_broken_line(ax=ax, contour=contour, diamond=[centre_x, centre_y], **set_line_kwarg_default(kwargs))

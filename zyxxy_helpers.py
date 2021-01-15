@@ -1,76 +1,146 @@
 #####################################################
 ## don't change this file, please                  ##
 #####################################################
-_default_arguments = {"line" : {}, 
-                      "shape" : {'turn' : 0, 'alpha' : 1.0},
-                      "shape_outline" : {}}
 
-def _set_line_style(colour, linewidth, joinstyle, zorder, _target):
-  global _count
+import math
+import random
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+from my_colours import my_colour_palette
+from zyxxy_settings import set_outline_kwarg_default
+
+##################################################################
+## MATHS HELPERS                                                ## 
+##################################################################
+def random_number(max, min=0.):
+  return random.uniform(0, 1) * (max - min) + min
+
+# both limits, min and max, are included in possible outcomes
+def random_integer_number(max, min=0.):
+  return random.randint(min, max)
+
+def random_element(list_to_choose_from):
+  return random.choice(list_to_choose_from)
+
+##################################################################
+## DIAMOND HELPERS                                              ## 
+##################################################################
+_default_diamond_arguments = {
+  'show' : False,
+  'zorder' : 1000, 
+  'size' : 15,
+  'colour' : 'green'
+}
+
+def set_diamond_style(show=None, size=None, colour=None, zorder=None):
+  global _default_diamond_arguments
+  if show is not None:
+    _default_diamond_arguments['show'] = show
+  if size is not None:
+    _default_diamond_arguments['size'] = size
   if colour is not None:
-    _target['colour'] = colour
-  if linewidth is not None:
-    _target['linewidth'] = linewidth
-  if joinstyle is not None:
-    _target['joinstyle'] = joinstyle
+    _default_diamond_arguments['colour'] = colour
   if zorder is not None:
-    _target['zorder'] = zorder
-  return _target
+    _default_diamond_arguments['zorder'] = zorder
 
-def new_layer():
-  old_layer_nb = max(_default_arguments['line']['zorder'],
-                     _default_arguments['shape']['zorder'],
-                     _default_arguments['shape_outline']['zorder'])
-  new_layer_nb = old_layer_nb + 1
-  _default_arguments['line']['zorder'] = new_layer_nb
-  _default_arguments['shape']['zorder'] = new_layer_nb
-  _default_arguments['shape_outline']['zorder'] = new_layer_nb
+def __draw_diamond(ax, diamond_location):
+  if _default_diamond_arguments['show'] and (diamond_location is not None):
+    diamond_r = (_default_diamond_arguments['size'] / 1000) * (ax.get_xlim()[1] - ax.get_xlim()[0])
+    all_diamond_x = [diamond_location[0], diamond_location[0]+diamond_r, diamond_location[0], diamond_location[0]-diamond_r, diamond_location[0]]
+    all_diamond_y = [diamond_location[1]+diamond_r, diamond_location[1], diamond_location[1]-diamond_r, diamond_location[1], diamond_location[1]+diamond_r]
+    fill_in_outline(ax=ax, all_x=all_diamond_x, all_y=all_diamond_y, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
 
-def set_line_style(colour=None, linewidth=None, joinstyle=None, zorder=None):
-  global _default_arguments
-  _set_line_style(colour=colour, linewidth=linewidth, joinstyle=joinstyle, zorder=zorder, _target=_default_arguments['line'])
+##################################################################
+## COLOUR HELPERS                                               ## 
+##################################################################
 
-def get_shape_zorder():
-  return _default_arguments['shape']['zorder']
+# Find colour that should be used. 
+# If the name is in the custom_color dictionary, use its value
+# Attention, names are case-sensitive
+# If not, assume that is it the name of a standard colour
+def find_colour_code(colour_name):
+  if colour_name in my_colour_palette:
+    return my_colour_palette[colour_name] 
+  if colour_name in mcolors.CSS4_COLORS:
+    return colour_name
+  # if we are here, the colour name has not been recognised
+  all_colour_names = (my_colour_palette.keys().sort() + 
+  mcolors.CSS4_COLORS.keys().sort())
+  raise Exception("Colour name is not recognised. It should be one of the following names: " + ', '.join(all_colour_names))
 
-def set_shape_style(outline_colour=None, outline_width=None, outline_joinstyle=None, outline_zorder=None, shape_colour=None,
-shape_turn=None, shape_zorder=None, shape_alpha=None):
-  global _default_arguments
-  if shape_alpha is not None:
-    _default_arguments['shape']['alpha'] = shape_alpha
-  if shape_zorder is not None:
-    _default_arguments['shape']['zorder'] = shape_zorder
-  if shape_turn is not None:
-    _default_arguments['shape']['turn'] = shape_turn
-  if shape_colour is not None:
-    _default_arguments['shape']['colour'] = shape_colour
+##################################################################
+## SHAPES AND LINES HELPERS                                     ## 
+##################################################################
 
-  if outline_zorder is None:
-    outline_zorder = _default_arguments['shape']['zorder']
+def vertices_qty_in_circle():
+  return 60
 
-  _set_line_style(colour=outline_colour, linewidth=outline_width, joinstyle=outline_joinstyle, zorder=outline_zorder, 
-  _target=_default_arguments['shape_outline'])
+# auxiliary functions to define sin and cos of angles measured in hours
+# we need "12-" because matlibplot's angle turns counterclockwise
+def sin_hours(turn):
+  return math.sin(math.radians((12 - turn) * 30))
+def cos_hours(turn):
+  return math.cos(math.radians((12 - turn) * 30))
 
+def rotate_point(point, diamond, turn):
+  if diamond is None:
+    return point
+  return [diamond[0] + (point[0] - diamond[0]) * cos_hours(turn) - (point[1] - diamond[1]) * sin_hours(turn),
+          diamond[1] + (point[0] - diamond[0]) * sin_hours(turn) + (point[1] - diamond[1]) * cos_hours(turn)] 
 
-def _fill_in_missing_values(target, default_values, target_prefix=''):
-  for key in default_values.keys():
-    if (target_prefix + key) not in target:
-      target[target_prefix + key] = default_values[key]
+# this function fills in the outline given by all_x and all_y
+# and rotates it if needed.
+# turn is like the turn of the hours hand of the clock
+# i.e. for turn = 3 (3 o'clock) the line with be drawn to the left of the diamond point
+# turn = 6 (6 o'clock) the line with be drawn to the bottom of the diamond point, and so on.
+# you can use any number, it will be transformed to degrees using 30*turn formula, and used accordingly.
+def fill_in_outline(ax, all_x, all_y, colour, diamond, turn, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
+  contour = [[x, y] for x, y in list(zip(all_x, all_y))]
+  if diamond is not None:
+    contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
+    __draw_diamond(ax=ax, diamond_location=diamond)   
+  
+  outline_style = {'colour' : outline_colour,
+             'linewidth' : outline_linewidth,
+             'joinstyle' : outline_joinstyle,
+             'zorder' : outline_zorder}
 
-def set_fill_in_outline_kwarg_defaults(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape'])
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape_outline'], 
-                          target_prefix='outline_') 
-  return kwargs
+  _draw_broken_line(ax=ax, contour=contour+contour[0:2], diamond=None, **set_outline_kwarg_default(outline_style))
+  
+  if colour is not None:
+    colour_code = find_colour_code(colour_name = colour)
+  else:
+    colour_code = 'none'
+  patch = plt.Polygon(contour, fc = colour_code, 
+                               ec = colour_code,
+                               zorder = zorder,
+                               alpha = alpha)
+  ax.add_patch(patch)
 
-def set_line_kwarg_default(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['line'])
-  return kwargs
+  if clip_outline is not None:
+    if type(clip_outline) is plt.Polygon:
+      clip_contour = clip_outline.get_xy()
+    else:
+      clip_contour = clip_outline
+    clip_patch = plt.Polygon(clip_contour, 
+                               fc = 'none', 
+                               ec = 'none',
+                               zorder = zorder)
+    ax.add_patch(clip_patch)
+    patch.set_clip_path(clip_patch)
+  
+  return patch
 
-def set_outline_kwarg_default(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape_outline'])
-  return kwargs
+def _draw_broken_line(ax, contour, colour, linewidth, joinstyle, zorder, diamond=None, turn=None):
+  if (contour is None) or (linewidth is None) or (colour is None) or (zorder is None) or (joinstyle is None) or (linewidth == 0):
+    if colour is None:
+      raise Exception('none')
+    return contour
+  if (diamond is not None) and (turn is not None):
+    contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
+
+  colour_code = find_colour_code(colour_name = colour)
+  ax.plot([c[0] for c in contour], [c[1] for c in contour],     lw=linewidth, color=colour_code, zorder=zorder, solid_joinstyle=joinstyle)
+
+  __draw_diamond(ax=ax, diamond_location=diamond)
+  return contour
