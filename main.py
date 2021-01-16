@@ -11,7 +11,7 @@ from zyxxy_settings import set_line_style, new_layer
 # Creating the canvas!                               ##
 ax = create_canvas_and_axes(canvas_width = 12,
                             canvas_height = 10, 
-                            title = "Hello, my name is Zyxxy!")
+                            title = "Hello, I am Zyxxy!")
 
 set_line_style(linewidth=1)
 #######################################################
@@ -40,4 +40,4 @@ draw_circle(ax=ax, centre_x=7, centre_y=5, radius=0.8, colour='white')
 draw_circle(ax=ax, centre_x=5, centre_y=5, radius=0.5, colour='black')
 draw_circle(ax=ax, centre_x=7, centre_y=5, radius=0.5, colour='black')
 
-show_drawing_and_save_if_needed(filename="zyxxy")
+show_drawing_and_save_if_needed(filename="")

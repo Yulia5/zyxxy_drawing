@@ -2,9 +2,10 @@
 ## don't change this file, please                  ##
 #####################################################
 
-from zyxxy_helpers import fill_in_outline, vertices_qty_in_circle
+from zyxxy_helpers import fill_in_outline, vertices_qty_in_circle, sin_hours, cos_hours
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults
-from zyxxy_outlines import build_smile, build_star, build_polygon
+from zyxxy_coordinates import build_smile, build_star, build_polygon, build_arc, build_ellipse_different_speeds
+import numpy as np  
 
 # this function draws a rectangle
 # diamond point is at the bottom left vertice
@@ -128,5 +129,61 @@ def draw_double_smile(ax, centre_x, width, corners_y, mid1_y, mid2_y, **kwargs):
 
 def draw_rhombus(ax, centre_x, centre_y, width, height, diamond=None, **kwargs):
   contour = draw_star(ax=ax, centre_x=centre_x, centre_y=centre_y, radius1=height/2, radius2=width/2, ends_qty=2, stretch_x=1.0, stretch_y=1.0, diamond=diamond, **kwargs)
+
+  return contour
+
+# draw a segment of an ellipse
+def draw_sector(ax, centre_x, centre_y, radius, 
+angle_start, angle_end, connect_centre=True, stretch_x=1.0, stretch_y=1.0, diamond=None, **kwargs):
+  contour_init = build_arc(centre_x=centre_x, centre_y=centre_y, radius_x=radius*stretch_x, radius_y=radius*stretch_y, angle_start=angle_start, angle_end=angle_end)
+
+  if connect_centre:
+    contour_init += [centre_x, centre_y]
+
+  if diamond is None:
+    diamond=(centre_x, centre_y)
+
+  contour = fill_in_outline(ax=ax, all_x=[c[0] for c in contour_init], all_y=[c[1] for c in contour_init], diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+
+  return contour
+
+def draw_drop(ax, centre_x, centre_y, radius, stretch_x=1.0, stretch_y=1.0, diamond=None, **kwargs):
+  contour_init = build_ellipse_different_speeds(centre_x=centre_x, centre_y=centre_y, radius_x=radius*stretch_x, radius_y=radius*stretch_y, angle_start=3, angle_end=9, speed_x=2.0, speed_y=1.0)
+
+  if diamond is None:
+    diamond=(centre_x, centre_y)
+
+  contour = fill_in_outline(ax=ax, all_x=[c[0] for c in contour_init], all_y=[c[1] for c in contour_init], diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+
+  return contour
+
+def draw_heart(ax, centre_x, centre_y, radius, angle_middle=0, angle_tip=3, stretch_x=1.0, stretch_y=1.0, diamond=None, **kwargs):
+  
+  # adding the right half-circle
+  right_arc_contour = build_arc(centre_x=0, centre_y=0, radius_x=radius, radius_y=radius, angle_start=9+angle_middle/2, angle_end=3+angle_tip/2)
+
+  # moving the mid-point to 0
+  right_arc_contour[:, 0] -= right_arc_contour[0, 0]
+
+  # adding the left half-circle
+  left_arc_contour = np.copy(right_arc_contour[::-1, :][:-1])
+  left_arc_contour[:, 0] *= -1.
+
+  # connecting left and right arcs. Keeping y coordinate of the points where arc connect for future use.
+  contour_init = np.append(left_arc_contour, right_arc_contour, axis=0)
+
+  # finding y coordinate of the tip
+  tip_y = right_arc_contour[-1, 1] + right_arc_contour[-1, 0] / abs((sin_hours(angle_tip/2) / cos_hours(angle_tip/2)))
+  # adding the tip point
+  contour_init = np.append(contour_init, [[0, tip_y]], axis=0)
+  
+  # moving the heart so that its centre were in the tip point
+  contour_init[:, 0] += centre_x
+  contour_init[:, 1] += centre_y - tip_y
+
+  if diamond is None:
+    diamond=(centre_x, centre_y)
+
+  contour = fill_in_outline(ax=ax, all_x=[c[0] for c in contour_init], all_y=[c[1] for c in contour_init], diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
