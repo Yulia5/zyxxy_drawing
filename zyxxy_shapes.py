@@ -177,9 +177,15 @@ def draw_heart(ax, centre_x, centre_y, radius, angle_middle=0, angle_tip=3, stre
   # adding the tip point
   contour_init = np.append(contour_init, [[0, tip_y]], axis=0)
   
+  # moving the heart so that its tip is on (0, 0),
+  # and stretching it.
+  contour_init[:, 1] -= tip_y
+  contour_init[:, 1] *= stretch_y
+  contour_init[:, 0] *= stretch_x
+
   # moving the heart so that its centre were in the tip point
   contour_init[:, 0] += centre_x
-  contour_init[:, 1] += centre_y - tip_y
+  contour_init[:, 1] += centre_y 
 
   if diamond is None:
     diamond=(centre_x, centre_y)
