@@ -75,11 +75,13 @@ def vertices_qty_in_circle():
   return 60
 
 # auxiliary functions to define sin and cos of angles measured in hours
-# we need "12-" because matlibplot's angle turns counterclockwise
 def sin_hours(turn):
-  return math.sin(math.radians((12 - turn) * 30))
+  return math.sin(math.radians(turn * 30))
 def cos_hours(turn):
-  return math.cos(math.radians((12 - turn) * 30))
+  return math.cos(math.radians(turn * 30))
+
+def asin_hours(sin_value):
+  return math.degrees(math.asin(min(1.0, sin_value)))/30 
 
 def rotate_point(point, diamond, turn):
   if diamond is None:
