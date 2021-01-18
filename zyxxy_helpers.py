@@ -5,10 +5,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from zyxxy_utils import cos_hours, sin_hours
 from zyxxy_settings import set_outline_kwarg_default
 from zyxxy_MY_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
 from zyxxy_coordinates import build_polygon
+from zyxxy_move import stretch_something, shift_something, rotate_something
+
+_all_shapes_per_zorder = {}
 
 ##################################################################
 ## CANVAS HELPERS                                               ## 
@@ -75,21 +77,6 @@ def find_colour_code(colour_name):
 ## SHAPES AND LINES HELPERS                                     ## 
 ##################################################################
 
-def rotate_point(point, diamond, turn):
-  if diamond is None:
-    return point
-  return [diamond[0] + (point[0] - diamond[0]) * cos_hours(turn) - (point[1] - diamond[1]) * sin_hours(turn),
-          diamond[1] + (point[0] - diamond[0]) * sin_hours(turn) + (point[1] - diamond[1]) * cos_hours(turn)] 
-
-def stretch_contour(contour, diamond, stretch_x, stretch_y):
-  if diamond is None:
-    return contour
-  if stretch_x is not None:
-    contour[:, 0] = diamond[0] + (contour[:, 0] - diamond[0]) * stretch_x 
-  if stretch_y is not None:
-    contour[:, 1] = diamond[1] + (contour[:, 1] - diamond[1]) * stretch_y
-  return contour
-
 # this function fills in the outline given by all_x and all_y
 # and rotates it if needed.
 # turn is like the turn of the hours hand of the clock
@@ -97,10 +84,9 @@ def stretch_contour(contour, diamond, stretch_x, stretch_y):
 # turn = 6 (6 o'clock) the line with be drawn to the bottom of the diamond point, and so on.
 # you can use any number, it will be transformed to degrees using 30*turn formula, and used accordingly.
 def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
-  contour = stretch_contour(contour=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
-  if diamond is not None:
-    contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
-    __draw_diamond(ax=ax, diamond_location=diamond)   
+  contour = stretch_something(something=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
+  contour = rotate_something(something=contour, diamond=diamond, turn=turn)
+  __draw_diamond(ax=ax, diamond_location=diamond)   
   
   outline_style = {'colour' : outline_colour,
              'linewidth' : outline_linewidth,
@@ -118,6 +104,7 @@ def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, z
                                zorder = zorder,
                                alpha = alpha)
   ax.add_patch(patch)
+  add_to_layer_record(zorder=zorder, what_to_add=patch)
 
   if clip_outline is not None:
     if type(clip_outline) is plt.Polygon:
@@ -130,17 +117,44 @@ def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, z
                                zorder = zorder)
     ax.add_patch(clip_patch)
     patch.set_clip_path(clip_patch)
+    add_to_layer_record(zorder=zorder, what_to_add=clip_patch)
   
   return patch
+
+def add_to_layer_record(zorder, what_to_add):
+  if zorder not in _all_shapes_per_zorder:
+    _all_shapes_per_zorder[zorder] = [what_to_add]
+  else:
+    _all_shapes_per_zorder[zorder] += [what_to_add]
+
+def shift_layer(layer_nb, shift):
+  if layer_nb not in _all_shapes_per_zorder:
+    return
+  for something in _all_shapes_per_zorder[layer_nb]:
+    shift_something(something=something, shift=shift)
+
+def rotate_layer(layer_nb, turn, diamond):
+  if layer_nb not in _all_shapes_per_zorder:
+    return
+  for something in _all_shapes_per_zorder[layer_nb]:
+    rotate_something(something=something, turn=turn, diamond=diamond)
+
+def stretch_layer(layer_nb, diamond, stretch_x, stretch_y):
+  if layer_nb not in _all_shapes_per_zorder:
+    return
+  for something in _all_shapes_per_zorder[layer_nb]:
+    stretch_something(something=something, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
 
 def _draw_broken_line(ax, contour, colour, linewidth, joinstyle, zorder, diamond=None, turn=None):
   if (contour is None) or (linewidth is None) or (colour is None) or (zorder is None) or (joinstyle is None) or (linewidth == 0):
     return contour
-  if (diamond is not None) and (turn is not None):
-    contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
+  
+  contour = rotate_something(something=contour, diamond=diamond, turn=turn)
 
   colour_code = find_colour_code(colour_name = colour)
-  ax.plot([c[0] for c in contour], [c[1] for c in contour],     lw=linewidth, color=colour_code, zorder=zorder, solid_joinstyle=joinstyle)
+  line, = ax.plot([c[0] for c in contour], [c[1] for c in contour],     lw=linewidth, color=colour_code, zorder=zorder, solid_joinstyle=joinstyle)
+
+  add_to_layer_record(zorder=zorder, what_to_add=line)
 
   __draw_diamond(ax=ax, diamond_location=diamond)
   return contour

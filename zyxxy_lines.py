@@ -2,7 +2,8 @@
 ## don't change this file, please                  ##
 #####################################################
 
-from zyxxy_helpers import _draw_broken_line, rotate_point
+from zyxxy_helpers import _draw_broken_line
+from zyxxy_move import rotate_point
 from zyxxy_settings import set_line_kwarg_default
 from zyxxy_coordinates import build_arc, build_smile, build_half_ellipse, build_ellipse_different_speeds
 
@@ -12,11 +13,6 @@ def draw_a_broken_line(ax, points, diamond=None, turn=0, **kwargs):
 
 # this function draws a line of a given length in a given turn
 # of a given width starting from the diamond point
-def draw_a_line_between_two_points(ax, point_1_x, point_1_y, point_2_x, point_2_y, **kwargs):
-  _draw_broken_line(ax=ax, contour=[[point_1_x, point_1_y], 
-                                   [point_2_x, point_2_y]],
-                   **set_line_kwarg_default(kwargs))
-
 def draw_a_line(ax, start_x, start_y, length, turn, **kwargs):
   rotated_centre = rotate_point(point=(start_x, start_y+length),
                                 diamond=(start_x, start_y), 
