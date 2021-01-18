@@ -29,8 +29,7 @@ my_default_margin_adjustments = {'top' : 0.85,
 my_default_image_format = "png"
 # Figure sizes (in inches) and DPIs  
 # Figure size in pixels is DPI * figure size in inches
-my_default_figsize = [3.6, 2.4]
-my_default_dpi = 100
+my_default_figsize = [6, 4]
+my_default_dpi = 75
 my_default_figsize4saving =  [3.6, 2.4]
 my_default_dpi4saving = 200
-

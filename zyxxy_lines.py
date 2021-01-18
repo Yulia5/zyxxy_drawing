@@ -6,6 +6,7 @@ from zyxxy_helpers import _draw_broken_line, rotate_point
 from zyxxy_settings import set_line_kwarg_default
 from zyxxy_coordinates import build_arc, build_smile, build_half_ellipse, build_ellipse_different_speeds
 
+#
 def draw_a_broken_line(ax, points, diamond=None, turn=0, **kwargs):
   _draw_broken_line(ax=ax, contour=points, turn=turn, diamond=diamond, **set_line_kwarg_default(kwargs))
 

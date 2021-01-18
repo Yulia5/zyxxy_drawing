@@ -5,6 +5,36 @@
 import numpy as np
 from zyxxy_utils import sin_hours, cos_hours, asin_hours
 
+#####################################################
+## contours manipulation                           ##
+#####################################################
+tolerance = 0.0001
+
+def is_the_same_point(p1, p2):
+  sqr_dist = ((p1[0] - p2[0]) ** 2) + ((p1[1] - p2[1]) ** 2) 
+  return (sqr_dist < tolerance)
+
+def link_contours(*arg):
+  result = []
+  for a in arg:
+    if (len(a) == 0):
+      continue
+    if (len(result) == 0):
+      result = a
+      continue
+    if is_the_same_point(p1=result[-1], p2=a[0]):
+      result = np.hstack((result[:-1, :], a))
+    else:
+      result = np.vstack((result, a))
+  return result
+
+def add_mirror(contour, mirror_x=0):
+  reverse_contour = np.copy(contour[::-1, :])
+  reverse_contour[:, 0] = 2 * mirror_x - reverse_contour[:, 0]
+  result = link_contours(reverse_contour, contour)
+  return result
+
+#####################################################
 def vertices_qty_in_circle():
   return 60
 

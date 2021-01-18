@@ -52,7 +52,7 @@ def __draw_diamond(ax, diamond_location):
     contour = build_polygon(centre_x=diamond_location[0], 
                             centre_y=diamond_location[1], 
                             vertices_qty=4, radius=diamond_r)
-    fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
+    _fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
 
 ##################################################################
 ## COLOUR HELPERS                                               ## 
@@ -96,7 +96,7 @@ def stretch_contour(contour, diamond, stretch_x, stretch_y):
 # i.e. for turn = 3 (3 o'clock) the line with be drawn to the left of the diamond point
 # turn = 6 (6 o'clock) the line with be drawn to the bottom of the diamond point, and so on.
 # you can use any number, it will be transformed to degrees using 30*turn formula, and used accordingly.
-def fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
+def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
   contour = stretch_contour(contour=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
   if diamond is not None:
     contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
@@ -114,7 +114,7 @@ def fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zo
   else:
     colour_code = 'none'
   patch = plt.Polygon(contour, fc = colour_code, 
-                               ec = colour_code,
+                               ec = 'none',
                                zorder = zorder,
                                alpha = alpha)
   ax.add_patch(patch)

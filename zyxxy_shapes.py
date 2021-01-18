@@ -2,13 +2,20 @@
 ## don't change this file, please                  ##
 #####################################################
 
-from zyxxy_helpers import fill_in_outline
-from zyxxy_coordinates import vertices_qty_in_circle
-from zyxxy_utils import sin_hours, cos_hours, acos_hours
+from zyxxy_helpers import _fill_in_outline
+from zyxxy_coordinates import vertices_qty_in_circle, link_contours, add_mirror
+from zyxxy_utils import acos_hours, tan_hours
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults
 from zyxxy_coordinates import build_smile, build_star, build_polygon, build_arc, build_ellipse_different_speeds
 import numpy as np 
 import math 
+
+# this function draws a polygon
+def draw_a_polygon(ax, contour, diamond=None, **kwargs):
+
+  contour2 = _fill_in_outline(ax=ax, contour=contour, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+
+  return contour2
 
 # this function draws a rectangle
 # diamond point is at the bottom left vertice
@@ -57,7 +64,7 @@ def draw_a_rectangle(ax, width, height, left_x=None, centre_x=None, right_x=None
   kwargs['diamond'] = diamond
  
   contour_array = np.array([[left_x, bottom_y], [right_x,bottom_y], [right_x, top_y], [left_x, top_y]])
-  contour = fill_in_outline(ax=ax, contour=contour_array, **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_array, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -72,7 +79,7 @@ def draw_a_square(ax, left_x, bottom_y, side=1, **kwargs):
 # if not rotated, the tip is pointing down
 def draw_a_triangle(ax, tip_x, tip_y, height, width, **kwargs):
   contour_array = np.array([[tip_x-width/2, tip_y+height], [tip_x, tip_y], [tip_x+width/2, tip_y+height]])
-  contour = fill_in_outline(ax=ax, contour=contour_array, diamond=(tip_x, tip_y), **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_array, diamond=(tip_x, tip_y), **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -85,20 +92,20 @@ def draw_star(ax, centre_x, centre_y, radius1, radius2, ends_qty, diamond=None, 
   if diamond is None:
     diamond=(centre_x, centre_y)
 
-  contour = fill_in_outline(ax=ax, contour = contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour = contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
 # a polygon is a special case of a star (when radiuses are equal), so we will reuse that function
 # its diamond point is in the centre (same as the star)
-def draw_a_polygon(ax, centre_x, centre_y, radius, 
+def draw_a_regular_polygon(ax, centre_x, centre_y, radius, 
 vertices_qty, diamond=None, **kwargs):
   contour_init = build_polygon(centre_x=centre_x, centre_y=centre_y, radius=radius, vertices_qty=vertices_qty) 
 
   if diamond is None:
     diamond=(centre_x, centre_y)
 
-  contour = fill_in_outline(ax=ax, contour = contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour = contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -109,7 +116,7 @@ def draw_an_ellipse(ax, centre_x, centre_y, radius_x, radius_y, diamond=None, **
   kwargs['stretch_x'] = radius_x
   kwargs['stretch_y'] = radius_y
 
-  contour = draw_a_polygon(ax=ax, centre_x=centre_x, centre_y=centre_y, radius=1, vertices_qty=vertices_qty_in_circle(), diamond=diamond, **kwargs)
+  contour = draw_a_regular_polygon(ax=ax, centre_x=centre_x, centre_y=centre_y, radius=1, vertices_qty=vertices_qty_in_circle(), diamond=diamond, **kwargs)
 
   return contour
 
@@ -126,7 +133,7 @@ def draw_a_double_smile(ax, centre_x, width, corners_y, mid1_y, mid2_y, **kwargs
   smile2 = build_smile(centre_x=centre_x, bottom_y=mid2_y, top_y=corners_y, width=width)
   contour_init = smile1[:-1] + smile2[::-1]
 
-  contour = fill_in_outline(ax=ax, contour=contour_init, diamond=(centre_x, corners_y), **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=(centre_x, corners_y), **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -148,7 +155,7 @@ angle_start, angle_end, connect_centre=True, diamond=None, **kwargs):
   if diamond is None:
     diamond=(centre_x, centre_y)
 
-  contour = fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -159,7 +166,7 @@ def draw_a_drop(ax, centre_x, centre_y, radius, diamond=None, **kwargs):
   if diamond is None:
     diamond=(centre_x, centre_y)
 
-  contour = fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -167,31 +174,26 @@ def draw_a_drop(ax, centre_x, centre_y, radius, diamond=None, **kwargs):
 def draw_a_heart(ax, centre_x, centre_y, radius, angle_middle=0, angle_tip=3, diamond=None, **kwargs):
   
   # adding the right half-circle
-  right_arc_contour = build_arc(centre_x=0, centre_y=0, radius_x=radius, radius_y=radius, angle_start=9+angle_middle/2, angle_end=3+angle_tip/2)
+  right_contour = build_arc(centre_x=0, centre_y=0, radius_x=radius, radius_y=radius, angle_start=9+angle_middle/2, angle_end=3+angle_tip/2)
 
   # moving the mid-point to 0
-  right_arc_contour[:, 0] -= right_arc_contour[0, 0]
+  right_contour -= [right_contour[0, 0], 0]
 
-  # adding the left half-circle
-  left_arc_contour = np.copy(right_arc_contour[::-1, :][:-1])
-  left_arc_contour[:, 0] *= -1.
+  # adding the tip
+  tip_y = right_contour[-1, 1] + right_contour[-1, 0] / abs(tan_hours(angle_tip/2))
+
+  right_contour = link_contours(right_contour, [[0, tip_y]])
 
   # connecting left and right arcs. Keeping y coordinate of the points where arc connect for future use.
-  contour_init = np.append(left_arc_contour, right_arc_contour, axis=0)
-
-  # finding y coordinate of the tip
-  tip_y = right_arc_contour[-1, 1] + right_arc_contour[-1, 0] / abs((sin_hours(angle_tip/2) / cos_hours(angle_tip/2)))
-  # adding the tip point
-  contour_init = np.append(contour_init, [[0, tip_y]], axis=0)
+  contour_init = add_mirror(right_contour)
   
   # moving the heart so that its centre were in the tip point
-  contour_init[:, 0] += centre_x
-  contour_init[:, 1] += centre_y - tip_y
+  contour_init += [centre_x, centre_y - tip_y]
 
   if diamond is None:
     diamond=(centre_x, centre_y)
 
-  contour = fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -212,13 +214,9 @@ def draw_an_egg(ax, centre_x, centre_y, width, height,where_it_bends, power, dia
 
   power_func_outline = a * power_func_x**power
 
-  right_half_contour = np.append(arc_outline, power_func_outline[::-1, :], axis=0) 
+  right_half_contour = link_contours(arc_outline, power_func_outline[::-1, :]) 
 
-  left_half_contour = np.copy(right_half_contour[::-1, :])
-  left_half_contour[:, 0] *= -1.
-
-  contour_init = np.append(left_half_contour, right_half_contour, axis=0)
-
-  # moving the heart so that its centre were in the tip point
-  contour_init[:, 0] += centre_x
-  contour_init[:, 1] += centre_y - tip_y
+  # adding the left half and
+  # moving the egg so that its centre were where needed
+  contour_init = add_mirror(right_half_contour)
+  contour_init += [centre_x, centre_y]
