@@ -101,18 +101,6 @@ def show_drawing_and_save_if_needed(filename=None,
   plt.subplots_adjust(**margin_adjustments)
   plt.show()
 
-def get_width(ax=None):
-  if ax is None:
-    ax = plt.gca()
-  xlims = ax.set_xlim()
-  return (xlims[1] - xlims[0])
-
-def get_height(ax=None):
-  if ax is None:
-    ax = plt.gca()
-  ylims = ax.set_ylim()
-  return (ylims[1] - ylims[0])
-
 def set_background_colour(new_background_colour):
   global background_rectangle
   background_rectangle.set_fc(new_background_colour)

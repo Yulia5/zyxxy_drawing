@@ -2,7 +2,9 @@
 ## don't change this file, please                  ##
 #####################################################
 
-from zyxxy_helpers import fill_in_outline, vertices_qty_in_circle, sin_hours, cos_hours, acos_hours
+from zyxxy_helpers import fill_in_outline
+from zyxxy_coordinates import vertices_qty_in_circle
+from zyxxy_utils import sin_hours, cos_hours, acos_hours
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults
 from zyxxy_coordinates import build_smile, build_star, build_polygon, build_arc, build_ellipse_different_speeds
 import numpy as np 

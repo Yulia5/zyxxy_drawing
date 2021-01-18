@@ -3,7 +3,10 @@
 #####################################################
 
 import numpy as np
-from zyxxy_helpers import sin_hours, cos_hours, asin_hours, vertices_qty_in_circle
+from zyxxy_utils import sin_hours, cos_hours, asin_hours
+
+def vertices_qty_in_circle():
+  return 60
 
 def build_arc(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end):
   _angle_start = angle_start % 12

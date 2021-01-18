@@ -2,7 +2,12 @@
 ## This file contains your settings                ##
 ## Please change it with care :-)                  ## #####################################################
 
-# You can save your favourite colours here!
+# There are 148 beautiful pre-defined colours!
+# You can find them here:
+# https://matplotlib.org/3.3.3/gallery/color/named_colors.html
+#
+# If this is not enough,
+# you can save your favourite colours here!
 # Try to give them names different from ...
 # ... the names of standard colours
 my_colour_palette = {'Bubble_blue'     : '#0099ff', 

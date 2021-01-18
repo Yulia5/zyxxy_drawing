@@ -2,26 +2,28 @@
 ## don't change this file, please                  ##
 #####################################################
 
-import math
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+from zyxxy_utils import cos_hours, sin_hours
 from zyxxy_settings import set_outline_kwarg_default
-from zyxxy_MY_SETTINGS import my_default_diamond_size,my_default_diamond_colour, my_colour_palette
+from zyxxy_MY_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
+from zyxxy_coordinates import build_polygon
 
 ##################################################################
-## MATHS HELPERS                                                ## 
+## CANVAS HELPERS                                               ## 
 ##################################################################
-def random_number(max, min=0.):
-  return random.uniform(0, 1) * (max - min) + min
+def get_width(ax=None):
+  if ax is None:
+    ax = plt.gca()
+  xlims = ax.set_xlim()
+  return (xlims[1] - xlims[0])
 
-# both limits, min and max, are included in possible outcomes
-def random_integer_number(max, min=0.):
-  return random.randint(min, max)
-
-def random_element(list_to_choose_from):
-  return random.choice(list_to_choose_from)
+def get_height(ax=None):
+  if ax is None:
+    ax = plt.gca()
+  ylims = ax.set_ylim()
+  return (ylims[1] - ylims[0])
 
 ##################################################################
 ## DIAMOND HELPERS                                              ## 
@@ -46,13 +48,10 @@ def set_diamond_style(show=None, size=None, colour=None, zorder=None):
 
 def __draw_diamond(ax, diamond_location):
   if _default_diamond_arguments['show'] and (diamond_location is not None):
-    diamond_r = (_default_diamond_arguments['size'] / 1000) * (ax.get_xlim()[1] - ax.get_xlim()[0])
-
-    all_diamond_x = [diamond_location[0], diamond_location[0]+diamond_r, diamond_location[0], diamond_location[0]-diamond_r, diamond_location[0]]
-    all_diamond_y = [diamond_location[1]+diamond_r, diamond_location[1], diamond_location[1]-diamond_r, diamond_location[1], diamond_location[1]+diamond_r]
-
-    contour = np.array([[all_diamond_x[i], all_diamond_y[i]] for i in range(5)])
-
+    diamond_r = get_width(ax=ax) * _default_diamond_arguments['size'] / 1000
+    contour = build_polygon(centre_x=diamond_location[0], 
+                            centre_y=diamond_location[1], 
+                            vertices_qty=4, radius=diamond_r)
     fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
 
 ##################################################################
@@ -75,21 +74,6 @@ def find_colour_code(colour_name):
 ##################################################################
 ## SHAPES AND LINES HELPERS                                     ## 
 ##################################################################
-
-def vertices_qty_in_circle():
-  return 60
-
-# auxiliary functions to define sin and cos of angles measured in hours
-# we need "12-" because matlibplot's angle turns counterclockwise
-def sin_hours(turn):
-  return math.sin(math.radians((turn) * 30))
-def cos_hours(turn):
-  return math.cos(math.radians((turn) * 30))
-
-def asin_hours(sin_value):
-  return 12-math.degrees(math.asin(min(1.0, sin_value)))/30 
-def acos_hours(cos_value):
-  return 12-math.degrees(math.acos(min(1.0, cos_value)))/30 
 
 def rotate_point(point, diamond, turn):
   if diamond is None:
