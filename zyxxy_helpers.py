@@ -81,9 +81,6 @@ def sin_hours(turn):
 def cos_hours(turn):
   return math.cos(math.radians((12 - turn) * 30))
 
-def asin_hours(sin_value):
-  return 12-math.degrees(math.asin(min(1.0, sin_value)))/30 
-
 def rotate_point(point, diamond, turn):
   if diamond is None:
     return point
