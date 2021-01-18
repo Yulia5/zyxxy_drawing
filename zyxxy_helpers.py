@@ -4,6 +4,7 @@
 
 import math
 import random
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from zyxxy_settings import set_outline_kwarg_default
@@ -46,9 +47,13 @@ def set_diamond_style(show=None, size=None, colour=None, zorder=None):
 def __draw_diamond(ax, diamond_location):
   if _default_diamond_arguments['show'] and (diamond_location is not None):
     diamond_r = (_default_diamond_arguments['size'] / 1000) * (ax.get_xlim()[1] - ax.get_xlim()[0])
+
     all_diamond_x = [diamond_location[0], diamond_location[0]+diamond_r, diamond_location[0], diamond_location[0]-diamond_r, diamond_location[0]]
     all_diamond_y = [diamond_location[1]+diamond_r, diamond_location[1], diamond_location[1]-diamond_r, diamond_location[1], diamond_location[1]+diamond_r]
-    fill_in_outline(ax=ax, all_x=all_diamond_x, all_y=all_diamond_y, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
+
+    contour = np.array([[all_diamond_x[i], all_diamond_y[i]] for i in range(5)])
+
+    fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
 
 ##################################################################
 ## COLOUR HELPERS                                               ## 
@@ -61,11 +66,11 @@ def find_colour_code(colour_name):
   if colour_name in my_colour_palette:
     return my_colour_palette[colour_name] 
   if colour_name in mcolors.CSS4_COLORS:
-    return colour_name
-  # if we are here, the colour name has not been recognised
-  all_colour_names = (my_colour_palette.keys().sort() + 
-  mcolors.CSS4_COLORS.keys().sort())
-  raise Exception("Colour name is not recognised. Colour names are case-sensitive. Colour name should be one of the following names: " + ', '.join(all_colour_names))
+    return colour_name # matplotlib knows how to handle it
+
+  # If we are here, the colour name has not been recognised
+  # Assuming that it is a colour code.
+  return colour_name
 
 ##################################################################
 ## SHAPES AND LINES HELPERS                                     ## 
@@ -75,13 +80,16 @@ def vertices_qty_in_circle():
   return 60
 
 # auxiliary functions to define sin and cos of angles measured in hours
+# we need "12-" because matlibplot's angle turns counterclockwise
 def sin_hours(turn):
-  return math.sin(math.radians(turn * 30))
+  return math.sin(math.radians((turn) * 30))
 def cos_hours(turn):
-  return math.cos(math.radians(turn * 30))
+  return math.cos(math.radians((turn) * 30))
 
 def asin_hours(sin_value):
-  return math.degrees(math.asin(min(1.0, sin_value)))/30 
+  return 12-math.degrees(math.asin(min(1.0, sin_value)))/30 
+def acos_hours(cos_value):
+  return 12-math.degrees(math.acos(min(1.0, cos_value)))/30 
 
 def rotate_point(point, diamond, turn):
   if diamond is None:
@@ -89,14 +97,23 @@ def rotate_point(point, diamond, turn):
   return [diamond[0] + (point[0] - diamond[0]) * cos_hours(turn) - (point[1] - diamond[1]) * sin_hours(turn),
           diamond[1] + (point[0] - diamond[0]) * sin_hours(turn) + (point[1] - diamond[1]) * cos_hours(turn)] 
 
+def stretch_contour(contour, diamond, stretch_x, stretch_y):
+  if diamond is None:
+    return contour
+  if stretch_x is not None:
+    contour[:, 0] = diamond[0] + (contour[:, 0] - diamond[0]) * stretch_x 
+  if stretch_y is not None:
+    contour[:, 1] = diamond[1] + (contour[:, 1] - diamond[1]) * stretch_y
+  return contour
+
 # this function fills in the outline given by all_x and all_y
 # and rotates it if needed.
 # turn is like the turn of the hours hand of the clock
 # i.e. for turn = 3 (3 o'clock) the line with be drawn to the left of the diamond point
 # turn = 6 (6 o'clock) the line with be drawn to the bottom of the diamond point, and so on.
 # you can use any number, it will be transformed to degrees using 30*turn formula, and used accordingly.
-def fill_in_outline(ax, all_x, all_y, colour, diamond, turn, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
-  contour = [[x, y] for x, y in list(zip(all_x, all_y))]
+def fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
+  contour = stretch_contour(contour=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
   if diamond is not None:
     contour = [rotate_point(point=point, diamond=diamond, turn=turn) for point in contour] 
     __draw_diamond(ax=ax, diamond_location=diamond)   
@@ -106,7 +123,7 @@ def fill_in_outline(ax, all_x, all_y, colour, diamond, turn, zorder, alpha, outl
              'joinstyle' : outline_joinstyle,
              'zorder' : outline_zorder}
 
-  _draw_broken_line(ax=ax, contour=contour+contour[0:2], diamond=None, **set_outline_kwarg_default(outline_style))
+  _draw_broken_line(ax=ax, contour=np.append(contour, contour[0:2], axis=0), diamond=None, **set_outline_kwarg_default(outline_style))
   
   if colour is not None:
     colour_code = find_colour_code(colour_name = colour)
