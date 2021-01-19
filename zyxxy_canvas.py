@@ -3,14 +3,20 @@
 #####################################################
 
 import numpy as np
+from matplotlib import animation
 import matplotlib.pyplot as plt
 from zyxxy_helpers import set_diamond_style
 from zyxxy_shapes import draw_a_rectangle
 from zyxxy_settings import set_shape_style, set_line_style
 
-from zyxxy_MY_SETTINGS import  my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_figsize4saving, my_default_dpi4saving, my_default_margin_adjustments
+from zyxxy_MY_SETTINGS import  my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS
 
 background_rectangle = None
+
+def set_background_colour(new_background_colour):
+  global background_rectangle
+  if background_rectangle is not None:
+    background_rectangle.set_fc(new_background_colour)
 
 # create the axis, set their sizes, 
 # add the grid and ticks if needed
@@ -83,24 +89,45 @@ def create_model_and_result_axes(method1, method2):
 def show_drawing_and_save_if_needed(filename=None,
                            figsize = my_default_figsize,
                            dpi = my_default_dpi,
-                           figsize4saving = my_default_figsize4saving,
-                           dpi4saving = my_default_dpi4saving,
-                           margin_adjustments = my_default_margin_adjustments):
+                           figsize4saving = my_default_image_file_figsize,
+                           dpi4saving = my_default_image_file_dpi,
+                           margin_adjustments = my_default_margin_adjustments,
+                           animation_file_figsize = my_default_animation_file_figsize,
+                           animation_file_dpi = my_default_animation_file_dpi,
+                           animation_interval = my_default_animation_interval,
+                           animation_blit = my_default_animation_blit,
+                           animation_repeat = my_default_animation_repeat,
+                           animation_FPS = my_default_animation_FPS,
+                           animation_func = None,
+                           animation_init = None,
+                           nb_of_frames = None):
   figure = plt.gcf()
+  if (animation_func is None) != (nb_of_frames is None):
+    raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
   if (filename is not None) and (filename != ""):
-    last_dot_position = filename.rfind(".")
-    if last_dot_position < 0:
-      filename += '.' + my_default_image_format
+    if animation_func is None:
       last_dot_position = filename.rfind(".")
-    figure.set_size_inches(figsize4saving)
-    plt.savefig(fname = filename, 
-                format = filename[last_dot_position+1:],
-                dpi = dpi4saving)
+      if last_dot_position < 0:
+        filename += '.' + my_default_image_format
+        last_dot_position = filename.rfind(".")
+      figure.set_size_inches(figsize4saving)
+      plt.savefig(fname = filename, 
+                  format = filename[last_dot_position+1:],
+                  dpi = dpi4saving)
+    else:
+      figure.set_dpi(my_default_animation_file_dpi) 
+      figure.set_size_inches(my_default_animation_file_figsize)
+      anim = animation.FuncAnimation(
+         fig=figure, 
+         func=animation_func, 
+         init_func=animation_init, 
+         frames=nb_of_frames, 
+         interval=animation_interval,
+         blit=animation_blit, 
+         repeat=animation_repeat)
+      writer = animation.writers['ffmpeg'](fps=animation_FPS)
+      anim.save(filename+'.mp4', writer=writer)
   figure.set_dpi(dpi) 
   figure.set_size_inches(figsize)
   plt.subplots_adjust(**margin_adjustments)
   plt.show()
-
-def set_background_colour(new_background_colour):
-  global background_rectangle
-  background_rectangle.set_fc(new_background_colour)

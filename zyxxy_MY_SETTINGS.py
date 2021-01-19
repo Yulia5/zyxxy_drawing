@@ -31,5 +31,13 @@ my_default_image_format = "png"
 # Figure size in pixels is DPI * figure size in inches
 my_default_figsize = [6, 4]
 my_default_dpi = 75
-my_default_figsize4saving =  [3.6, 2.4]
-my_default_dpi4saving = 200
+
+my_default_image_file_figsize =  [3.6, 2.4]
+my_default_image_file_dpi = 200
+
+my_default_animation_file_figsize =  [3.6, 2.4]
+my_default_animation_file_dpi = 200
+my_default_animation_interval = 200
+my_default_animation_blit = True
+my_default_animation_repeat = False
+my_default_animation_FPS = 5

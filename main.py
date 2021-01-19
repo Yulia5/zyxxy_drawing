@@ -6,16 +6,8 @@ from zyxxy_lines import draw_a_broken_line
 from zyxxy_coordinates import build_arc, link_contours
 from zyxxy_settings import new_layer
 from zyxxy_helpers import shift_layer, rotate_layer, get_all_shapes_in_layers
+from zyxxy_utils import build_piecewise_const_array
 import numpy as np
-from matplotlib import animation
-import matplotlib.pyplot as plt
-
-def draw_a_leg(ax, x_coord, colour):
-
-  draw_a_sector(ax=ax, centre_x=x_coord+feel_length/2, centre_y=bottom_body-leg_length, radius=feel_length/2, stretch_y=feet_height/(feel_length/2), angle_start=9, angle_end=3, colour=colour)
-
-  draw_a_rectangle(ax=ax, left_x=x_coord, top_y=bottom_body, height=leg_length, width=leg_width, colour=colour)
-
 
 #########################################################
 ## CREATING THE DRAWING!                               ##
@@ -48,10 +40,24 @@ leg_length = 15
 feet_height = 5
 feel_length = 20
 
+nb_jaw_openings = 2
+jaw_frames = 3
+max_jaw_opening_angle = 1
+
+nb_jumps = 2
+prep_jump_frames = 1
+jump_frames = 3
+size_jump = 20
+nb_wait_frames = 2
+
 # legs
 for shift, colour in [[0, 'green'], [-17, 'lime']]:
   for x in [50, 100]:
-    draw_a_leg(ax=ax, x_coord=x+shift, colour=colour)
+    x_coord = x + shift
+    # draw a leg
+    draw_a_rectangle(ax=ax, left_x=x_coord, top_y=bottom_body, height=leg_length, width=leg_width, colour=colour)
+    # draw a feet
+    draw_a_sector(ax=ax, centre_x=x_coord+feel_length/2, centre_y=bottom_body-leg_length, radius=feel_length/2, stretch_y=feet_height/(feel_length/2), angle_start=9, angle_end=3, colour=colour)
 
 new_layer()
 
@@ -71,7 +77,7 @@ draw_a_circle(ax=ax, centre_x=left_body, centre_y=(2*centre_backside-bottom_body
 # lower teeth and jaw
 teeth_x = np.linspace(right_body-lip_r, right_head, 2*nb_teeth+1)
 upper_teeth = np.array([[teeth_x[t], lip_y - (t%2) * teeth_length] for t in range(2*nb_teeth+1)])
-lower_teeth = link_contours( upper_teeth[1:,:]+[0, teeth_length], [[teeth_x[-1], lip_y]])
+lower_teeth = link_contours(upper_teeth[1:,:] + [0, teeth_length], [[teeth_x[-1], lip_y]])
 draw_a_polygon(ax=ax, contour=lower_teeth, colour='white')
 
 draw_a_rectangle(ax=ax, left_x=right_body, bottom_y=bottom_body, height=lip_y-bottom_body, width=right_head-right_body, colour='lime')
@@ -101,26 +107,9 @@ lipline_top = build_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_
 lipline_top = link_contours([[right_head, lip_y]], lipline_top)
 draw_a_broken_line(ax=ax, points=lipline_top, colour='green', linewidth=2)
 
-nb_jaw_openings = 2
-jaw_frames = 3
-max_jaw_opening_angle = 1
-
-nb_jumps = 2
-prep_jump_frames = 1
-jump_frames = 3
-size_jump = 20
-nb_wait_frames = 2
-
 total_nb_of_frames = nb_jaw_openings * 2 * jaw_frames + nb_jumps * (4 * prep_jump_frames + 2 * jump_frames + nb_wait_frames)
 
 scenarios = {}
-
-def build_piecewise_const_array(nb_elements_elements, total_size):
-  result = []
-  for nb_elements, element in nb_elements_elements:
-    result += [1.0 * element for _ in range(nb_elements)]
-  result += [0. for _ in range(total_size - len(result))]
-  return np.array(result)
 
 scenarios['jaw_turn'] = build_piecewise_const_array(
   nb_elements_elements=[[jaw_frames, -1], [jaw_frames, 1]]*nb_jaw_openings, total_size=total_nb_of_frames)
@@ -140,27 +129,21 @@ scenarios['body_lift']*= size_jump / (prep_jump_frames+jump_frames)
 scenarios['leg_lift'] *= size_jump / (prep_jump_frames+jump_frames)
 
 def init():
-  # do nothing
-  shapes = get_all_shapes_in_layers(0, 1, 2)
-  return shapes
+  # return the list of the shapes that are moved by animation
+  return get_all_shapes_in_layers(0, 1, 2)
 
 def animate(i):
   # legs
   shift_layer(layer_nb=0, shift=[0, scenarios['leg_lift'][i]])
-  # body & head
+  # body, head & upper jaw
   shift_layer(layer_nb=1, shift=[0, scenarios['body_lift'][i]])
   shift_layer(layer_nb=2, shift=[0, scenarios['body_lift'][i]])
   # upper jaw
   rotate_layer(layer_nb=2, turn=scenarios['jaw_turn'][i], diamond=[right_body-lip_r, lip_y+lip_r])
-
+  # return the list of the shapes that are moved by animation
   return get_all_shapes_in_layers(0, 1, 2)
 
-anim = animation.FuncAnimation(
-         plt.gcf(), 
-         animate, 
-         init_func=init, 
-         frames=total_nb_of_frames, 
-         interval=200,
-         blit=True)
-
-show_drawing_and_save_if_needed(filename="")
+show_drawing_and_save_if_needed(filename="croc", 
+                                animation_func = animate,
+                                animation_init = init,
+                                nb_of_frames = total_nb_of_frames)

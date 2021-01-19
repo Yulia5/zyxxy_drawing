@@ -4,6 +4,7 @@
 
 import math
 import random
+import numpy as np
 
 ##################################################################
 ## MATHS HELPERS                                                ## 
@@ -32,3 +33,11 @@ def asin_hours(sin_value):
   return math.degrees(math.asin(min(1.0, sin_value)))/30 
 def acos_hours(cos_value):
   return math.degrees(math.acos(min(1.0, cos_value)))/30 
+
+# useful function to build animation scenarios
+def build_piecewise_const_array(nb_elements_elements, total_size):
+  result = []
+  for nb_elements, element in nb_elements_elements:
+    result += [element for _ in range(nb_elements)]
+  result += [0 for _ in range(total_size - len(result))]
+  return np.array(result, dtype=type(0.))
