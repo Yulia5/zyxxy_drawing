@@ -15,8 +15,7 @@ import numpy as np
 # Creating the canvas!                               ##
 ax = create_canvas_and_axes(canvas_width = 190,
                             canvas_height = 100,
-                            background_colour = 'skyblue'
-                            )
+                            background_colour = 'skyblue')
 
 #######################################################
 # Now let's draw the shapes!                         ##
