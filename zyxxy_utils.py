@@ -4,11 +4,6 @@
 
 import math
 import random
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-from zyxxy_settings import set_outline_kwarg_default
-from zyxxy_MY_SETTINGS import my_default_diamond_size,my_default_diamond_colour, my_colour_palette
 
 ##################################################################
 ## MATHS HELPERS                                                ## 

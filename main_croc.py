@@ -55,7 +55,51 @@ for shift, colour in [[0, 'green'], [-17, 'lime']]:
 
 new_layer()
 
+# body
+draw_a_rectangle(ax=ax, left_x=left_body, bottom_y=bottom_body, height=top_body-bottom_body, width=right_body-left_body, colour='lime')
 
+# backside
+draw_a_sector(ax=ax, centre_x=left_body, centre_y=centre_backside, radius=centre_backside-bottom_body,angle_start=6, angle_end=12, colour='lime')
+
+# tail
+draw_a_rectangle(ax=ax, left_x=left_body, top_y=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body, colour='lime')
+
+draw_a_sector(ax=ax, centre_x=tail_right, centre_y=2*centre_backside-bottom_body, radius=tail_width,angle_start=3, angle_end=6, colour='lime')
+
+draw_a_circle(ax=ax, centre_x=left_body, centre_y=(2*centre_backside-bottom_body-tail_width+top_body)/2, radius=(2*centre_backside-bottom_body-tail_width-top_body)/2, colour='skyblue')
+
+# lower teeth and jaw
+teeth_x = np.linspace(right_body-lip_r, right_head, 2*nb_teeth+1)
+upper_teeth = np.array([[teeth_x[t], lip_y - (t%2) * teeth_length] for t in range(2*nb_teeth+1)])
+lower_teeth = link_contours( upper_teeth[1:,:]+[0, teeth_length], [[teeth_x[-1], lip_y]])
+draw_a_polygon(ax=ax, contour=lower_teeth, colour='white')
+
+draw_a_rectangle(ax=ax, left_x=right_body, bottom_y=bottom_body, height=lip_y-bottom_body, width=right_head-right_body, colour='lime')
+
+new_layer()
+
+# upper jaw
+draw_a_rectangle(ax=ax, left_x=right_body, bottom_y=lip_y, height=top_head-lip_y, width=right_head-right_body, colour='lime')
+
+# ... and the eyes, white circles with black circles on top
+eye_y = top_body
+for radius, colour in [[8, 'lime'], [5, 'white'], [3, 'black']]:
+  for eye_x in [right_body, right_body+12]:
+    draw_a_circle(ax=ax, centre_x=eye_x, centre_y=eye_y, radius=radius, colour=colour)
+
+# ... and the nostrils
+nostril_y = top_head
+for nostril_x in [right_head-r_nostrils, right_head-3*r_nostrils]:
+  draw_a_circle(ax=ax, centre_x=nostril_x, centre_y=nostril_y, radius=r_nostrils, colour='lime')
+  draw_a_circle(ax=ax, centre_x=nostril_x, centre_y=nostril_y, radius=1, colour='green')
+
+# ... and the teeth and the lip
+# teeth
+draw_a_polygon(ax=ax, contour=upper_teeth, colour='white')
+# upper lip
+lipline_top = build_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_x=lip_r, radius_y=lip_r, angle_start=6, angle_end=9)
+lipline_top = link_contours([[right_head, lip_y]], lipline_top)
+draw_a_broken_line(ax=ax, points=lipline_top, colour='green', linewidth=2)
 
 nb_jaw_openings = 2
 jaw_frames = 1

@@ -104,4 +104,3 @@ def show_drawing_and_save_if_needed(filename=None,
 def set_background_colour(new_background_colour):
   global background_rectangle
   background_rectangle.set_fc(new_background_colour)
-  background_rectangle.set_ec(new_background_colour)

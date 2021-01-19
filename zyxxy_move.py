@@ -4,7 +4,7 @@
 
 from zyxxy_utils import cos_hours, sin_hours
 import numpy as np 
-import matplotlib.lines
+import matplotlib.lines, matplotlib.patches
 
 def rotate_point(point, diamond, turn):
   if diamond is None:
@@ -17,8 +17,9 @@ def get_xy(something):
     return something
   elif isinstance(something, matplotlib.lines.Line2D):
     return something.get_xydata()
-  else:
+  elif isinstance(something, matplotlib.patches.Polygon):
     return something.get_xy()
+  raise Exception("Data type ", type(something), " is not handled")
 
 def set_xy(something, xy):
   if isinstance(something, np.ndarray):
@@ -26,8 +27,10 @@ def set_xy(something, xy):
   elif isinstance(something, matplotlib.lines.Line2D):
     something.set_xdata(xy[:, 0])
     something.set_ydata(xy[:, 1])
-  else:
+  elif isinstance(something, matplotlib.patches.Polygon):
     something.set_xy(xy)
+  else:
+    raise Exception("Data type ", type(something), " is not handled")
   return something
 
 def shift_something(something, shift):

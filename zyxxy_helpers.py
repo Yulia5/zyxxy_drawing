@@ -129,22 +129,25 @@ def add_to_layer_record(zorder, what_to_add):
 
 def shift_layer(layer_nb, shift):
   if layer_nb not in _all_shapes_per_zorder:
-    return
+    return []
   for something in _all_shapes_per_zorder[layer_nb]:
     shift_something(something=something, shift=shift)
+  return _all_shapes_per_zorder[layer_nb]
 
 def rotate_layer(layer_nb, turn, diamond):
   if layer_nb not in _all_shapes_per_zorder:
-    return
+    return []
   for something in _all_shapes_per_zorder[layer_nb]:
     rotate_something(something=something, turn=turn, diamond=diamond)
+  return _all_shapes_per_zorder[layer_nb]
 
 def stretch_layer(layer_nb, diamond, stretch_x, stretch_y):
   if layer_nb not in _all_shapes_per_zorder:
-    return
+    return []
   for something in _all_shapes_per_zorder[layer_nb]:
     stretch_something(something=something, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
-
+  return _all_shapes_per_zorder[layer_nb]
+  
 def _draw_broken_line(ax, contour, colour, linewidth, joinstyle, zorder, diamond=None, turn=None):
   if (contour is None) or (linewidth is None) or (colour is None) or (zorder is None) or (joinstyle is None) or (linewidth == 0):
     return contour
