@@ -14,10 +14,9 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from zyxxy_helpers import _draw_broken_line
-from zyxxy_move import rotate_point
+from zyxxy_helpers import _draw_broken_line, rotate_point
 from zyxxy_settings import set_line_kwarg_default
-from zyxxy_coordinates import build_arc, build_smile, build_half_ellipse, build_ellipse_different_speeds
+from zyxxy_coordinates import build_an_arc, build_a_smile, build_a_half_ellipse, build_an_ellipse_with_different_speeds
 
 #
 def draw_a_broken_line(ax, points, diamond=None, turn=0, **kwargs):
@@ -35,17 +34,17 @@ def draw_a_line(ax, start_x, start_y, length, turn, **kwargs):
                    **set_line_kwarg_default(kwargs))
 
 def draw_an_arc(ax, centre_x, centre_y, radius_x, radius_y, angle_start, angle_end, **kwargs):
-  contour = build_arc(centre_x=centre_x, centre_y=centre_y, radius_x=radius_x, radius_y=radius_y, angle_start=angle_start, angle_end=angle_end)
+  contour = build_an_arc(centre_x=centre_x, centre_y=centre_y, radius_x=radius_x, radius_y=radius_y, angle_start=angle_start, angle_end=angle_end)
   _draw_broken_line(ax=ax, contour=contour, **set_line_kwarg_default(kwargs))
 
 def draw_a_smile(ax, centre_x, bottom_y, top_y, width, **kwargs):
-  contour = build_smile(centre_x=centre_x, bottom_y=bottom_y, top_y=top_y, width=width)
+  contour = build_a_smile(centre_x=centre_x, bottom_y=bottom_y, top_y=top_y, width=width)
   _draw_broken_line(ax=ax, contour=contour, diamond=[centre_x, top_y], **set_line_kwarg_default(kwargs))
 
 def draw_half_ellipse_line(ax, centre_x, bottom_y, top_y, width, **kwargs):
-  contour = build_half_ellipse(centre_x=centre_x, bottom_y=bottom_y, top_y=top_y, width=width)
+  contour = build_a_half_ellipse(centre_x=centre_x, bottom_y=bottom_y, top_y=top_y, width=width)
   _draw_broken_line(ax=ax, contour=contour, diamond=[centre_x, top_y], **set_line_kwarg_default(kwargs))
 
 def draw_an_ellipse_line_different_speeds(ax, centre_x, centre_y, radius_x, radius_y, start_hour, end_hour, speed_x=1.0, speed_y=1.0, **kwargs):
-  contour = build_ellipse_different_speeds(centre_x=centre_x, centre_y=centre_y, radius_x=radius_x, radius_y=radius_y, start_hour=start_hour, end_hour=end_hour, speed_x=speed_x, speed_y=speed_x)
+  contour = build_an_ellipse_with_different_speeds(centre_x=centre_x, centre_y=centre_y, radius_x=radius_x, radius_y=radius_y, start_hour=start_hour, end_hour=end_hour, speed_x=speed_x, speed_y=speed_x)
   _draw_broken_line(ax=ax, contour=contour, diamond=[centre_x, centre_y], **set_line_kwarg_default(kwargs))

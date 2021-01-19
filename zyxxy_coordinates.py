@@ -35,12 +35,12 @@ def link_contours(*arg):
       result = a
       continue
     if is_the_same_point(p1=result[-1], p2=a[0]):
-      result = np.hstack((result[:-1, :], a))
+      result = np.vstack((result[:-1, :], a))
     else:
       result = np.vstack((result, a))
   return result
 
-def add_mirror(contour, mirror_x=0):
+def add_a_mirror(contour, mirror_x=0):
   reverse_contour = np.copy(contour[::-1, :])
   reverse_contour[:, 0] = 2 * mirror_x - reverse_contour[:, 0]
   result = link_contours(reverse_contour, contour)
@@ -50,7 +50,7 @@ def add_mirror(contour, mirror_x=0):
 def vertices_qty_in_circle():
   return 60
 
-def build_arc(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end):
+def build_an_arc(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end):
   _angle_start = angle_start % 12
   _angle_end = angle_end %12
   if _angle_start > _angle_end:
@@ -66,30 +66,36 @@ def build_arc(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end):
 
   return contour
 
-def build_smile(centre_x, bottom_y, top_y, width):
+def build_a_smile(centre_x, bottom_y, top_y, width):
   if abs((top_y-bottom_y)/width) < 0.001: # assume it's a straight line
     result = np.array([[], []])
   else:
     # reusing build_arc
     radius = 0.5 * (width**2 / 4 + (top_y - bottom_y)**2) / (top_y - bottom_y)
     angle = - asin_hours(sin_value = width / (2 * radius))
-    result = build_arc(centre_x=centre_x, centre_y=bottom_y+radius, radius_x=radius, radius_y=radius, angle_start=6-angle, angle_end=6+angle)
+    result = build_an_arc(centre_x=centre_x, centre_y=bottom_y+radius, radius_x=radius, radius_y=radius, angle_start=6-angle, angle_end=6+angle)
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [centre_x - width/2, top_y]
   result[-1] = [centre_x + width/2, top_y]
   # all done!
   return result
 
-def build_half_ellipse(centre_x, bottom_y, top_y, width):
+def build_a_double_smile(centre_x, width, corners_y, mid1_y, mid2_y): 
+  smile1 = build_a_smile(centre_x=centre_x, bottom_y=mid1_y, top_y=corners_y, width=width)
+  smile2 = build_a_smile(centre_x=centre_x, bottom_y=mid2_y, top_y=corners_y, width=width)
+  result = link_contours(smile1, smile2[::-1])
+  return result
+
+def build_a_half_ellipse(centre_x, bottom_y, top_y, width):
   # reusing build_arc
-  result = build_arc(centre_x=centre_x, centre_y=top_y, radius_x=width/2, radius_y=top_y-bottom_y, angle_start=3, angle_end=9)
+  result = build_an_arc(centre_x=centre_x, centre_y=top_y, radius_x=width/2, radius_y=top_y-bottom_y, angle_start=3, angle_end=9)
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [centre_x - width/2, top_y]
   result[-1] = [centre_x + width/2, top_y]
   # all done!
   return result
 
-def build_ellipse_different_speeds(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end, speed_x=1.0, speed_y=1.0):
+def build_an_ellipse_with_different_speeds(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end, speed_x=1.0, speed_y=1.0):
   step = 1. / (max(abs(speed_x), abs(speed_y)) * vertices_qty_in_circle())
   angles = np.arange(angle_start, angle_end, step)
 
@@ -97,14 +103,14 @@ def build_ellipse_different_speeds(centre_x, centre_y, radius_x, radius_y, angle
 
   return contour
 
-def build_polygon(centre_x, centre_y, vertices_qty, radius):
+def build_a_regular_polygon(centre_x, centre_y, vertices_qty, radius):
   angles_indices = range(vertices_qty)
   
   contour = np.array([[centre_x + radius * sin_hours(i * 12 / vertices_qty), centre_y + radius * cos_hours(i * 12 / vertices_qty)] for i in angles_indices])
 
   return contour
 
-def build_star(centre_x, centre_y, radius1, radius2, ends_qty):
+def build_a_star(centre_x, centre_y, radius1, radius2, ends_qty):
   angles_indices = range(2*ends_qty)
   
   contour = np.array([[centre_x + (radius1 * (i%2 == 0) + radius2  * (i%2 == 1)) * sin_hours(i * 12/(2*ends_qty)), centre_y + (radius1 * (i%2 == 0) + radius2  * (i%2 == 1))* cos_hours(i * 12/(2*ends_qty))] for i in angles_indices])

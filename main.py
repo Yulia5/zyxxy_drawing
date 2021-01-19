@@ -1,12 +1,12 @@
 #######################################################
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_shapes import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon
+from zyxxy_shapes import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_a_double_smile
 from zyxxy_lines import draw_a_broken_line
-from zyxxy_coordinates import build_arc, link_contours
+from zyxxy_coordinates import build_an_arc, link_contours
 from zyxxy_settings import new_layer
 from zyxxy_helpers import shift_layer, rotate_layer, get_all_shapes_in_layers
-from zyxxy_utils import build_piecewise_const_array
+from zyxxy_utils import pad_with_zeros
 import numpy as np
 
 #########################################################
@@ -38,6 +38,9 @@ leg_width = 10
 leg_length = 15
 feet_height = 5
 feel_length = 20
+
+nb_blinks = 2
+blink_frames = 3
 
 nb_jaw_openings = 2
 jaw_frames = 3
@@ -91,6 +94,14 @@ eye_y = top_body
 for radius, colour in [[8, 'lime'], [5, 'white'], [3, 'black']]:
   for eye_x in [right_body, right_body+12]:
     draw_a_circle(ax=ax, centre_x=eye_x, centre_y=eye_y, radius=radius, colour=colour)
+# ... and the eyelids. Saving them in array for future use   
+eyelids = []
+eyelid_width = 12
+for eye_x in [right_body, right_body+12]:
+  for td in [-1, 1]:
+    mid_y = eye_y + td * eyelid_width / 2
+    eyelid = draw_a_double_smile(ax=ax, centre_x=eye_x, width=eyelid_width, corners_y=eye_y, mid1_y=mid_y, mid2_y=mid_y, colour='green')
+    eyelids.append(eyelid)
 
 # ... and the nostrils
 nostril_y = top_head
@@ -102,27 +113,38 @@ for nostril_x in [right_head-r_nostrils, right_head-3*r_nostrils]:
 # teeth
 draw_a_polygon(ax=ax, contour=upper_teeth, colour='white')
 # upper lip
-lipline_top = build_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_x=lip_r, radius_y=lip_r, angle_start=6, angle_end=9)
+lipline_top = build_an_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_x=lip_r, radius_y=lip_r, angle_start=6, angle_end=9)
 lipline_top = link_contours([[right_head, lip_y]], lipline_top)
 draw_a_broken_line(ax=ax, points=lipline_top, colour='green', linewidth=2)
 
-total_nb_of_frames = nb_jaw_openings * 2 * jaw_frames + nb_jumps * (4 * prep_jump_frames + 2 * jump_frames + nb_wait_frames)
+# now for the animation!
+total_nb_of_frames = nb_blinks * 2 * blink_frames + nb_jaw_openings * 2 * jaw_frames + nb_jumps * (4 * prep_jump_frames + 2 * jump_frames + nb_wait_frames)
 
 scenarios = {}
 
-scenarios['jaw_turn'] = build_piecewise_const_array(
-  nb_elements_elements=[[jaw_frames, -1], [jaw_frames, 1]]*nb_jaw_openings, total_size=total_nb_of_frames)
+scenarios['jaw_turn'] = pad_with_zeros(np.tile([-1] * jaw_frames + [1] * jaw_frames, nb_jaw_openings), 0, total_nb_of_frames)
 
-scenarios['body_lift'] = build_piecewise_const_array(
-  nb_elements_elements=[[nb_jaw_openings*2*jaw_frames, 0]] 
-  + [[prep_jump_frames, -1], [prep_jump_frames+jump_frames, 1], 
-     [prep_jump_frames+jump_frames, -1], [prep_jump_frames, 1], [nb_wait_frames, 0]]*nb_jumps, total_size=total_nb_of_frames)
+one_jump = ([-1] * prep_jump_frames + 
+            [1] * (prep_jump_frames + jump_frames) + 
+            [-1] * (prep_jump_frames + jump_frames) + 
+            [1] * prep_jump_frames + 
+            [0] * nb_wait_frames)
+scenarios['body_lift'] = pad_with_zeros(np.tile(one_jump, nb_jumps),
+  nb_blinks * 2 * blink_frames + nb_jaw_openings * 2 * jaw_frames, 
+  total_nb_of_frames)
 
-scenarios['leg_lift'] = build_piecewise_const_array(
-  nb_elements_elements=[[nb_jaw_openings*2*jaw_frames, 0]] 
-  + [[2*prep_jump_frames, 0], [jump_frames, 1], 
-     [jump_frames, -1], [2*prep_jump_frames, 0], [nb_wait_frames, 0]]*nb_jumps, total_size=total_nb_of_frames)
+one_leg_lift = ([0] * 2 * prep_jump_frames + 
+                [1] * jump_frames + 
+                [-1] * jump_frames + 
+                [0] * (2*prep_jump_frames + nb_wait_frames))
+scenarios['leg_lift'] = pad_with_zeros(np.tile(one_leg_lift, nb_jumps),
+  nb_blinks * 2 * blink_frames + nb_jaw_openings * 2 * jaw_frames, 
+  total_nb_of_frames)
 
+for key in scenarios.keys():
+  scenarios[key] = pad_with_zeros(scenarios[key], total_nb_of_frames)
+
+#pad_with_zeros(scenarios['jaw_turn'], total_size=total_nb_of_frames)
 scenarios['jaw_turn'] *= max_jaw_opening_angle / jaw_frames
 scenarios['body_lift']*= size_jump / (prep_jump_frames+jump_frames)
 scenarios['leg_lift'] *= size_jump / (prep_jump_frames+jump_frames)
@@ -142,7 +164,6 @@ def animate(i):
   # return the list of the shapes that are moved by animation
   return get_all_shapes_in_layers(0, 1, 2)
 
-show_drawing_and_save_if_needed(filename="croc", 
-                                animation_func = animate,
-                                animation_init = init,
-                                nb_of_frames = total_nb_of_frames)
+show_drawing_and_save_if_needed(filename="croc" 
+  #, animation_func = animate,  animation_init = init, nb_of_frames = total_nb_of_frames
+  )

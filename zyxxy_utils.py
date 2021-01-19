@@ -47,9 +47,6 @@ def acos_hours(cos_value):
   return math.degrees(math.acos(min(1.0, cos_value)))/30 
 
 # useful function to build animation scenarios
-def build_piecewise_const_array(nb_elements_elements, total_size):
-  result = []
-  for nb_elements, element in nb_elements_elements:
-    result += [element for _ in range(nb_elements)]
-  result += [0 for _ in range(total_size - len(result))]
-  return np.array(result, dtype=type(0.))
+def pad_with_zeros(input, total_size):
+  result = np.hstack((np.array(input), np.tile([0], total_size - input.size)))
+  return result
