@@ -127,6 +127,12 @@ def add_to_layer_record(zorder, what_to_add):
   else:
     _all_shapes_per_zorder[zorder] += [what_to_add]
 
+def get_all_shapes_in_layers(*args):
+  result = []
+  for zorder in args:
+    result += _all_shapes_per_zorder[zorder]
+  return result
+
 def shift_layer(layer_nb, shift):
   if layer_nb not in _all_shapes_per_zorder:
     return []
