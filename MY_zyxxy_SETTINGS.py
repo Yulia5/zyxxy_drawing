@@ -25,6 +25,18 @@
 my_colour_palette = {'Bubble_blue'     : '#0099ff', 
                      'Light_pink'      : '#ff8888'}
 
+# Colours, alphas and linewidths!
+my_default_shape_alpha = 1.0
+my_default_shape_colour = 'none'
+
+my_default_outline_colour = 'black'
+my_default_outline_width = 0
+my_default_outline_joinstyle = 'miter'
+
+my_default_line_colour = 'black'
+my_default_line_linewidth = 2
+my_default_line_joinstyle = 'round'
+
 # Diamond parameters!
 # Diamonds don't move when you turn the shapes
 my_default_diamond_size = 15
@@ -53,3 +65,8 @@ my_default_animation_interval = 200
 my_default_animation_blit = True
 my_default_animation_repeat = False
 my_default_animation_FPS = 5
+
+my_default_demo_canvas_size = [16, 10]
+my_default_demo_figsize = [6, 5]
+my_default_demo_dpi = 75
+my_default_demo_tick_step = 1

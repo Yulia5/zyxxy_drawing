@@ -21,7 +21,8 @@ from zyxxy_shapes_base import set_diamond_style
 from zyxxy_patches import draw_a_rectangle
 from zyxxy_settings import set_shape_style, set_line_style
 
-from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS
+from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_shape_alpha, my_default_shape_colour, my_default_outline_colour, my_default_outline_width,my_default_outline_joinstyle, my_default_line_colour,my_default_line_linewidth, my_default_line_joinstyle
+
 
 background_rectangle = None
 
@@ -41,16 +42,18 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_title_font_size,
                            axes_label_font_size = my_default_axes_label_font_size,
                            axes_tick_font_size = my_default_axes_tick_font_size,
-                           ax = None):
+shape_alpha=my_default_shape_alpha, shape_colour=my_default_shape_colour, outline_colour=my_default_outline_colour, outline_width=my_default_outline_width,outline_joinstyle=my_default_outline_joinstyle, line_colour=my_default_line_colour,line_linewidth=my_default_line_linewidth, 
+line_joinstyle=my_default_line_joinstyle,
+ax = None):
   global background_rectangle
 
   if ax is None:
     _, ax = plt.subplots()
 
   # set line and outline styles
-  set_shape_style(outline_colour='black', outline_width=0, outline_joinstyle='miter', outline_zorder=0, shape_zorder=0, shape_alpha=1.0)
+  set_shape_style(outline_colour=outline_colour, outline_width=outline_width, outline_joinstyle=outline_joinstyle, outline_zorder=0, shape_zorder=0, shape_alpha=shape_alpha, shape_colour=shape_colour)
 
-  set_line_style(colour='black', linewidth=2, joinstyle='round', zorder=0)
+  set_line_style(colour=line_colour, linewidth=line_linewidth, joinstyle=line_joinstyle, zorder=0)
 
   ax.set_title(title, fontdict={'size': title_font_size})
 

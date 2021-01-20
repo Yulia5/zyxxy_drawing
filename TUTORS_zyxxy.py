@@ -1,7 +1,7 @@
 #######################################################
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_shapes import draw_a_triangle, draw_a_circle
+from zyxxy_patches import draw_a_triangle, draw_a_circle
 from zyxxy_lines import draw_a_line
 from zyxxy_settings import set_line_style, new_layer
 

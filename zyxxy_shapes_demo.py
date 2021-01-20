@@ -17,7 +17,7 @@
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_patches import draw_a_polygon
 from zyxxy_shapes_base import  update_xy
-from MY_zyxxy_SETTINGS import my_default_margin_adjustments
+from MY_zyxxy_SETTINGS import my_default_margin_adjustments, my_default_demo_canvas_size, my_default_demo_tick_step, my_default_demo_figsize, my_default_demo_dpi
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button
@@ -38,20 +38,22 @@ common_params_dict = {'turn' : [0, 12, 0],
                       'stretch_x' : [0.2, 5, 1],
                       'stretch_y' : [0.2, 5, 1]}
 
-def run_demo(shapename, shape_params_dict):
+def run_demo(shapename, shape_params_dict, canvas_size=my_default_demo_canvas_size, tick_step=my_default_demo_tick_step,
+figsize=my_default_demo_figsize,
+dpi=my_default_demo_dpi):
 
   top_slider_location = max(len(shape_params_dict), len(common_params_dict))
 
   my_default_margin_adjustments['bottom'] += 0.05 * top_slider_location
 
   # Creating the canvas!
-  ax = create_canvas_and_axes(canvas_width = 16,
-                              canvas_height = 10,
-                              tick_step = 1,
-                              title = "Try Out " + shapename)
+  ax = create_canvas_and_axes(canvas_width=canvas_size[0],
+                              canvas_height=canvas_size[1],
+                              tick_step=tick_step,
+                              title="Try Out "+shapename)
 
   # does not matter what shape, it will be redrawn
-  diamond_shape, shape = draw_a_polygon(ax=ax, contour=np.array([[0,0], [1,1], [2,0]]), diamond=old_diamond_coords, colour='red')
+  diamond_shape, shape = draw_a_polygon(ax=ax, contour=np.array([[0,0], [1,1], [1,0]]), diamond=old_diamond_coords, colour='red')
 
   button = Button(plt.axes([0.6, 0.025, 0.1, 0.04]), 'Reset')
 
@@ -87,4 +89,4 @@ def run_demo(shapename, shape_params_dict):
 
   # Initialize plot with correct initial active value
   update(None)
-  show_drawing_and_save_if_needed(figsize = [6, 5])
+  show_drawing_and_save_if_needed(figsize=figsize, dpi=dpi)

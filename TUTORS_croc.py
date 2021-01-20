@@ -1,11 +1,11 @@
 #######################################################
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_shapes import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_a_double_smile
+from zyxxy_patches import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_a_double_smile
 from zyxxy_lines import draw_a_broken_line
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_double_smile
 from zyxxy_settings import new_layer
-from zyxxy_helpers import shift_layer, rotate_layer, get_all_shapes_in_layers, set_xy
+from zyxxy_shapes_base import shift_layer, rotate_layer, get_all_shapes_in_layers, set_xy
 import numpy as np
 
 #########################################################
