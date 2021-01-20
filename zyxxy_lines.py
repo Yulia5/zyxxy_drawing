@@ -14,7 +14,7 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from zyxxy_helpers import _draw_broken_line, rotate_point
+from zyxxy_shapes_base import _draw_broken_line, rotate_point
 from zyxxy_settings import set_line_kwarg_default
 from zyxxy_coordinates import build_an_arc, build_a_smile, build_a_half_ellipse, build_an_ellipse_with_different_speeds
 import numpy as np

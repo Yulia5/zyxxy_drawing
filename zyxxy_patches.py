@@ -14,7 +14,7 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from zyxxy_helpers import _fill_in_outline
+from zyxxy_shapes_base import _fill_in_outline
 from zyxxy_coordinates import vertices_qty_in_circle, link_contours, add_a_mirror
 from zyxxy_utils import acos_hours, tan_hours
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults

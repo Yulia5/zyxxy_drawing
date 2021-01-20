@@ -21,7 +21,7 @@ from zyxxy_settings import set_outline_kwarg_default
 from MY_zyxxy_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
 from zyxxy_coordinates import build_a_regular_polygon
 from zyxxy_utils import cos_hours, sin_hours
-import matplotlib.lines, matplotlib.patches
+import matplotlib.lines, matplotlib.patches, zyxxy_coordinates
 
 ##################################################################
 ## CANVAS HELPERS                                               ## 
@@ -143,6 +143,24 @@ def stretch_something(something, diamond, stretch_x, stretch_y):
 
   set_xy(something=something, xy=xy)
   return xy
+
+def update_xy(shapename, kwargs_shape, kwargs_common, shape, diamond_shape, old_diamond_coords):
+  method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
+  # putting them together to create the initial contour and the diamond
+  diamond_coords, contour = method_to_call(**kwargs_shape)
+  # stretching
+  contour = stretch_something(something=contour, diamond=diamond_coords, stretch_x=kwargs_common['stretch_x'], stretch_y=kwargs_common['stretch_y'])
+  # turning
+  contour = rotate_something(something=contour, diamond=diamond_coords, turn=kwargs_common['turn'])
+  # updating the plot
+  set_xy(shape, contour)
+  # updating the diamond
+  new_diamond_coords = np.array(diamond_coords)
+  shift_something(something=diamond_shape, shift=new_diamond_coords-old_diamond_coords)
+  return new_diamond_coords
+
+
+
 
 ##################################################################
 ## SHAPES AND LINES HELPERS                                     ## 
