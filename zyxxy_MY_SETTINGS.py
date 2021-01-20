@@ -28,7 +28,7 @@ my_colour_palette = {'Bubble_blue'     : '#0099ff',
 # Diamond parameters!
 # Diamonds don't move when you turn the shapes
 my_default_diamond_size = 15
-my_default_diamond_colour = None # 'green' # 
+my_default_diamond_colour = 'green' #  None # 
 
 # Font sizes and adjustment needed to fit them
 my_default_title_font_size = 18
