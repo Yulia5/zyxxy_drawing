@@ -18,7 +18,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from zyxxy_settings import set_outline_kwarg_default
-from zyxxy_MY_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
+from MY_zyxxy_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
 from zyxxy_coordinates import build_a_regular_polygon
 from zyxxy_utils import cos_hours, sin_hours
 import matplotlib.lines, matplotlib.patches
@@ -62,11 +62,14 @@ def set_diamond_style(show=None, size=None, colour=None, zorder=None):
 def __draw_diamond(ax, diamond_location):
   if _default_diamond_arguments['show'] and (diamond_location is not None):
     diamond_r = get_width(ax=ax) * _default_diamond_arguments['size'] / 1000
-    contour = build_a_regular_polygon(
+    _, contour = build_a_regular_polygon(
                               centre_x=diamond_location[0], 
                               centre_y=diamond_location[1], 
                               vertices_qty=4, radius=diamond_r)
-    _fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
+    _, diamond_patch = _fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
+    return diamond_patch
+  else:
+    return None
 
 ##################################################################
 ## COLOUR HELPERS                                               ## 
@@ -153,18 +156,19 @@ def _draw_broken_line(ax, contour, colour, linewidth, joinstyle, zorder, diamond
   contour = rotate_something(something=contour, diamond=diamond, turn=turn)
 
   colour_code = find_colour_code(colour_name = colour)
+
   line, = ax.plot([c[0] for c in contour], [c[1] for c in contour],     lw=linewidth, color=colour_code, zorder=zorder, solid_joinstyle=joinstyle)
 
   add_to_layer_record(zorder=zorder, what_to_add=line)
 
-  __draw_diamond(ax=ax, diamond_location=diamond)
-  return contour
+  diamond_patch = __draw_diamond(ax=ax, diamond_location=diamond)
+  return diamond_patch, line
 
 # this function creates and fills in a polygon
 def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
   contour = stretch_something(something=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
   contour = rotate_something(something=contour, diamond=diamond, turn=turn)
-  __draw_diamond(ax=ax, diamond_location=diamond)   
+  diamond_patch = __draw_diamond(ax=ax, diamond_location=diamond)   
   
   outline_style = {'colour' : outline_colour,
              'linewidth' : outline_linewidth,
@@ -197,7 +201,7 @@ def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, z
     patch.set_clip_path(clip_patch)
     add_to_layer_record(zorder=zorder, what_to_add=clip_patch)
   
-  return patch
+  return diamond_patch, patch
 
 ########################################################################
 # handling shapes per layers

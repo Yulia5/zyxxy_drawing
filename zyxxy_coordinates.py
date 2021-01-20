@@ -64,7 +64,7 @@ def build_an_arc(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end)
   contour = np.array([[centre_x + radius_x * sin_hours(a),
               centre_y + radius_y * cos_hours(a)] for a in angles])
 
-  return contour
+  return [centre_x, centre_y], contour
 
 def build_a_smile(centre_x, bottom_y, top_y, width):
   if abs((top_y-bottom_y)/width) < 0.001: # assume it's a straight line
@@ -73,27 +73,27 @@ def build_a_smile(centre_x, bottom_y, top_y, width):
     # reusing build_arc
     radius = 0.5 * (width**2 / 4 + (top_y - bottom_y)**2) / (top_y - bottom_y)
     angle = - asin_hours(sin_value = width / (2 * radius))
-    result = build_an_arc(centre_x=centre_x, centre_y=bottom_y+radius, radius_x=radius, radius_y=radius, angle_start=6-angle, angle_end=6+angle)
+    _, result = build_an_arc(centre_x=centre_x, centre_y=bottom_y+radius, radius_x=radius, radius_y=radius, angle_start=6-angle, angle_end=6+angle)
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [centre_x - width/2, top_y]
   result[-1] = [centre_x + width/2, top_y]
   # all done!
-  return result
+  return [centre_x, top_y], result
 
 def build_a_double_smile(centre_x, width, corners_y, mid1_y, mid2_y): 
-  smile1 = build_a_smile(centre_x=centre_x, bottom_y=mid1_y, top_y=corners_y, width=width)
-  smile2 = build_a_smile(centre_x=centre_x, bottom_y=mid2_y, top_y=corners_y, width=width)
+  _, smile1 = build_a_smile(centre_x=centre_x, bottom_y=mid1_y, top_y=corners_y, width=width)
+  _, smile2 = build_a_smile(centre_x=centre_x, bottom_y=mid2_y, top_y=corners_y, width=width)
   result = link_contours(smile1, smile2[::-1])
-  return result
+  return [centre_x, corners_y], result
 
-def build_a_half_ellipse(centre_x, bottom_y, top_y, width):
+def build_a_half_ellipse(centre_x, centre_y, bottom_y, width):
   # reusing build_arc
-  result = build_an_arc(centre_x=centre_x, centre_y=top_y, radius_x=width/2, radius_y=top_y-bottom_y, angle_start=3, angle_end=9)
+  _, result = build_an_arc(centre_x=centre_x, centre_y=centre_y, radius_x=width/2, radius_y=centre_y-bottom_y, angle_start=3, angle_end=9)
   # adjusting start and end points to make sure they match the inputs exactly
-  result[0] = [centre_x - width/2, top_y]
-  result[-1] = [centre_x + width/2, top_y]
+  result[0] = [centre_x - width/2, centre_y]
+  result[-1] = [centre_x + width/2, centre_y]
   # all done!
-  return result
+  return [centre_x, centre_y], result
 
 def build_an_ellipse_with_different_speeds(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end, speed_x=1.0, speed_y=1.0):
   step = 1. / (max(abs(speed_x), abs(speed_y)) * vertices_qty_in_circle())
@@ -101,18 +101,18 @@ def build_an_ellipse_with_different_speeds(centre_x, centre_y, radius_x, radius_
 
   contour = np.array([[centre_x + radius_x * sin_hours(a * speed_x), centre_y + radius_y * cos_hours(a * speed_y)] for a in angles])
 
-  return contour
+  return [centre_x, centre_y], contour
 
 def build_a_regular_polygon(centre_x, centre_y, vertices_qty, radius):
   angles_indices = range(vertices_qty)
   
   contour = np.array([[centre_x + radius * sin_hours(i * 12 / vertices_qty), centre_y + radius * cos_hours(i * 12 / vertices_qty)] for i in angles_indices])
 
-  return contour
+  return [centre_x, centre_y], contour
 
 def build_a_star(centre_x, centre_y, radius1, radius2, ends_qty):
   angles_indices = range(2*ends_qty)
   
   contour = np.array([[centre_x + (radius1 * (i%2 == 0) + radius2  * (i%2 == 1)) * sin_hours(i * 12/(2*ends_qty)), centre_y + (radius1 * (i%2 == 0) + radius2  * (i%2 == 1))* cos_hours(i * 12/(2*ends_qty))] for i in angles_indices])
 
-  return contour
+  return [centre_x, centre_y], contour

@@ -18,7 +18,7 @@ from zyxxy_helpers import _fill_in_outline
 from zyxxy_coordinates import vertices_qty_in_circle, link_contours, add_a_mirror
 from zyxxy_utils import acos_hours, tan_hours
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults
-from zyxxy_coordinates import build_a_smile, build_a_double_smile, build_a_star,build_a_regular_polygon, build_an_arc, build_an_ellipse_with_different_speeds
+from zyxxy_coordinates import build_a_double_smile, build_a_star,build_a_regular_polygon, build_an_arc, build_an_ellipse_with_different_speeds
 import numpy as np 
 import math 
 
@@ -141,7 +141,7 @@ def draw_a_circle(ax, centre_x, centre_y, radius, diamond=None, **kwargs):
 # this function that draws a star
 # its diamond point is in the centre
 def draw_a_double_smile(ax, centre_x, width, corners_y, mid1_y, mid2_y, **kwargs): 
-  contour_init = build_a_double_smile(centre_x=centre_x, width=width, corners_y=corners_y, mid1_y=mid1_y, mid2_y=mid2_y)
+  _, contour_init = build_a_double_smile(centre_x=centre_x, width=width, corners_y=corners_y, mid1_y=mid1_y, mid2_y=mid2_y)
 
   contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=(centre_x, corners_y), **set_fill_in_outline_kwarg_defaults(kwargs))
 
