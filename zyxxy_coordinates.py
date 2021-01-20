@@ -68,7 +68,7 @@ def build_an_arc(centre_x, centre_y, radius_x, radius_y, angle_start, angle_end)
 
 def build_a_smile(centre_x, bottom_y, top_y, width):
   if abs((top_y-bottom_y)/width) < 0.001: # assume it's a straight line
-    result = np.array([[], []])
+    result = np.empty([2, 2])
   else:
     # reusing build_arc
     radius = 0.5 * (width**2 / 4 + (top_y - bottom_y)**2) / (top_y - bottom_y)

@@ -45,8 +45,3 @@ def asin_hours(sin_value):
   return math.degrees(math.asin(min(1.0, sin_value)))/30 
 def acos_hours(cos_value):
   return math.degrees(math.acos(min(1.0, cos_value)))/30 
-
-# useful function to build animation scenarios
-def pad_with_zeros(input, total_size):
-  result = np.hstack((np.array(input), np.tile([0], total_size - input.size)))
-  return result

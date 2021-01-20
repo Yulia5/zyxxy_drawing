@@ -3,10 +3,9 @@
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shapes import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_a_double_smile
 from zyxxy_lines import draw_a_broken_line
-from zyxxy_coordinates import build_an_arc, link_contours
+from zyxxy_coordinates import build_an_arc, link_contours, build_a_double_smile
 from zyxxy_settings import new_layer
-from zyxxy_helpers import shift_layer, rotate_layer, get_all_shapes_in_layers
-from zyxxy_utils import pad_with_zeros
+from zyxxy_helpers import shift_layer, rotate_layer, get_all_shapes_in_layers, set_xy
 import numpy as np
 
 #########################################################
@@ -118,31 +117,49 @@ lipline_top = link_contours([[right_head, lip_y]], lipline_top)
 draw_a_broken_line(ax=ax, points=lipline_top, colour='green', linewidth=2)
 
 # now for the animation!
-total_nb_of_frames = nb_blinks * 2 * blink_frames + nb_jaw_openings * 2 * jaw_frames + nb_jumps * (4 * prep_jump_frames + 2 * jump_frames + nb_wait_frames)
-
 scenarios = {}
 
-scenarios['jaw_turn'] = pad_with_zeros(np.tile([-1] * jaw_frames + [1] * jaw_frames, nb_jaw_openings), 0, total_nb_of_frames)
+eyelid_outlines_all_scenarios = []
+for eyelid_shape_nb in range(blink_frames):
+  eyelid_outlines = []
+  for eye_x in [right_body, right_body+12]:
+    for td in [-1, 1]:
+      eyelid_outline = build_a_double_smile(centre_x=eye_x, width=eyelid_width, corners_y=eye_y, 
+      mid1_y=eye_y + td * eyelid_width / 2, 
+      mid2_y=eye_y + td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1))
+      eyelid_outlines.append(eyelid_outline)
+  eyelid_outlines_all_scenarios.append(eyelid_outlines)
 
-one_jump = ([-1] * prep_jump_frames + 
+one_eyelid_blick = [i for i in range(blink_frames)] + [(blink_frames-1-i) for i in range(blink_frames)]
+all_eyelid_blick_scenarios = np.tile(one_eyelid_blick, nb_blinks)
+
+one_jaw_turn = [-1.] * jaw_frames + [1] * jaw_frames
+scenarios['jaw_turn'] = np.hstack((
+  [0] * (all_eyelid_blick_scenarios.size),
+  np.tile(one_jaw_turn, nb_jaw_openings)))
+
+one_jump = ([-1.] * prep_jump_frames + 
             [1] * (prep_jump_frames + jump_frames) + 
             [-1] * (prep_jump_frames + jump_frames) + 
             [1] * prep_jump_frames + 
             [0] * nb_wait_frames)
-scenarios['body_lift'] = pad_with_zeros(np.tile(one_jump, nb_jumps),
-  nb_blinks * 2 * blink_frames + nb_jaw_openings * 2 * jaw_frames, 
-  total_nb_of_frames)
+scenarios['body_lift'] = np.hstack((
+[0] * scenarios['jaw_turn'].size, 
+np.tile(one_jump, nb_jumps)))
 
-one_leg_lift = ([0] * 2 * prep_jump_frames + 
+one_leg_lift = ([0.] * 2 * prep_jump_frames + 
                 [1] * jump_frames + 
                 [-1] * jump_frames + 
                 [0] * (2*prep_jump_frames + nb_wait_frames))
-scenarios['leg_lift'] = pad_with_zeros(np.tile(one_leg_lift, nb_jumps),
-  nb_blinks * 2 * blink_frames + nb_jaw_openings * 2 * jaw_frames, 
-  total_nb_of_frames)
+scenarios['leg_lift'] = np.hstack((
+[0] * scenarios['jaw_turn'].size,
+np.tile(one_leg_lift, nb_jumps)))
+
+total_nb_of_frames = len(scenarios['leg_lift'])
 
 for key in scenarios.keys():
-  scenarios[key] = pad_with_zeros(scenarios[key], total_nb_of_frames)
+  scenarios[key] = np.hstack((scenarios[key], 
+  [0] * (total_nb_of_frames - scenarios[key].size)))
 
 #pad_with_zeros(scenarios['jaw_turn'], total_size=total_nb_of_frames)
 scenarios['jaw_turn'] *= max_jaw_opening_angle / jaw_frames
@@ -154,9 +171,15 @@ def init():
   return get_all_shapes_in_layers(0, 1, 2)
 
 def animate(i):
-  # legs
+  # eyelid blink  
+  if i < all_eyelid_blick_scenarios.size:
+    eyelid_outlines_this_scenario = eyelid_outlines_all_scenarios[all_eyelid_blick_scenarios[i]]
+    for eyelid_nb, eyelid_shape in enumerate(eyelids):
+      set_xy(something=eyelid_shape, 
+             xy=eyelid_outlines_this_scenario[eyelid_nb])
+  # lift legs
   shift_layer(layer_nb=0, shift=[0, scenarios['leg_lift'][i]])
-  # body, head & upper jaw
+  # lift body, head & upper jaw
   shift_layer(layer_nb=1, shift=[0, scenarios['body_lift'][i]])
   shift_layer(layer_nb=2, shift=[0, scenarios['body_lift'][i]])
   # upper jaw
@@ -165,5 +188,5 @@ def animate(i):
   return get_all_shapes_in_layers(0, 1, 2)
 
 show_drawing_and_save_if_needed(filename="croc" 
-  #, animation_func = animate,  animation_init = init, nb_of_frames = total_nb_of_frames
+  , animation_func = animate,  animation_init = init, nb_of_frames = total_nb_of_frames
   )
