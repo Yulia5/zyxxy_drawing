@@ -211,6 +211,7 @@ def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, z
       clip_contour = clip_outline.get_xy()
     else:
       clip_contour = clip_outline
+
     clip_patch = plt.Polygon(clip_contour, 
                                fc = 'none', 
                                ec = 'none',
