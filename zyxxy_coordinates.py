@@ -27,11 +27,12 @@ def is_the_same_point(p1, p2):
   return (sqr_dist < tolerance)
 
 def link_contours(*arg):
-  result = []
-  for a in arg:
-    if (len(a) == 0):
+  result = np.empty((2, 0))
+  for _a in arg:
+    a = np.array(_a)
+    if (a.size == 0):
       continue
-    if (len(result) == 0):
+    if (result.size == 0):
       result = a
       continue
     if is_the_same_point(p1=result[-1], p2=a[0]):

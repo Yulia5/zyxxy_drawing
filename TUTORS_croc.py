@@ -99,7 +99,7 @@ eyelid_width = 12
 for eye_x in [right_body, right_body+12]:
   for td in [-1, 1]:
     mid_y = eye_y + td * eyelid_width / 2
-    eyelid = draw_a_double_smile(ax=ax, centre_x=eye_x, width=eyelid_width, corners_y=eye_y, mid1_y=mid_y, mid2_y=mid_y, colour='green')
+    _, eyelid = draw_a_double_smile(ax=ax, centre_x=eye_x, width=eyelid_width, corners_y=eye_y, mid1_y=mid_y, mid2_y=mid_y, colour='green')
     eyelids.append(eyelid)
 
 # ... and the nostrils
@@ -112,7 +112,7 @@ for nostril_x in [right_head-r_nostrils, right_head-3*r_nostrils]:
 # teeth
 draw_a_polygon(ax=ax, contour=upper_teeth, colour='white')
 # upper lip
-lipline_top = build_an_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_x=lip_r, radius_y=lip_r, angle_start=6, angle_end=9)
+_, lipline_top = build_an_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_x=lip_r, radius_y=lip_r, angle_start=6, angle_end=9)
 lipline_top = link_contours([[right_head, lip_y]], lipline_top)
 draw_a_broken_line(ax=ax, points=lipline_top, colour='green', linewidth=2)
 
@@ -124,7 +124,7 @@ for eyelid_shape_nb in range(blink_frames):
   eyelid_outlines = []
   for eye_x in [right_body, right_body+12]:
     for td in [-1, 1]:
-      eyelid_outline = build_a_double_smile(centre_x=eye_x, width=eyelid_width, corners_y=eye_y, 
+      _, eyelid_outline = build_a_double_smile(centre_x=eye_x, width=eyelid_width, corners_y=eye_y, 
       mid1_y=eye_y + td * eyelid_width / 2, 
       mid2_y=eye_y + td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1))
       eyelid_outlines.append(eyelid_outline)
@@ -175,8 +175,11 @@ def animate(i):
   if i < all_eyelid_blick_scenarios.size:
     eyelid_outlines_this_scenario = eyelid_outlines_all_scenarios[all_eyelid_blick_scenarios[i]]
     for eyelid_nb, eyelid_shape in enumerate(eyelids):
-      set_xy(something=eyelid_shape, 
+      try:
+        set_xy(something=eyelid_shape, 
              xy=eyelid_outlines_this_scenario[eyelid_nb])
+      except:
+        raise Exception((eyelid_shape))
   # lift legs
   shift_layer(layer_nb=0, shift=[0, scenarios['leg_lift'][i]])
   # lift body, head & upper jaw

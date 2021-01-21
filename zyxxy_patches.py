@@ -99,7 +99,7 @@ def draw_a_triangle(ax, tip_x, tip_y, height, width, **kwargs):
 # its diamond point is in the centre
 def draw_star(ax, centre_x, centre_y, radius1, radius2, ends_qty, diamond=None, **kwargs): 
 
-  contour_init = build_a_star(centre_x=centre_x, centre_y=centre_y, radius1=radius1, radius2=radius2, ends_qty=ends_qty)
+  diamond, contour_init = build_a_star(centre_x=centre_x, centre_y=centre_y, radius1=radius1, radius2=radius2, ends_qty=ends_qty)
 
   if diamond is None:
     diamond=(centre_x, centre_y)
@@ -112,10 +112,10 @@ def draw_star(ax, centre_x, centre_y, radius1, radius2, ends_qty, diamond=None, 
 # its diamond point is in the centre (same as the star)
 def draw_a_regular_polygon(ax, centre_x, centre_y, radius, 
 vertices_qty, diamond=None, **kwargs):
-  contour_init = build_a_regular_polygon(centre_x=centre_x, centre_y=centre_y, radius=radius, vertices_qty=vertices_qty) 
+  diamond, contour_init = build_a_regular_polygon(centre_x=centre_x, centre_y=centre_y, radius=radius, vertices_qty=vertices_qty) 
 
-  if diamond is None:
-    diamond=(centre_x, centre_y)
+  if diamond is not None:
+    diamond = diamond
 
   contour = _fill_in_outline(ax=ax, contour = contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
@@ -141,9 +141,9 @@ def draw_a_circle(ax, centre_x, centre_y, radius, diamond=None, **kwargs):
 # this function that draws a star
 # its diamond point is in the centre
 def draw_a_double_smile(ax, centre_x, width, corners_y, mid1_y, mid2_y, **kwargs): 
-  _, contour_init = build_a_double_smile(centre_x=centre_x, width=width, corners_y=corners_y, mid1_y=mid1_y, mid2_y=mid2_y)
+  diamond, contour_init = build_a_double_smile(centre_x=centre_x, width=width, corners_y=corners_y, mid1_y=mid1_y, mid2_y=mid2_y)
 
-  contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=(centre_x, corners_y), **set_fill_in_outline_kwarg_defaults(kwargs))
+  contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
   return contour
 
@@ -157,13 +157,10 @@ def draw_a_sector(ax, centre_x, centre_y, radius,
 angle_start, angle_end, connect_centre=True, diamond=None, **kwargs):
   
 
-  contour_init = build_an_arc(centre_x=centre_x, centre_y=centre_y, radius_x=radius, radius_y=radius, angle_start=angle_start, angle_end=angle_end)
+  diamond, contour_init = build_an_arc(centre_x=centre_x, centre_y=centre_y, radius_x=radius, radius_y=radius, angle_start=angle_start, angle_end=angle_end)
 
   if connect_centre:
     contour_init = link_contours(contour_init, [[centre_x, centre_y]])
-
-  if diamond is None:
-    diamond=(centre_x, centre_y)
 
   contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
@@ -171,10 +168,7 @@ angle_start, angle_end, connect_centre=True, diamond=None, **kwargs):
 
 # drawing a drop. 
 def draw_a_drop(ax, centre_x, centre_y, radius, diamond=None, **kwargs):
-  contour_init = build_an_ellipse_with_different_speeds(centre_x=centre_x, centre_y=centre_y, radius_x=radius, radius_y=radius, angle_start=3, angle_end=9, speed_x=2.0, speed_y=1.0)
-
-  if diamond is None:
-    diamond=(centre_x, centre_y)
+  diamond, contour_init = build_an_ellipse_with_different_speeds(centre_x=centre_x, centre_y=centre_y, radius_x=radius, radius_y=radius, angle_start=3, angle_end=9, speed_x=2.0, speed_y=1.0)
 
   contour = _fill_in_outline(ax=ax, contour=contour_init, diamond=diamond, **set_fill_in_outline_kwarg_defaults(kwargs))
 
@@ -184,7 +178,7 @@ def draw_a_drop(ax, centre_x, centre_y, radius, diamond=None, **kwargs):
 def draw_a_heart(ax, centre_x, centre_y, radius, angle_middle=0, angle_tip=3, diamond=None, **kwargs):
   
   # adding the right half-circle
-  right_contour = build_an_arc(centre_x=0, centre_y=0, radius_x=radius, radius_y=radius, angle_start=9+angle_middle/2, angle_end=3+angle_tip/2)
+  _, right_contour = build_an_arc(centre_x=0, centre_y=0, radius_x=radius, radius_y=radius, angle_start=9+angle_middle/2, angle_end=3+angle_tip/2)
 
   # moving the mid-point to 0
   right_contour -= [right_contour[0, 0], 0]
@@ -218,7 +212,7 @@ def draw_an_egg(ax, centre_x, centre_y, width, height,where_it_bends, power, dia
 
   a = height*where_it_bends - height *(1-where_it_bends)*cos_alpha/((0.5 * width * math.sqrt(1 - cos_alpha**2)) ** power)
 
-  arc_outline = build_an_arc(centre_x=0, centre_y=height*where_it_bends, radius_x=0.5*width, radius_y=height*(1-where_it_bends), angle_start=0, angle_end=3+alpha)
+  diamond, arc_outline = build_an_arc(centre_x=0, centre_y=height*where_it_bends, radius_x=0.5*width, radius_y=height*(1-where_it_bends), angle_start=0, angle_end=3+alpha)
 
   power_func_x = np.linspace(start=0, stop=0.5*width, num=vertices_qty_in_circle()/2)
 
