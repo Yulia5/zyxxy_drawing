@@ -226,7 +226,7 @@ def build_a_regular_polygon(vertices_qty):
 # a star #############################################################
 def build_a_star(ends_qty, radii_ratio): 
   angles = [i * 12/(2*ends_qty) for i in range(2*ends_qty)]
-  radii = [1 * (i%2 == 0) + radii_ratio  * (i%2 == 1) for i in range(2*ends_qty)]
+  radii = [radii_ratio * (i%2 == 0) + 1 * (i%2 == 1) for i in range(2*ends_qty)]
 
   contour = np.array([[radii[i] * sin_hours(angles[i]), 
                        radii[i] * cos_hours(angles[i])] for i in range(2*ends_qty)])

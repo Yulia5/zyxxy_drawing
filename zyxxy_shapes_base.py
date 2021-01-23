@@ -274,6 +274,8 @@ def add_to_layer_record(what_to_add):
 
 def get_all_shapes_in_layers(*args):
   result = []
+  if len(args) == 0:
+    args = [k for k in _all_shapes_per_zorder.keys() if k>=0]
   for zorder in args:
     result += _all_shapes_per_zorder[zorder]
   return result
