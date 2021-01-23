@@ -17,10 +17,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
-from zyxxy_settings import set_outline_kwarg_default
+
 from MY_zyxxy_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
 from zyxxy_coordinates import build_a_regular_polygon
-from zyxxy_utils import cos_hours, sin_hours
+from zyxxy_utils import rotate_point, stretch_something
 import matplotlib.lines, matplotlib.patches, zyxxy_coordinates
 
 ##################################################################
@@ -48,28 +48,10 @@ _default_diamond_arguments = {
   'colour' : my_default_diamond_colour
 }
 
-def set_diamond_style(show=None, size=None, colour=None, zorder=None):
+def set_diamond_style(show=None):
   global _default_diamond_arguments
   if show is not None:
     _default_diamond_arguments['show'] = show
-  if size is not None:
-    _default_diamond_arguments['size'] = size
-  if colour is not None:
-    _default_diamond_arguments['colour'] = colour
-  if zorder is not None:
-    _default_diamond_arguments['zorder'] = zorder
-
-def __draw_diamond(ax, diamond_location):
-  if _default_diamond_arguments['show'] and (diamond_location is not None):
-    diamond_r = get_width(ax=ax) * _default_diamond_arguments['size'] / 1000
-    _, contour = build_a_regular_polygon(
-                              centre_x=diamond_location[0], 
-                              centre_y=diamond_location[1], 
-                              vertices_qty=4, radius=diamond_r)
-    _, diamond_patch = _fill_in_outline(ax=ax, contour=contour, stretch_x=1, stretch_y=1, colour=_default_diamond_arguments['colour'], diamond=None, turn=None, alpha=1.0, zorder=_default_diamond_arguments['zorder'])
-    return diamond_patch
-  else:
-    return None
 
 ##################################################################
 ## COLOUR HELPERS                                               ## 
@@ -79,11 +61,12 @@ def __draw_diamond(ax, diamond_location):
 # Assume that it's a name of a standard colour.
 # Attention, names are case-sensitive
 def find_colour_code(colour_name):
+  if colour_name is None:
+    return 'none'
   if colour_name in my_colour_palette:
     return my_colour_palette[colour_name] 
   if colour_name in mcolors.CSS4_COLORS:
     return colour_name # matplotlib knows how to handle it
-
   # If we are here, the colour name has not been recognised
   # Assuming that it is a colour code.
   return colour_name
@@ -91,13 +74,7 @@ def find_colour_code(colour_name):
 ##################################################################
 ## MOVEMENT HELPERS                                             ## 
 ##################################################################
-def rotate_point(point, diamond, turn):
-  if diamond is None:
-    return point
-  return [diamond[0] + (point[0] - diamond[0]) * cos_hours(turn) + (point[1] - diamond[1]) * sin_hours(turn),
-          diamond[1] - (point[0] - diamond[0]) * sin_hours(turn) + (point[1] - diamond[1]) * cos_hours(turn)] 
-
-def get_xy(something):
+def _get_xy(something):
   if isinstance(something, np.ndarray):
     return something
   elif isinstance(something, matplotlib.lines.Line2D):
@@ -106,7 +83,7 @@ def get_xy(something):
     return something.get_xy()
   raise Exception("Data type ", type(something), " is not handled")
 
-def set_xy(something, xy):
+def _set_xy(something, xy):
   if isinstance(something, np.ndarray):
     something = xy
   elif isinstance(something, matplotlib.lines.Line2D):
@@ -118,121 +95,182 @@ def set_xy(something, xy):
     raise Exception("Data type ", type(something), " is not handled")
   return something
 
-def shift_something(something, shift):
-  xy = get_xy(something=something)
-  xy += shift
-  set_xy(something=something, xy=xy)
-  return xy
+class Shape:
+  def __init__(self, ax, is_patch, patch_zorder, patch_colour, patch_alpha, line_colour, line_width, line_joinstyle, line_zorder):
+    colour_code_patch = find_colour_code(colour_name = patch_colour)
+    colour_code_line = find_colour_code(colour_name = line_colour)
+    if ax is None:
+      self.ax = plt.gfa()
+    else:
+      self.ax = ax
 
-def rotate_something(something, turn, diamond):
-  xy = get_xy(something=something)
+    self.patch_zorder = patch_zorder
+    self.line_zorder = line_zorder
+    self.diamond_coords = [0, 0]
+    self.diamond_contour = build_a_regular_polygon(
+      centre_x=0, centre_y=0, vertices_qty=4, 
+      radius=(get_width(ax=ax)*_default_diamond_arguments['size']/1000))
+    self.clip_patch = None
+    self.clip_line = None
 
-  if (diamond is not None) and (turn is not None) and (turn != 0):      xy = np.array([rotate_point(point=point, diamond=diamond,turn=turn) for point in xy])
-
-  set_xy(something=something, xy=xy)
-  return xy
-
-def stretch_something(something, diamond, stretch_x, stretch_y):
-  xy = get_xy(something=something)
-
-  if diamond is not None:
-    if stretch_x is not None and (stretch_x != 1.):
-      xy[:, 0] = diamond[0] + (xy[:, 0] - diamond[0]) * stretch_x 
-    if stretch_y is not None and (stretch_y != 1.):
-      xy[:, 1] = diamond[1] + (xy[:, 1] - diamond[1]) * stretch_y
-
-  set_xy(something=something, xy=xy)
-  return xy
-
-def update_xy(shapename, kwargs_shape, kwargs_common, shape, diamond_shape, old_diamond_coords):
-  method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
-  # putting them together to create the initial contour and the diamond
-  diamond_coords, contour = method_to_call(**kwargs_shape)
-  # stretching
-  contour = stretch_something(something=contour, diamond=diamond_coords, stretch_x=kwargs_common['stretch_x'], stretch_y=kwargs_common['stretch_y'])
-  # turning
-  contour = rotate_something(something=contour, diamond=diamond_coords, turn=kwargs_common['turn'])
-  # updating the plot
-  set_xy(shape, contour)
-  # updating the diamond
-  new_diamond_coords = np.array(diamond_coords)
-  shift_something(something=diamond_shape, shift=new_diamond_coords-old_diamond_coords)
-  return new_diamond_coords
-
-
-
-
-##################################################################
-## SHAPES AND LINES HELPERS                                     ## 
-##################################################################
-
-# this function creates a broken line
-def _draw_broken_line(ax, contour, colour, linewidth, joinstyle, zorder, diamond=None, turn=None):
-  if (contour is None) or (linewidth is None) or (colour is None) or (zorder is None) or (joinstyle is None) or (linewidth == 0):
-    return contour
-  
-  contour = rotate_something(something=contour, diamond=diamond, turn=turn)
-
-  colour_code = find_colour_code(colour_name = colour)
-
-  line, = ax.plot([c[0] for c in contour], [c[1] for c in contour],     lw=linewidth, color=colour_code, zorder=zorder, solid_joinstyle=joinstyle)
-
-  add_to_layer_record(zorder=zorder, what_to_add=line)
-
-  diamond_patch = __draw_diamond(ax=ax, diamond_location=diamond)
-  return diamond_patch, line
-
-# this function creates and fills in a polygon
-def _fill_in_outline(ax, contour, colour, diamond, turn, stretch_x, stretch_y, zorder, alpha, outline_colour=None, outline_linewidth=None, outline_joinstyle=None, outline_zorder=None, clip_outline=None):  
-  contour = stretch_something(something=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
-  contour = rotate_something(something=contour, diamond=diamond, turn=turn)
-  diamond_patch = __draw_diamond(ax=ax, diamond_location=diamond)   
-  
-  outline_style = {'colour' : outline_colour,
-             'linewidth' : outline_linewidth,
-             'joinstyle' : outline_joinstyle,
-             'zorder' : outline_zorder}
-
-  _draw_broken_line(ax=ax, contour=np.append(contour, contour[0:2], axis=0), diamond=None, **set_outline_kwarg_default(outline_style))
-  
-  if colour is not None:
-    colour_code = find_colour_code(colour_name = colour)
-  else:
-    colour_code = 'none'
-  patch = plt.Polygon(contour, fc = colour_code, 
+    dummy_line, = ax.plot([0, 0], [0, 1], lw=line_width, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
+    
+    if is_patch:
+      self.line = None
+      self.outline = dummy_line
+      self.patch = plt.Polygon(np.array([[0,0], [1,1], [1,0]]), #dummy 
+                               fc = colour_code_patch, 
                                ec = 'none',
-                               zorder = zorder,
-                               alpha = alpha)
-  ax.add_patch(patch)
-  add_to_layer_record(zorder=zorder, what_to_add=patch)
+                               zorder = patch_zorder,
+                               alpha = patch_alpha)
+      self.ax.add_patch(self.patch)
+    else:
+      self.patch = None
+      self.outline = None
+      self.line, = dummy_line
 
-  if clip_outline is not None:
+    self.diamond_patch = plt.Polygon(self.diamond_contour, 
+      fc = _default_diamond_arguments['colour'], 
+      ec = 'none',
+      zorder = _default_diamond_arguments['zorder'],
+      alpha = 1.0)
+
+    add_to_layer_record(what_to_add=self.patch)
+    add_to_layer_record(what_to_add=self.line)
+    add_to_layer_record(what_to_add=self.outline)
+
+  def update_xy(self, shapename, **kwargs):
+    method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
+    diamond_coords, contour = method_to_call(**kwargs)
+
+    # updating the shapes
+    if self.line is not None:
+      _set_xy(self.line, contour)
+    if self.outline is not None:
+      _set_xy(self.outline, np.append(contour, contour[0:2], axis=0))
+    if self.patch is not None:
+      _set_xy(self.patch, contour)
+    
+    # updating the diamond
+    self.update_diamond(new_diamond_coords=np.array(diamond_coords))
+
+  def add_clip_outline(self, clip_outline):
     if type(clip_outline) is plt.Polygon:
       clip_contour = clip_outline.get_xy()
     else:
       clip_contour = clip_outline
 
-    clip_patch = plt.Polygon(clip_contour, 
+    if self.patch is not None:
+      self.clip_patch = plt.Polygon(clip_contour, 
                                fc = 'none', 
                                ec = 'none',
-                               zorder = zorder)
-    ax.add_patch(clip_patch)
-    patch.set_clip_path(clip_patch)
-    add_to_layer_record(zorder=zorder, what_to_add=clip_patch)
-  
-  return diamond_patch, patch
+                               zorder = self.patch_zorder)
+      self.ax.add_patch(self.clip_patch)
+      self.patch.set_clip_path(self.clip_patch)
+    
+    if (self.outline is not None) or (self.line is not None): 
+      self.clip_line = plt.Polygon(clip_contour, 
+                               fc = 'none', 
+                               ec = 'none',
+                               zorder = self.line_zorder)
+      if self.outline is not None:
+        self.outline.set_clip_path(self.clip_line)
+      if self.line is not None:
+        self.line.set_clip_path(self.clip_line)
 
+    add_to_layer_record(what_to_add=self.clip_line)
+    add_to_layer_record(what_to_add=self.clip_patch)
+  
+  def update_diamond(self, new_diamond_coords):
+    self.diamond_coords = new_diamond_coords
+    if self.diamond_patch is not None:                  
+      _set_xy(something=self.diamond_patch, 
+              xy=self.diamond_coords+self.diamond_contour)
+
+  def get_what_to_move(self):
+    return [self.line, self.patch, self.outline, self.clip_patch, self.clip_line]
+
+  def shift(self, shift):
+    what_to_move = self.get_what_to_move()
+    for something in what_to_move:
+      if something is None:
+        continue
+      xy = _get_xy(something=something)
+      xy += shift
+      _set_xy(something=something, xy=xy)
+    self.update_diamond(new_diamond_coords = self.diamond_coords + shift)
+
+  def rotate(self, turn, diamond_override = None):
+    if (turn is None) or (turn == 0):
+      return
+    if diamond_override is not None:
+      diamond_to_use = diamond_override
+      rotate_point(point=self.diamond_coords, diamond=diamond_override, turn=turn)
+    else:
+      diamond_to_use = self.diamond_coords
+      
+    what_to_move = self.get_what_to_move()
+    for something in what_to_move:
+      if something is None:
+        continue
+      xy = _get_xy(something=something)
+      xy = np.array([rotate_point(point=point, diamond=diamond_to_use, turn=turn) for point in xy])
+      _set_xy(something=something, xy=xy)
+
+  def stretch(self, stretch_x, stretch_y, diamond_override = None):
+    if diamond_override is not None:
+      diamond_to_use = diamond_override
+      self.diamond_coords[0] = stretch_something        (what_to_stretch=self.diamond_coords[0], 
+                                                 diamond=diamond_to_use[0], 
+                                                 stretch_coeff=stretch_x)
+      self.diamond_coords[1] = stretch_something(what_to_stretch=self.diamond_coords[1], 
+                                                 diamond=diamond_to_use[1], 
+                                                 stretch_coeff=stretch_y)
+    else:
+      diamond_to_use = self.diamond_coords
+
+    for something in [self.patch_or_line, self.outline, self.clip]:
+      if something is None:
+        continue
+      xy = _get_xy(something=something)
+      xy[:, 0] = stretch_something(what_to_stretch=xy[:, 0], 
+                                                 diamond=diamond_to_use[0], 
+                                                 stretch_coeff=stretch_x)
+      xy[:, 1] = stretch_something(what_to_stretch=xy[:, 1], 
+                                                 diamond=diamond_to_use[1], 
+                                                 stretch_coeff=stretch_y)
+      _set_xy(something=something, xy=xy)
+
+
+def draw_given_shapename(ax, is_patch, shapename, shape_kwargs, diamond_x, diamond_y, stretch_x, stretch_y, turn, **kwargs):
+  new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
+  new_shape.update_xy_by_shapename(shapename=shapename, **shape_kwargs)
+  new_shape.shift(shift=[diamond_x, diamond_y])
+  new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
+  new_shape.rotate(turn=turn)
+  return new_shape
+
+def draw_given_contour(ax, is_patch, contour, diamond_x, diamond_y, stretch_x, stretch_y, turn, **kwargs):
+  new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
+  new_shape.update_xy_given_contour(contour=contour)
+  new_shape.shift(shift=[diamond_x, diamond_y])
+  new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
+  new_shape.rotate(turn=turn)
+  return new_shape
+  
 ########################################################################
 # handling shapes per layers
 ########################################################################
 
 _all_shapes_per_zorder = {}
 
-def add_to_layer_record(zorder, what_to_add):
-  if zorder not in _all_shapes_per_zorder:
-    _all_shapes_per_zorder[zorder] = [what_to_add]
-  else:
-    _all_shapes_per_zorder[zorder] += [what_to_add]
+def add_to_layer_record(what_to_add):
+  if what_to_add is not None:
+    zorder = what_to_add.get_zorder()
+    if zorder not in _all_shapes_per_zorder:
+      _all_shapes_per_zorder[zorder] = [what_to_add]
+    else:
+      _all_shapes_per_zorder[zorder] += [what_to_add]
 
 def get_all_shapes_in_layers(*args):
   result = []
@@ -243,20 +281,20 @@ def get_all_shapes_in_layers(*args):
 def shift_layer(layer_nb, shift):
   if layer_nb not in _all_shapes_per_zorder:
     return []
-  for something in _all_shapes_per_zorder[layer_nb]:
-    shift_something(something=something, shift=shift)
+  for shape in _all_shapes_per_zorder[layer_nb]:
+    shape.rotate(shift=shift)
   return _all_shapes_per_zorder[layer_nb]
 
 def rotate_layer(layer_nb, turn, diamond):
   if layer_nb not in _all_shapes_per_zorder:
     return []
-  for something in _all_shapes_per_zorder[layer_nb]:
-    rotate_something(something=something, turn=turn, diamond=diamond)
+  for shape in _all_shapes_per_zorder[layer_nb]:
+    shape.rotate(turn=turn, diamond=diamond)
   return _all_shapes_per_zorder[layer_nb]
 
 def stretch_layer(layer_nb, diamond, stretch_x, stretch_y):
   if layer_nb not in _all_shapes_per_zorder:
     return []
-  for something in _all_shapes_per_zorder[layer_nb]:
-    stretch_something(something=something, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
+  for shape in _all_shapes_per_zorder[layer_nb]:
+    shape.rotate(diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
   return _all_shapes_per_zorder[layer_nb]

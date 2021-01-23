@@ -15,8 +15,11 @@
 ########################################################################
 
 _default_arguments = {"line" : {}, 
-                      "shape" : {'turn' : 0, 'alpha' : 1.0, 'stretch_x' : 1.0, 'stretch_y' : 1.0},
+                      "shape" : {},
                       "shape_outline" : {}}
+
+def set_all_colour_etc_settings(colour_etc_settings):
+  _default_arguments = colour_etc_settings
 
 def _set_line_style(colour, linewidth, joinstyle, zorder, _target):
   global _count
@@ -46,18 +49,12 @@ def set_line_style(colour=None, linewidth=None, joinstyle=None, zorder=None):
 def get_shape_zorder():
   return _default_arguments['shape']['zorder']
 
-def set_shape_style(outline_colour=None, outline_width=None, outline_joinstyle=None, outline_zorder=None, shape_colour=None, shape_stretch_x=None, shape_stretch_y=None, shape_turn=None, shape_zorder=None, shape_alpha=None):
+def set_shape_style(outline_colour=None, outline_width=None, outline_joinstyle=None, outline_zorder=None, shape_colour=None, shape_zorder=None, shape_alpha=None):
   global _default_arguments
   if shape_alpha is not None:
     _default_arguments['shape']['alpha'] = shape_alpha
   if shape_zorder is not None:
     _default_arguments['shape']['zorder'] = shape_zorder
-  if shape_turn is not None:
-    _default_arguments['shape']['turn'] = shape_turn
-  if shape_turn is not None:
-    _default_arguments['shape']['stretch_x'] = shape_stretch_x
-  if shape_turn is not None:
-    _default_arguments['shape']['stretch_y'] = shape_stretch_y
   if shape_colour is not None:
     _default_arguments['shape']['colour'] = shape_colour
 

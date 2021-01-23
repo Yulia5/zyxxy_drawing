@@ -26,16 +26,16 @@ my_colour_palette = {'Bubble_blue'     : '#0099ff',
                      'Light_pink'      : '#ff8888'}
 
 # Colours, alphas and linewidths!
-my_default_shape_alpha = 1.0
-my_default_shape_colour = 'none'
-
-my_default_outline_colour = 'black'
-my_default_outline_width = 0
-my_default_outline_joinstyle = 'miter'
-
-my_default_line_colour = 'black'
-my_default_line_linewidth = 2
-my_default_line_joinstyle = 'round'
+my_default_colour_etc_settings = {
+                     "line" : {'colour' : 'black', 
+                                    'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
+                     "shape" : {'alpha' : 1.0, 
+                                     'zorder' : 1, 
+                                     'colour' : 'none'},
+                     "shape_outline" : {'colour' : 'black', 
+                                             'linewidth' : 0, 
+                                             'joinstyle' : 'miter', 
+                                             'zorder' : 1}}
 
 # Diamond parameters!
 # Diamonds don't move when you turn the shapes
@@ -70,3 +70,13 @@ my_default_demo_canvas_size = [16, 10]
 my_default_demo_figsize = [6, 5]
 my_default_demo_dpi = 75
 my_default_demo_tick_step = 1
+
+my_default_demo_params = {"line" : {'colour' : 'black', 
+                                    'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
+                          "shape" : {'alpha' : 0.5, 
+                                     'zorder' : 1, 
+                                     'colour' : 'red'},
+                          "shape_outline" : {'colour' : 'black', 
+                                             'linewidth' : 2, 
+                                             'joinstyle' : 'miter', 
+                                             'zorder' : 1}}
