@@ -29,10 +29,10 @@ my_colour_palette = {'Bubble_blue'     : '#0099ff',
 my_default_colour_etc_settings = {
                      "line" : {'colour' : 'black', 
                                     'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
-                     "shape" : {'alpha' : 1.0, 
+                     "patch" : {'alpha' : 1.0, 
                                      'zorder' : 1, 
                                      'colour' : 'none'},
-                     "shape_outline" : {'colour' : 'black', 
+                     "patch_outline" : {'colour' : 'black', 
                                              'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1}}
@@ -73,10 +73,10 @@ my_default_demo_tick_step = 1
 
 my_default_demo_params = {"line" : {'colour' : 'black', 
                                     'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
-                          "shape" : {'alpha' : 0.5, 
+                          "patch" : {'alpha' : 0.5, 
                                      'zorder' : 1, 
                                      'colour' : 'red'},
-                          "shape_outline" : {'colour' : 'black', 
+                          "patch_outline" : {'colour' : 'black', 
                                              'linewidth' : 2, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1}}

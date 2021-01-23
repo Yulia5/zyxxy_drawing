@@ -17,8 +17,7 @@
 import numpy as np
 from matplotlib import animation
 import matplotlib.pyplot as plt
-from zyxxy_shapes_base import set_diamond_style
-from zyxxy_patches import draw_a_rectangle
+from zyxxy_shapes_base import set_diamond_style, draw_a_rectangle
 from zyxxy_settings import set_all_colour_etc_settings
 
 from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_colour_etc_settings
@@ -74,7 +73,7 @@ def create_canvas_and_axes(canvas_width,
     ax.set_xticks(ticks = [])
     ax.set_yticks(ticks = [])
     if background_colour is not None:
-      background_rectangle = draw_a_rectangle(ax=ax, left_x=left_x, bottom_y=bottom_y, height=canvas_height, width=canvas_width, colour=background_colour, zorder=-1)
+      draw_a_rectangle(ax=ax, width=canvas_width, height=canvas_height, left_x=left_x, bottom_y=bottom_y, colour=background_colour, zorder=-1)
 
   # show diamond points if and only if we show the axis and grid
   set_diamond_style(show = (tick_step is not None))

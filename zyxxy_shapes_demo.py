@@ -16,7 +16,7 @@
 
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shapes_base import draw_given_shapename
-from MY_zyxxy_SETTINGS import my_default_margin_adjustments, my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step
+from MY_zyxxy_SETTINGS import my_default_margin_adjustments, my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_params
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button
@@ -77,46 +77,43 @@ def run_demo(shapename):
       counter -= 1
       target[param_name] = Slider(ax=plt.axes([slider_start, 0.1+0.05*counter, 0.3, 0.03]), label=param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=get_step(params = param_params))
 
-  def draw_new_shape():
+  def draw_new_shape(ax):
     global new_shape
 
     kwargs_shape = {key:sliders_specific[key].val for key in sliders_specific.keys()}
     kwargs_common= {key:sliders_common[key].val for key in sliders_common.keys()}
 
-    new_shape = draw_given_shapename(ax=None, is_patch=True, shapename=shapename, shape_kwargs=kwargs_shape, **kwargs_common)
+    new_shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, shape_kwargs=kwargs_shape, **kwargs_common, **my_default_demo_params)
     plt.draw()
 
   def update_specific(val):
-    draw_new_shape()
-
-  def just_stretch():
-    global new_shape
-    new_shape.stretch(stretch_x=sliders_common['stretch_x'].val, 
-                        stretch_y=sliders_common['stretch_y'].val)
-  def just_shift():
-    global new_shape
-    new_shape.shift(shift=[sliders_common['diamond_x'].val, 
-                           sliders_common['diamond_y'].val])  
-  def just_turn():
-    global new_shape
-    new_shape.rotate(turn=sliders_common['turn'].val)  
-
-  def update_given_action(action_func):
-    global new_shape
-    if new_shape is None:
-      draw_new_shape()
-    else:
-      action_func()
-      plt.draw()
+    draw_new_shape(ax=ax)
 
   def update_stretch(val):
-    update_given_action(just_stretch)
+    global new_shape
+    if new_shape is None:
+      draw_new_shape(ax=ax)
+    else:
+      new_shape.stretch(stretch_x=sliders_common['stretch_x'].val, 
+                        stretch_y=sliders_common['stretch_y'].val)
+      plt.draw()
 
   def update_shift(val):
-    update_given_action(just_shift)    
+    global new_shape
+    if new_shape is None:
+      draw_new_shape(ax=ax)
+    else:
+      new_shape.shift(shift=[sliders_common['diamond_x'].val, 
+                           sliders_common['diamond_y'].val])
+      plt.draw()   
     
   def update_turn(val):
-    update_given_action(just_turn)    
+    global new_shape
+    if new_shape is None:
+      draw_new_shape(ax=ax)
+    else:
+      new_shape.rotate(turn=sliders_common['turn'].val)
+      plt.draw()   
 
   def reset(event):
     for _slider in [sliders_specific.values() + sliders_common.values()]:
@@ -127,10 +124,10 @@ def run_demo(shapename):
 
   for _slider in [sliders_common['stretch_x'], sliders_common['stretch_y']]:
     _slider.on_changed(update_stretch)
-  for _slider in [sliders_common['shift_x'], sliders_common['shift_y']]:
+  for _slider in [sliders_common['diamond_x'], sliders_common['diamond_y']]:
     _slider.on_changed(update_shift)
   sliders_common['turn'].on_changed(update_turn)
   button.on_clicked(reset)
   
-  draw_new_shape()
+  draw_new_shape(ax=ax)
   show_drawing_and_save_if_needed(figsize=my_default_demo_figsize, dpi=my_default_demo_dpi)

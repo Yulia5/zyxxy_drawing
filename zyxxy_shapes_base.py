@@ -19,9 +19,9 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
 from MY_zyxxy_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
-from zyxxy_coordinates import build_a_regular_polygon
+import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-import matplotlib.lines, matplotlib.patches, zyxxy_coordinates
+import matplotlib.lines, matplotlib.patches
 
 ##################################################################
 ## CANVAS HELPERS                                               ## 
@@ -257,6 +257,12 @@ def draw_given_contour(ax, is_patch, contour, diamond_x, diamond_y, stretch_x, s
   new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
   new_shape.rotate(turn=turn)
   return new_shape
+
+def draw_a_rectangle(ax, width, height, left_x=None, centre_x=None, right_x=None, bottom_y=None, centre_y=None, top_y=None, **kwargs):
+  diamond_best_guess, contour = zyxxy_coordinates.build_a_rectangle(
+    width=width, height=height, 
+    left_x=left_x, centre_x=centre_x, right_x=right_x, bottom_y=bottom_y, centre_y=centre_y, top_y=top_y)
+  draw_given_contour(ax=ax, is_patch=True, contour=contour, diamond_x=diamond_best_guess[0], diamond_y=diamond_best_guess[1], stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs)
   
 ########################################################################
 # handling shapes per layers
