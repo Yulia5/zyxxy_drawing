@@ -96,9 +96,12 @@ def _set_xy(something, xy):
   return something
 
 class Shape:
-  def __init__(self, ax, is_patch, patch_zorder, patch_colour, patch_alpha, line_colour, line_linewidth, line_joinstyle, line_zorder):
+  def __init__(self, ax, is_patch, patch_zorder, patch_colour, patch_alpha, outline_colour, outline_linewidth, outline_joinstyle, outline_zorder,
+  line_colour, line_linewidth, line_joinstyle, line_zorder):
     colour_code_patch = find_colour_code(colour_name = patch_colour)
     colour_code_line = find_colour_code(colour_name = line_colour)
+    colour_code_outline = find_colour_code(colour_name = outline_colour)
+
     if ax is None:
       self.ax = plt.gfa()
     else:
@@ -111,11 +114,10 @@ class Shape:
                     (get_width(ax=ax)*_default_diamond_arguments['size']/1000))
     self.clip_patch = None
     self.clip_line = None
-
-    dummy_line, = ax.plot([0, 0], [0, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
     
     if is_patch:
       self.line = None
+      dummy_line, = ax.plot([0, 0], [0, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
       self.outline = dummy_line
       self.patch = plt.Polygon(np.array([[0,0], [1,1], [1,0]]), #dummy 
                                fc = colour_code_patch, 
@@ -124,6 +126,7 @@ class Shape:
                                alpha = patch_alpha)
       self.ax.add_patch(self.patch)
     else:
+      dummy_line, = ax.plot([0, 0], [0, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
       self.patch = None
       self.outline = None
       self.line, = dummy_line

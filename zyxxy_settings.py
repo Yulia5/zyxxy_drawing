@@ -14,7 +14,7 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
+from MY_zyxxy_SETTINGS import my_default_demo_params
 
 _default_arguments = {"line" : {}, 
                       "patch" : {},
@@ -74,7 +74,7 @@ def _fill_in_missing_values(target, default_values, target_prefix=''):
 
 def set_fill_in_outline_kwarg_defaults(kwargs, defaults_for_demo=False):
   if defaults_for_demo:
-    defaults_to_use = my_default_colour_etc_settings
+    defaults_to_use = my_default_demo_params
   else:
     defaults_to_use = _default_arguments
   _fill_in_missing_values(target=kwargs, 
@@ -82,7 +82,7 @@ def set_fill_in_outline_kwarg_defaults(kwargs, defaults_for_demo=False):
                           target_prefix='patch_')
   _fill_in_missing_values(target=kwargs, 
                           default_values=defaults_to_use['patch_outline'], 
-                          target_prefix='line_') 
+                          target_prefix='outline_') 
   _fill_in_missing_values(target=kwargs, 
                           default_values=defaults_to_use['line'], 
                           target_prefix='line_')
