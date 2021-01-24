@@ -96,7 +96,7 @@ def _set_xy(something, xy):
   return something
 
 class Shape:
-  def __init__(self, ax, is_patch, patch_zorder, patch_colour, patch_alpha, line_colour, line_width, line_joinstyle, line_zorder):
+  def __init__(self, ax, is_patch, patch_zorder, patch_colour, patch_alpha, line_colour, line_linewidth, line_joinstyle, line_zorder):
     colour_code_patch = find_colour_code(colour_name = patch_colour)
     colour_code_line = find_colour_code(colour_name = line_colour)
     if ax is None:
@@ -107,13 +107,12 @@ class Shape:
     self.patch_zorder = patch_zorder
     self.line_zorder = line_zorder
     self.diamond_coords = [0, 0]
-    self.diamond_contour = build_a_regular_polygon(
-      centre_x=0, centre_y=0, vertices_qty=4, 
-      radius=(get_width(ax=ax)*_default_diamond_arguments['size']/1000))
+    self.diamond_contour = (np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * 
+                    (get_width(ax=ax)*_default_diamond_arguments['size']/1000))
     self.clip_patch = None
     self.clip_line = None
 
-    dummy_line, = ax.plot([0, 0], [0, 1], lw=line_width, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
+    dummy_line, = ax.plot([0, 0], [0, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
     
     if is_patch:
       self.line = None
@@ -139,9 +138,9 @@ class Shape:
     add_to_layer_record(what_to_add=self.line)
     add_to_layer_record(what_to_add=self.outline)
 
-  def update_xy(self, shapename, **kwargs):
+  def update_xy_by_shapename(self, shapename, **kwargs):
     method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
-    diamond_coords, contour = method_to_call(**kwargs)
+    contour = method_to_call(**kwargs)
 
     # updating the shapes
     if self.line is not None:
@@ -152,7 +151,7 @@ class Shape:
       _set_xy(self.patch, contour)
     
     # updating the diamond
-    self.update_diamond(new_diamond_coords=np.array(diamond_coords))
+    self.update_diamond(new_diamond_coords=np.array([0, 0]))
 
   def add_clip_outline(self, clip_outline):
     if type(clip_outline) is plt.Polygon:
@@ -191,6 +190,8 @@ class Shape:
     return [self.line, self.patch, self.outline, self.clip_patch, self.clip_line]
 
   def shift(self, shift):
+    if shift is None:
+      return
     what_to_move = self.get_what_to_move()
     for something in what_to_move:
       if something is None:
@@ -229,7 +230,8 @@ class Shape:
     else:
       diamond_to_use = self.diamond_coords
 
-    for something in [self.patch_or_line, self.outline, self.clip]:
+    what_to_move = self.get_what_to_move()
+    for something in what_to_move:
       if something is None:
         continue
       xy = _get_xy(something=something)
@@ -242,18 +244,18 @@ class Shape:
       _set_xy(something=something, xy=xy)
 
 
-def draw_given_shapename(ax, is_patch, shapename, shape_kwargs, diamond_x, diamond_y, stretch_x, stretch_y, turn, **kwargs):
+def draw_given_shapename(ax, is_patch, shapename, shape_kwargs, diamond, stretch_x, stretch_y, turn, **kwargs):
   new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
   new_shape.update_xy_by_shapename(shapename=shapename, **shape_kwargs)
-  new_shape.shift(shift=[diamond_x, diamond_y])
+  new_shape.shift(shift=diamond)
   new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
   new_shape.rotate(turn=turn)
   return new_shape
 
-def draw_given_contour(ax, is_patch, contour, diamond_x, diamond_y, stretch_x, stretch_y, turn, **kwargs):
+def draw_given_contour(ax, is_patch, contour, diamond, stretch_x, stretch_y, turn, **kwargs):
   new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
   new_shape.update_xy_given_contour(contour=contour)
-  new_shape.shift(shift=[diamond_x, diamond_y])
+  new_shape.shift(shift=diamond)
   new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
   new_shape.rotate(turn=turn)
   return new_shape
@@ -263,6 +265,9 @@ def draw_a_rectangle(ax, width, height, left_x=None, centre_x=None, right_x=None
     width=width, height=height, 
     left_x=left_x, centre_x=centre_x, right_x=right_x, bottom_y=bottom_y, centre_y=centre_y, top_y=top_y)
   draw_given_contour(ax=ax, is_patch=True, contour=contour, diamond_x=diamond_best_guess[0], diamond_y=diamond_best_guess[1], stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs)
+
+def draw_broken_line(contour, ax=None, diamond=None, stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs):
+  draw_given_contour(ax=ax, is_patch=False, contour=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y, turn=turn, **kwargs)
   
 ########################################################################
 # handling shapes per layers

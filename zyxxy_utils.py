@@ -16,12 +16,16 @@
 
 import math
 import random
-
+import numpy as np
 
 tolerance = 0.0001
 
 def is_the_same_point(p1, p2):
-  sqr_dist = ((p1[0] - p2[0]) ** 2) + ((p1[1] - p2[1]) ** 2) 
+  diff = p1 - p2
+  if isinstance(diff, (int, float)):
+    sqr_dist = diff**2
+  else:
+    sqr_dist = np.sum(diff**2) 
   return (sqr_dist < tolerance)
 
 ##################################################################

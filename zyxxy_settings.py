@@ -14,11 +14,14 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
+
 _default_arguments = {"line" : {}, 
-                      "shape" : {},
-                      "shape_outline" : {}}
+                      "patch" : {},
+                      "patch_outline" : {}}
 
 def set_all_colour_etc_settings(colour_etc_settings):
+  global _default_arguments
   _default_arguments = colour_etc_settings
 
 def _set_line_style(colour, linewidth, joinstyle, zorder, _target):
@@ -35,55 +38,52 @@ def _set_line_style(colour, linewidth, joinstyle, zorder, _target):
 
 def new_layer():
   old_layer_nb = max(_default_arguments['line']['zorder'],
-                     _default_arguments['shape']['zorder'],
-                     _default_arguments['shape_outline']['zorder'])
+                     _default_arguments['patch']['zorder'],
+                     _default_arguments['patch_outline']['zorder'])
   new_layer_nb = old_layer_nb + 1
   _default_arguments['line']['zorder'] = new_layer_nb
-  _default_arguments['shape']['zorder'] = new_layer_nb
-  _default_arguments['shape_outline']['zorder'] = new_layer_nb
+  _default_arguments['patch']['zorder'] = new_layer_nb
+  _default_arguments['patch_outline']['zorder'] = new_layer_nb
 
 def set_line_style(colour=None, linewidth=None, joinstyle=None, zorder=None):
   global _default_arguments
   _set_line_style(colour=colour, linewidth=linewidth, joinstyle=joinstyle, zorder=zorder, _target=_default_arguments['line'])
 
 def get_shape_zorder():
-  return _default_arguments['shape']['zorder']
+  return _default_arguments['patch']['zorder']
 
 def set_shape_style(outline_colour=None, outline_width=None, outline_joinstyle=None, outline_zorder=None, shape_colour=None, shape_zorder=None, shape_alpha=None):
   global _default_arguments
   if shape_alpha is not None:
-    _default_arguments['shape']['alpha'] = shape_alpha
+    _default_arguments['patch']['alpha'] = shape_alpha
   if shape_zorder is not None:
-    _default_arguments['shape']['zorder'] = shape_zorder
+    _default_arguments['patch']['zorder'] = shape_zorder
   if shape_colour is not None:
-    _default_arguments['shape']['colour'] = shape_colour
+    _default_arguments['patch']['colour'] = shape_colour
 
   if outline_zorder is None:
-    outline_zorder = _default_arguments['shape']['zorder']
+    outline_zorder = _default_arguments['patch']['zorder']
 
   _set_line_style(colour=outline_colour, linewidth=outline_width, joinstyle=outline_joinstyle, zorder=outline_zorder, 
-  _target=_default_arguments['shape_outline'])
-
+  _target=_default_arguments['patch_outline'])
 
 def _fill_in_missing_values(target, default_values, target_prefix=''):
   for key in default_values.keys():
     if (target_prefix + key) not in target:
       target[target_prefix + key] = default_values[key]
 
-def set_fill_in_outline_kwarg_defaults(kwargs):
+def set_fill_in_outline_kwarg_defaults(kwargs, defaults_for_demo=False):
+  if defaults_for_demo:
+    defaults_to_use = my_default_colour_etc_settings
+  else:
+    defaults_to_use = _default_arguments
   _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape'])
+                          default_values=defaults_to_use['patch'], 
+                          target_prefix='patch_')
   _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape_outline'], 
-                          target_prefix='outline_') 
-  return kwargs
-
-def set_line_kwarg_default(kwargs):
+                          default_values=defaults_to_use['patch_outline'], 
+                          target_prefix='line_') 
   _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['line'])
-  return kwargs
-
-def set_outline_kwarg_default(kwargs):
-  _fill_in_missing_values(target=kwargs, 
-                          default_values=_default_arguments['shape_outline'])
+                          default_values=defaults_to_use['line'], 
+                          target_prefix='line_')
   return kwargs

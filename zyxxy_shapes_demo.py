@@ -16,6 +16,7 @@
 
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shapes_base import draw_given_shapename
+from zyxxy_settings import set_fill_in_outline_kwarg_defaults
 from MY_zyxxy_SETTINGS import my_default_margin_adjustments, my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_params
 
 import matplotlib.pyplot as plt
@@ -81,9 +82,11 @@ def run_demo(shapename):
     global new_shape
 
     kwargs_shape = {key:sliders_specific[key].val for key in sliders_specific.keys()}
-    kwargs_common= {key:sliders_common[key].val for key in sliders_common.keys()}
-
-    new_shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, shape_kwargs=kwargs_shape, **kwargs_common, **my_default_demo_params)
+    kwargs_common= {key:sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
+    kwargs_common['diamond'] = [sliders_common['diamond_x'].val, 
+                                sliders_common['diamond_y'].val]
+    colour_etc_kwargs = set_fill_in_outline_kwarg_defaults({}, defaults_for_demo=True)
+    new_shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, shape_kwargs=kwargs_shape, **kwargs_common, **colour_etc_kwargs)
     plt.draw()
 
   def update_specific(val):
