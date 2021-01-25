@@ -35,8 +35,8 @@ def get_step(params):
 common_params_dict = {'turn' : [0, 12, 0],
                       'stretch_x' : [0.2, 5, 1],
                       'stretch_y' : [0.2, 5, 1],
-                      'diamond_x' : np.array([0.5, 0, 1]), 
-                      'diamond_y' : np.array([0.5, 0, 1])}
+                      'diamond_x' : np.array([0., 1., 0.5]), 
+                      'diamond_y' : np.array([0., 1., 0.5])}
 
 shape_names_params_dicts = {'a_rhombus' : {},
                             'a_triangle': {}, 
@@ -121,7 +121,7 @@ def run_demo(shapename):
       plt.draw()   
 
   def reset(event):
-    for _slider in [sliders_specific.values() + sliders_common.values()]:
+    for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
       _slider.reset()
 
   for _slider in sliders_specific.values():
