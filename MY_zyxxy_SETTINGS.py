@@ -67,7 +67,7 @@ my_default_animation_repeat = False
 my_default_animation_FPS = 5
 
 my_default_demo_canvas_size = [16, 10]
-my_default_demo_figsize = [3, 2]
+my_default_demo_figsize = [15, 10]
 my_default_demo_dpi = 75
 my_default_demo_tick_step = 1
 

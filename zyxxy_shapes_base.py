@@ -23,6 +23,8 @@ import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
 import matplotlib.lines, matplotlib.patches
 
+counter = 0
+
 ##################################################################
 ## CANVAS HELPERS                                               ## 
 ##################################################################
@@ -109,7 +111,7 @@ class Shape:
 
     self.patch_zorder = patch_zorder
     self.line_zorder = line_zorder
-    self.diamond_coords = [0, 0]
+    self.diamond_coords = np.array([0, 0])
     self.diamond_contour = (np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * 
                     (get_width(ax=ax)*_default_diamond_arguments['size']/1000))
     self.clip_patch = None
@@ -156,6 +158,12 @@ class Shape:
     # updating the diamond
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
 
+  def update_given_shapename(self, shapename, kwargs_shape, kwargs_common):
+    self.update_xy_by_shapename(shapename, **kwargs_shape)
+    self.set_new_diamond_and_shift(new_diamond_coords=kwargs_common['diamond'])
+    self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=kwargs_common['stretch_y'])
+    self.rotate(turn=kwargs_common['turn'])
+
   def add_clip_outline(self, clip_outline):
     if type(clip_outline) is plt.Polygon:
       clip_contour = clip_outline.get_xy()
@@ -184,7 +192,7 @@ class Shape:
     add_to_layer_record(what_to_add=self.clip_patch)
   
   def update_diamond(self, new_diamond_coords):
-    self.diamond_coords = new_diamond_coords
+    self.diamond_coords = np.array(new_diamond_coords)
     if self.diamond_patch is not None:                  
       _set_xy(something=self.diamond_patch, 
               xy=self.diamond_coords+self.diamond_contour)
@@ -203,6 +211,20 @@ class Shape:
       xy += shift
       _set_xy(something=something, xy=xy)
     self.update_diamond(new_diamond_coords = self.diamond_coords + shift)
+
+  def set_new_diamond_and_shift(self, new_diamond_coords):
+    if new_diamond_coords is None:
+      return
+    shift = -self.diamond_coords + new_diamond_coords
+    what_to_move = self.get_what_to_move()
+    for something in what_to_move:
+      if something is None:
+        continue
+      xy = _get_xy(something=something)
+      xy += shift
+      _set_xy(something=something, xy=xy)
+    self.update_diamond(new_diamond_coords = new_diamond_coords)
+
 
   def rotate(self, turn, diamond_override = None):
     if (turn is None) or (turn == 0):
@@ -224,7 +246,7 @@ class Shape:
   def stretch(self, stretch_x, stretch_y, diamond_override = None):
     if diamond_override is not None:
       diamond_to_use = diamond_override
-      self.diamond_coords[0] = stretch_something        (what_to_stretch=self.diamond_coords[0], 
+      self.diamond_coords[0] = stretch_something(what_to_stretch=self.diamond_coords[0], 
                                                  diamond=diamond_to_use[0], 
                                                  stretch_coeff=stretch_x)
       self.diamond_coords[1] = stretch_something(what_to_stretch=self.diamond_coords[1], 
@@ -247,12 +269,9 @@ class Shape:
       _set_xy(something=something, xy=xy)
 
 
-def draw_given_shapename(ax, is_patch, shapename, shape_kwargs, diamond, stretch_x, stretch_y, turn, **kwargs):
+def draw_given_shapename(ax, is_patch, shapename, kwargs_shape, kwargs_common, **kwargs):
   new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
-  new_shape.update_xy_by_shapename(shapename=shapename, **shape_kwargs)
-  new_shape.shift(shift=diamond)
-  new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
-  new_shape.rotate(turn=turn)
+  new_shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
   return new_shape
 
 def draw_given_contour(ax, is_patch, contour, diamond, stretch_x, stretch_y, turn, **kwargs):

@@ -32,6 +32,8 @@ def get_step(params):
       step = candidate_step
   return step
 
+new_shape=None
+
 common_params_dict = {'turn' : [0, 12, 0],
                       'stretch_x' : [0.2, 5, 1],
                       'stretch_y' : [0.2, 5, 1],
@@ -54,9 +56,7 @@ shape_names_params_dicts = {'a_rhombus' : {},
 
 def run_demo(shapename):
   shape_params_dict = shape_names_params_dicts[shapename]
-
   top_slider_location = max(len(shape_params_dict), len(common_params_dict))
-
   my_default_margin_adjustments['bottom'] += 0.05 * top_slider_location
 
   # Creating the canvas!
@@ -86,54 +86,27 @@ def run_demo(shapename):
     kwargs_common['diamond'] = [sliders_common['diamond_x'].val, 
                                 sliders_common['diamond_y'].val]
     colour_etc_kwargs = set_fill_in_outline_kwarg_defaults({}, defaults_for_demo=True)
-    
-    new_shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, shape_kwargs=kwargs_shape, **kwargs_common, **colour_etc_kwargs)
-    
+
+    if new_shape is None:
+      new_shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common, **colour_etc_kwargs)
+    else:
+      new_shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+   
     plt.draw()
 
-  def update_specific(val):
+  def update(val):
     draw_new_shape(ax=ax)
-
-  def update_stretch(val):
-    global new_shape
-    if new_shape is None:
-      draw_new_shape(ax=ax)
-    else:
-      new_shape.stretch(stretch_x=sliders_common['stretch_x'].val, 
-                        stretch_y=sliders_common['stretch_y'].val)
-      plt.draw()
-
-  def update_shift(val):
-    global new_shape
-    if new_shape is None:
-      draw_new_shape(ax=ax)
-    else:
-      new_shape.shift(shift=[sliders_common['diamond_x'].val, 
-                           sliders_common['diamond_y'].val])
-      plt.draw()   
-    
-  def update_turn(val):
-    global new_shape
-    if new_shape is None:
-      draw_new_shape(ax=ax)
-    else:
-      new_shape.rotate(turn=sliders_common['turn'].val)
-      plt.draw()   
 
   def reset(event):
     for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
       _slider.reset()
 
-  for _slider in sliders_specific.values():
-    _slider.on_changed(update_specific)
+  for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
+      _slider.on_changed(update)
 
-  for _slider in [sliders_common['stretch_x'], sliders_common['stretch_y']]:
-    _slider.on_changed(update_stretch)
-  for _slider in [sliders_common['diamond_x'], sliders_common['diamond_y']]:
-    _slider.on_changed(update_shift)
-  sliders_common['turn'].on_changed(update_turn)
   button.on_clicked(reset)
   
   draw_new_shape(ax=ax)
-  plt.show()
-  show_drawing_and_save_if_needed(figsize=my_default_demo_figsize, dpi=my_default_demo_dpi)
+  show_drawing_and_save_if_needed(figsize=my_default_demo_figsize, 
+                                  dpi=my_default_demo_dpi,
+                                  margin_adjustments=my_default_margin_adjustments)
