@@ -22,6 +22,14 @@ from math import sqrt
 ## contours manipulation                           ##
 #####################################################
 
+def conc_1_or_2_dim(a, b):
+  if a.ndim != b.ndim:
+    raise Exception("Dimension number mismatch", a.ndim, "!=", b.ndim)
+  if a.ndim == 1:
+    return np.hstack((a, b))
+  else:
+    return np.vstack((a, b))
+
 def link_contours(*arg):
   result = np.empty((2, 0))
   for _a in arg:
@@ -32,9 +40,9 @@ def link_contours(*arg):
       result = a
       continue
     if is_the_same_point(p1=result[-1], p2=a[0]):
-      result = np.vstack((result[:-1, :], a))
+      result = conc_1_or_2_dim(result[:-1, :], a)
     else:
-      result = np.vstack((result, a))
+      result = conc_1_or_2_dim(result, a)
   return result
 
 def add_a_left_mirror(contour, mirror_x=0):
