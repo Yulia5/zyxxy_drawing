@@ -34,29 +34,40 @@ def get_step(params):
 
 new_shape=None
 
-common_params_dict = {'turn' : [0, 12, 0],
-                      'stretch_x' : [0.2, 5, 1],
-                      'stretch_y' : [0.2, 5, 1],
-                      'diamond_x' : np.array([0., 1., 0.5]), 
-                      'diamond_y' : np.array([0., 1., 0.5])}
+slider_range = {'half_way_0_1' : np.array([0., 1., 0.5, 1]),
+                'stretch'      : np.array([0., 5, 1, 0.1]),
+                'turn'         : np.array([0, 12, 0, 1]),
+                'double_turn'  : np.array([0, 24, 0, 1]),
+                'long_turn'    : np.array([0, 60, 0, 3]),
+                'half_turn'    : np.array([0,  6, 0, 1]),
+                'minus_1_to_1' : np.array([-1., 1., 0., .1]),
+                'vertices'     : np.array([0, 12, 0, 1]),}
 
-shape_names_params_dicts = {'a_rhombus' : {},
+common_params_dict_definition = {'turn' : 'turn',
+                                 'stretch_x' : 'stretch',
+                                 'stretch_y' : 'stretch',
+                                 'diamond_x' : 'half_way_0_1', 
+                                 'diamond_y' : 'half_way_0_1'}
+
+shape_names_params_dicts_definition = {
+                            'a_rhombus' : {},
                             'a_triangle': {}, 
                             'a_square': {}, 
                             'a_circle': {}, 
                             'an_elliptic_drop': {},
-                            'a_smile': {'dip' : []},
-                            'a_star': {'ends_qty' : [], 'radii_ratio' : []},
-                            'a_regular_polygon': {'vertices_qty' : []},
-                            'an_ellipse': {'radius_x' : [], 'radius_y' : []},
-                            'a_double_smile': {'dip_1' : [], 'dip_2' : []},
-                            'a_heart': {'angle_middle' : [], 'tip_addon' : []},
-                            'a_sector': {'angle_start' : [], 'angle_end' : [], 'radii_ratio' : []},
-                            'an_arc': {'angle_start' : [], 'angle_end' : [], 'speed_x' : [], 'speed_y' : []}}
+                            'a_smile': {'dip' : 'minus_1_to_1'},
+                            'a_star': {'ends_qty' : 'vertices', 'radii_ratio' : 'stretch'},
+                            'a_regular_polygon': {'vertices_qty' : 'vertices'},
+                            #'an_ellipse': {'radius_x' : [], 'radius_y' : []},
+                            'a_double_smile': {'dip_1' : 'minus_1_to_1', 'dip_2' : 'minus_1_to_1'},
+                            'a_heart': {'angle_middle' : 'half_turn', 'tip_addon' : 'stretch'},
+                            'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
+                            'an_arc': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
 def run_demo(shapename):
-  shape_params_dict = shape_names_params_dicts[shapename]
-  top_slider_location = max(len(shape_params_dict), len(common_params_dict))
+  this_shape_params_definition = shape_names_params_dicts_definition[shapename]
+  shape_params_dict =  {key:np.copy(slider_range[value]) for key, value in this_shape_params_definition.items()}
+  top_slider_location = max(len(shape_params_dict), len(common_params_dict_definition))
   my_default_margin_adjustments['bottom'] += 0.05 * top_slider_location
 
   # Creating the canvas!
@@ -65,8 +76,10 @@ def run_demo(shapename):
                               tick_step=my_default_demo_tick_step,
                               title="Try Out "+shapename)
   
-  common_params_dict['diamond_x'] *= my_default_demo_canvas_size[0]
-  common_params_dict['diamond_y'] *= my_default_demo_canvas_size[1]
+  common_params_dict = {key:np.copy(slider_range[value]) for key, value in common_params_dict_definition.items()}
+  
+  common_params_dict['diamond_x'][:-1] *= my_default_demo_canvas_size[0]
+  common_params_dict['diamond_y'][:-1] *= my_default_demo_canvas_size[1]
 
   button = Button(plt.axes([0.6, 0.025, 0.1, 0.04]), 'Reset')
 
