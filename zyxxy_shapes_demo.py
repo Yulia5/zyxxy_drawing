@@ -23,17 +23,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
 
-default_step = 1
-def get_step(params):
-  step = default_step
-  for p in params:
-    candidate_step = p % 1
-    if candidate_step > 0.01 and candidate_step < step:
-      step = candidate_step
-  return step
-
-new_shape=None
-
 slider_range = {'half_way_0_1' : [0., 1., 0.5, 1],
                 'stretch'      : [0., 5, 1, 0.1],
                 'turn'         : [0, 12, 0, 1],
@@ -64,22 +53,25 @@ shape_names_params_dicts_definition = {
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
                             'an_arc': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
+shapes_by_side_by_shapename = {'left' : {key : None for key in shape_names_params_dicts_definition.keys()},
+                               'right': {key : None for key in shape_names_params_dicts_definition.keys()},}
+widgets_by_side_by_shapename = {'left' : {key : {} for key in shape_names_params_dicts_definition.keys()},
+                                'right': {key : {} for key in shape_names_params_dicts_definition.keys()},}
+active_shapename = {'left' : None, 'right' : None}
+
 # Creating the canvas!
 ax = create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
                             canvas_height=my_default_demo_canvas_size[1], 
                             tick_step=my_default_demo_tick_step,
                             title="Try Out Shapes")
+rax_left = plt.axes([0.025, 0.1, 0.15, 0.05*len(shape_names_params_dicts_definition)])
+radio_left = RadioButtons(rax_left, shape_names_params_dicts_definition.keys(), active=0)
 
-rax = plt.axes([0.025, 0.1, 0.15, 0.05*len(shape_names_params_dicts_definition)])
-radio = RadioButtons(rax, shape_names_params_dicts_definition.keys(), active=0)
-def switch_demo(label):
-  run_demo(shapename=label)
-radio.on_clicked(switch_demo)
 
-def run_demo(shapename):
+def place_shapes_and_widgets(side, shapename):
   this_shape_params_definition = shape_names_params_dicts_definition[shapename]
-  shape_params_dict =  {key:np.copy(slider_range[value]) for key, value in this_shape_params_definition.items()}
-  top_slider_location = max(len(shape_params_dict), len(common_params_dict_definition))
+  shape_params_dict = {key:np.copy(slider_range[value]) for key, value in this_shape_params_definition.items()}
+  top_slider_location = len(shape_params_dict) + len(common_params_dict_definition)
   margin_adjustments = {k:v for k, v in my_default_margin_adjustments.items()}
   margin_adjustments['bottom'] += 0.05 * top_slider_location
   
@@ -88,34 +80,49 @@ def run_demo(shapename):
   common_params_dict['diamond_x'][:-1] *= my_default_demo_canvas_size[0]
   common_params_dict['diamond_y'][:-1] *= my_default_demo_canvas_size[1]
 
-  button = Button(plt.axes([0.6, 0.025, 0.1, 0.04]), 'Reset')
+  if side == 'left':
+    widget_left = 0.15
+  else:
+    widget_left = 0.65
 
+  button = Button(plt.axes([widget_left, 0.025, 0.1, 0.04]), 'Reset')
+
+  counter = top_slider_location
   sliders_specific = {}
   sliders_common = {}
-  for slider_start, param_params_dict, target in ((0.15, shape_params_dict, sliders_specific), (0.65, common_params_dict, sliders_common)):
-    counter = top_slider_location
+  for param_params_dict, target in ((shape_params_dict, sliders_specific), (common_params_dict, sliders_common)):
     for param_name, param_params in param_params_dict.items():
       counter -= 1
-      target[param_name] = Slider(ax=plt.axes([slider_start, 0.1+0.05*counter, 0.3, 0.03]), label=param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=get_step(params = param_params))
+      target[param_name] = Slider(ax=plt.axes([widget_left, 0.1+0.05*counter, 0.3, 0.03]), label=shapename+param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3])
 
-  def draw_new_shape(ax):
-    global new_shape
+  widgets_by_side_by_shapename[side][shapename] = {'sliders_specific': sliders_specific, 
+                                                   'sliders_common': sliders_common, 
+                                                   'button': button}
 
-    kwargs_shape = {key:sliders_specific[key].val for key in sliders_specific.keys()}
-    kwargs_common= {key:sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
-    kwargs_common['diamond'] = [sliders_common['diamond_x'].val, 
-                                sliders_common['diamond_y'].val]
+  def draw_new_shape():
+    global shapes_by_side_by_shapename
+    global widgets_by_side_by_shapename
+    _shape = shapes_by_side_by_shapename[side][shapename]
+    _widgets = widgets_by_side_by_shapename[side][shapename]
+    _sliders_specific = _widgets['sliders_specific']
+    _sliders_common = _widgets['sliders_common']
+
+    kwargs_shape = {key:_sliders_specific[key].val for key in sliders_specific.keys()}
+    kwargs_common= {key:_sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
+    kwargs_common['diamond'] = [_sliders_common['diamond_x'].val, 
+                                _sliders_common['diamond_y'].val]
     colour_etc_kwargs = set_fill_in_outline_kwarg_defaults({}, defaults_for_demo=True)
 
-    if new_shape is None:
-      new_shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common, **colour_etc_kwargs)
+    if _shape is None:
+      _shape = draw_given_shapename(ax=ax, is_patch=True, shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common, **colour_etc_kwargs)
+      shapes_by_side_by_shapename[side][shapename] = _shape
     else:
-      new_shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+      _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
    
     plt.draw()
 
   def update(val):
-    draw_new_shape(ax=ax)
+    draw_new_shape()
 
   def reset(event):
     for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
@@ -126,9 +133,39 @@ def run_demo(shapename):
 
   button.on_clicked(reset)
   
-  draw_new_shape(ax=ax)
+  draw_new_shape()
   show_drawing_and_save_if_needed(figsize=my_default_demo_figsize, 
                                   dpi=my_default_demo_dpi,
                                   margin_adjustments=margin_adjustments)
 
-switch_demo(label='a_circle')
+def switch_demo(side, shapename, switch_on):
+  if shapename is None:
+    return
+
+  _shape = shapes_by_side_by_shapename[side][shapename]
+  _widgets = widgets_by_side_by_shapename[side][shapename]
+  if not switch_on:
+    _shape.set_visible(None)
+  else:
+    _shape.set_visible(True) # depends on the switch
+
+  # widgets
+  _widgets['button'].set_visible(switch_on)
+  for _s in _widgets['sliders_specific'].values():
+    _s.set_visible(switch_on)
+  for _s in _widgets['sliders_common'].values():
+    _s.set_visible(switch_on)
+
+
+for side in ['left', 'right']:
+  for shapename in shape_names_params_dicts_definition.keys():
+    place_shapes_and_widgets(side=side, shapename=shapename)
+    switch_demo(side=side, shapename=shapename, switch_on=False)
+
+switch_demo(side='left', label='a_circle', switch_on=True)
+
+def switch_demo_left(label):
+  switch_demo(side='left', shapename=active_shapename['left'], switch_on=False)
+  switch_demo(side='left', shapename=label                   , switch_on=True)
+  active_shapename['left'] = label
+radio_left.on_clicked(switch_demo_left)
