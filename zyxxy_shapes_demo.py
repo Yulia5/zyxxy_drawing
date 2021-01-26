@@ -20,7 +20,7 @@ from zyxxy_settings import set_fill_in_outline_kwarg_defaults
 from MY_zyxxy_SETTINGS import my_default_margin_adjustments, my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step
 
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button
+from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
 
 default_step = 1
@@ -34,14 +34,14 @@ def get_step(params):
 
 new_shape=None
 
-slider_range = {'half_way_0_1' : np.array([0., 1., 0.5, 1]),
-                'stretch'      : np.array([0., 5, 1, 0.1]),
-                'turn'         : np.array([0, 12, 0, 1]),
-                'double_turn'  : np.array([0, 24, 0, 1]),
-                'long_turn'    : np.array([0, 60, 0, 3]),
-                'half_turn'    : np.array([0,  6, 0, 1]),
-                'minus_1_to_1' : np.array([-1., 1., 0., .1]),
-                'vertices'     : np.array([0, 12, 0, 1]),}
+slider_range = {'half_way_0_1' : [0., 1., 0.5, 1],
+                'stretch'      : [0., 5, 1, 0.1],
+                'turn'         : [0, 12, 0, 1],
+                'double_turn'  : [0, 24, 0, 1],
+                'long_turn'    : [0, 60, 0, 3],
+                'half_turn'    : [0,  6, 0, 1],
+                'minus_1_to_1' : [-1., 1., 0., .1],
+                'vertices'     : [0, 12, 0, 1],}
 
 common_params_dict_definition = {'turn' : 'turn',
                                  'stretch_x' : 'stretch',
@@ -50,10 +50,10 @@ common_params_dict_definition = {'turn' : 'turn',
                                  'diamond_y' : 'half_way_0_1'}
 
 shape_names_params_dicts_definition = {
+                            'a_circle': {}, 
                             'a_rhombus' : {},
                             'a_triangle': {}, 
                             'a_square': {}, 
-                            'a_circle': {}, 
                             'an_elliptic_drop': {},
                             'a_smile': {'dip' : 'minus_1_to_1'},
                             'a_star': {'ends_qty' : 'vertices', 'radii_ratio' : 'stretch'},
@@ -64,17 +64,24 @@ shape_names_params_dicts_definition = {
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
                             'an_arc': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
+# Creating the canvas!
+ax = create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
+                            canvas_height=my_default_demo_canvas_size[1], 
+                            tick_step=my_default_demo_tick_step,
+                            title="Try Out Shapes")
+
+rax = plt.axes([0.025, 0.1, 0.15, 0.05*len(shape_names_params_dicts_definition)])
+radio = RadioButtons(rax, shape_names_params_dicts_definition.keys(), active=0)
+def switch_demo(label):
+  run_demo(shapename=label)
+radio.on_clicked(switch_demo)
+
 def run_demo(shapename):
   this_shape_params_definition = shape_names_params_dicts_definition[shapename]
   shape_params_dict =  {key:np.copy(slider_range[value]) for key, value in this_shape_params_definition.items()}
   top_slider_location = max(len(shape_params_dict), len(common_params_dict_definition))
-  my_default_margin_adjustments['bottom'] += 0.05 * top_slider_location
-
-  # Creating the canvas!
-  ax = create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
-                              canvas_height=my_default_demo_canvas_size[1],
-                              tick_step=my_default_demo_tick_step,
-                              title="Try Out "+shapename)
+  margin_adjustments = {k:v for k, v in my_default_margin_adjustments.items()}
+  margin_adjustments['bottom'] += 0.05 * top_slider_location
   
   common_params_dict = {key:np.copy(slider_range[value]) for key, value in common_params_dict_definition.items()}
   
@@ -122,4 +129,6 @@ def run_demo(shapename):
   draw_new_shape(ax=ax)
   show_drawing_and_save_if_needed(figsize=my_default_demo_figsize, 
                                   dpi=my_default_demo_dpi,
-                                  margin_adjustments=my_default_margin_adjustments)
+                                  margin_adjustments=margin_adjustments)
+
+switch_demo(label='a_circle')
