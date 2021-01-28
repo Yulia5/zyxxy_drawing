@@ -119,7 +119,7 @@ class Shape:
     
     if is_patch:
       self.line = None
-      dummy_line, = ax.plot([0, 0], [0, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
+      dummy_line, = ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
       self.outline = dummy_line
       self.patch = plt.Polygon(np.array([[0,0], [1,1], [1,0]]), #dummy 
                                fc = colour_code_patch, 
@@ -128,7 +128,7 @@ class Shape:
                                alpha = patch_alpha)
       self.ax.add_patch(self.patch)
     else:
-      dummy_line, = ax.plot([0, 0], [0, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
+      dummy_line, = ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
       self.patch = None
       self.outline = None
       self.line, = dummy_line
@@ -151,7 +151,8 @@ class Shape:
     if self.line is not None:
       _set_xy(self.line, contour)
     if self.outline is not None:
-      _set_xy(self.outline, np.append(contour, contour[0:2], axis=0))
+      if (np.array(self.outline)).size > 3:
+        _set_xy(self.outline, np.append(contour, contour[0:2], axis=0))
     if self.patch is not None:
       _set_xy(self.patch, contour)
     
@@ -199,6 +200,20 @@ class Shape:
 
   def get_what_to_move(self):
     return [self.line, self.patch, self.outline, self.clip_patch, self.clip_line]
+
+  def set_visible(self, val):
+    if val is None:
+      what_to_hide = self.get_what_to_move()
+      for something in what_to_hide:
+        if something is not None:
+          something.set_visible(False)
+    else:
+      for something in [self.patch, self.outline, self.clip_patch]:
+        if something is not None:
+          something.set_visible(val)
+      for something in [self.line, self.clip_line]:
+        if something is not None:
+          something.set_visible(not val)
 
   def shift(self, shift):
     if shift is None:
