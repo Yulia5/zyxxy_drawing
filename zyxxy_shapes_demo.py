@@ -14,14 +14,16 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
+from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shapes_base import Shape
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults
-from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap
+from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
+
+plt.rcParams.update({'font.size': my_default_demo_font_size})
 
 slider_range = {'half_way_0_1' : [0., 1., 0.5, 1],
                 'stretch'      : [0., 5, 1, 0.1],
@@ -75,20 +77,13 @@ shape_switcher = {}
 shape_switcher_options = ['None']+[k for k in shape_names_params_dicts_definition.keys()]
 fig = plt.figure()
 for side, rax_x_left in both_rax_x_left.items():
-  print(my_default_demo_radio_width)
   rax = plt.axes([rax_x_left, my_default_demo_rax_bottom, my_default_demo_radio_width, my_default_demo_widget_height*len(shape_switcher_options)])
-  print([rax_x_left, my_default_demo_rax_bottom, my_default_demo_radio_width, my_default_demo_widget_height*len(shape_switcher_options)])
   fig.add_axes(rax)
   shape_switcher[side] = RadioButtons(rax, shape_switcher_options, active=2)
 
 # Creating the canvas!
 
-print(my_default_demo_radio_width)
-print(1-2*my_default_demo_radio_width)
 big_axes_width = 1-2*(my_default_demo_radio_width + my_default_demo_radio_side_margin+my_default_demo_plot_gap)
-print(big_axes_width)
-print([my_default_demo_radio_side_margin+my_default_demo_radio_width+my_default_demo_plot_gap, my_default_demo_rax_bottom, big_axes_width, 1-my_default_demo_rax_bottom])
-
 ax = plt.axes([my_default_demo_radio_side_margin+my_default_demo_radio_width+my_default_demo_plot_gap, my_default_demo_rax_bottom+my_default_demo_plot_bottom_gap, big_axes_width, 1-my_default_demo_rax_bottom-my_default_demo_plot_bottom_gap])
 fig.add_axes(ax)
 
@@ -96,9 +91,10 @@ create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
                             canvas_height=my_default_demo_canvas_size[1], 
                             tick_step=my_default_demo_tick_step,
                             title="Try Out Shapes",
+                            title_font_size = my_default_demo_font_size*1.5,
+                            axes_label_font_size = my_default_demo_font_size,
+                            axes_tick_font_size = my_default_demo_font_size,
                             ax=ax)
-
-#plt.subplots_adjust(**margin_adjustments)
 plt.draw()
 plt.show(block=False)
 
@@ -137,13 +133,16 @@ def place_shapes_and_widgets(side, shapename):
 
   button = Button(ax=plt.axes([widget_left, 0.025, 0.1, my_default_demo_widget_height]) , label='Reset')
 
-  counter = (MAX_WIDGET_QTY + 1)
+  counter = MAX_WIDGET_QTY + 1
   sliders_specific = {}
   sliders_common = {}
   for param_params_dict, target in ((shape_params_dict, sliders_specific), (common_params_dict, sliders_common)):
     for param_name, param_params in param_params_dict.items():
       counter -= 1
-      target[param_name] = Slider(ax=plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter, 0.3, my_default_demo_widget_height]), label=shapename+param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3])
+      target[param_name] = Slider(ax=plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter, 0.3, my_default_demo_widget_height]), label=param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3])
+      target[param_name].label.set_size(my_default_demo_font_size)
+      #target[param_name].val.set_size(my_default_demo_font_size)
+      
 
   widgets_by_side_by_shapename[side][shapename] = {'sliders_specific': sliders_specific, 
                                                    'sliders_common': sliders_common, 

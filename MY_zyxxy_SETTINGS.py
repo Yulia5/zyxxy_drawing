@@ -71,14 +71,13 @@ my_default_demo_figsize = [10.5*1.8, 8*1.8]
 my_default_demo_dpi = 75
 my_default_demo_tick_step = 1
 
-my_default_demo_radio_width = 0.15
+my_default_demo_radio_width = 0.15*1.3
 my_default_demo_radio_side_margin = 0.025
 my_default_demo_widget_height = 0.02 * 1.5
 my_default_demo_widget_gap = 0.01
 my_default_demo_plot_gap = 0.05
 my_default_demo_plot_bottom_gap = 0.01
-
-my_default_demo_widget_height + my_default_demo_widget_gap 
+my_default_demo_font_size = 20
 
 my_default_demo_params = {"line" : {'colour' : 'black', 
                                     'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
