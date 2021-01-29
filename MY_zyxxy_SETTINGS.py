@@ -39,7 +39,7 @@ my_default_colour_etc_settings = {
 
 # Diamond parameters!
 # Diamonds don't move when you turn the shapes
-my_default_diamond_size = 15
+my_default_diamond_size = 150
 my_default_diamond_colour = 'green' #  None # 
 
 # Font sizes and adjustment needed to fit them
@@ -67,9 +67,18 @@ my_default_animation_repeat = False
 my_default_animation_FPS = 5
 
 my_default_demo_canvas_size = [16, 10]
-my_default_demo_figsize = [15, 10]
+my_default_demo_figsize = [10.5*1.8, 8*1.8]
 my_default_demo_dpi = 75
 my_default_demo_tick_step = 1
+
+my_default_demo_radio_width = 0.15
+my_default_demo_radio_side_margin = 0.025
+my_default_demo_widget_height = 0.02 * 1.5
+my_default_demo_widget_gap = 0.01
+my_default_demo_plot_gap = 0.05
+my_default_demo_plot_bottom_gap = 0.01
+
+my_default_demo_widget_height + my_default_demo_widget_gap 
 
 my_default_demo_params = {"line" : {'colour' : 'black', 
                                     'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
