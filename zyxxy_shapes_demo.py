@@ -68,6 +68,19 @@ rax_left = plt.axes([0.025, 0.3, 0.15, 0.05*len(shape_names_params_dicts_definit
 radio_left = RadioButtons(rax_left, shape_names_params_dicts_definition.keys(), active=2)
 count_shapes = 0
 
+def update_given_shapename_and_side(side, shapename):
+  global shapes_by_side_by_shapename
+  global widgets_by_side_by_shapename
+  _shape = shapes_by_side_by_shapename[side][shapename]
+  _widgets = widgets_by_side_by_shapename[side][shapename]
+  _sliders_specific = _widgets['sliders_specific']
+  _sliders_common = _widgets['sliders_common']
+
+  kwargs_shape = {key:_sliders_specific[key].val for key in _sliders_specific.keys()}
+  kwargs_common= {key:_sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
+  kwargs_common['diamond'] = [_sliders_common['diamond_x'].val, 
+                              _sliders_common['diamond_y'].val]
+  _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
 
 def place_shapes_and_widgets(side, shapename):
   global count_shapes
@@ -87,7 +100,6 @@ def place_shapes_and_widgets(side, shapename):
     widget_left = 0.65
   widget_left += count_shapes * 0.0001
 
-  #widgets_by_side_by_shapename[side][shapename]['Reset'] = plt.axes([widget_left, 0.025, 0.1, 0.04])
   button = Button(ax=plt.axes([widget_left, 0.025, 0.1, 0.04]) , label='Reset')
 
   counter = top_slider_location
@@ -103,33 +115,17 @@ def place_shapes_and_widgets(side, shapename):
                                                    'button': button}
   colour_etc_kwargs = set_fill_in_outline_kwarg_defaults({}, defaults_for_demo=True)
   _shape = Shape(ax=ax, is_patch=True, **colour_etc_kwargs)
-  shapes_by_side_by_shapename[side][shapename] = _shape                                                
-
-  def draw_new_shape():
-    global shapes_by_side_by_shapename
-    global widgets_by_side_by_shapename
-    _shape = shapes_by_side_by_shapename[side][shapename]
-    _widgets = widgets_by_side_by_shapename[side][shapename]
-    _sliders_specific = _widgets['sliders_specific']
-    _sliders_common = _widgets['sliders_common']
-
-    kwargs_shape = {key:_sliders_specific[key].val for key in sliders_specific.keys()}
-    kwargs_common= {key:_sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
-    kwargs_common['diamond'] = [_sliders_common['diamond_x'].val, 
-                                _sliders_common['diamond_y'].val]
-    _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
-   
-    ax.redraw_in_frame()
+  shapes_by_side_by_shapename[side][shapename] = _shape
 
   def update(val):
-    draw_new_shape()
+    update_given_shapename_and_side(side=side, shapename=shapename)
 
   def reset(event):
     for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
       _slider.reset()
 
   for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
-      _slider.on_changed(update)
+    _slider.on_changed(update)
 
   button.on_clicked(reset)
 
@@ -157,8 +153,13 @@ def switch_demo(side, shapename, switch_on):
 for side in ['left', 'right']:
   for shapename in shape_names_params_dicts_definition.keys():
     place_shapes_and_widgets(side=side, shapename=shapename)
-    switch_demo(side=side, shapename=shapename, switch_on=False)
 plt.draw()
+plt.show(block=False)
+
+for side in ['left', 'right']:
+  for shapename in shape_names_params_dicts_definition.keys():
+    update_given_shapename_and_side(side=side, shapename=shapename)
+    switch_demo(side=side, shapename=shapename, switch_on=False)
 
 def switch_demo_left(label):
   # label == radio_left.value_selected

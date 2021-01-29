@@ -121,7 +121,7 @@ class Shape:
       self.line = None
       dummy_line, = ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
       self.outline = dummy_line
-      self.patch = plt.Polygon(np.array([[0,0], [1,1], [1,0]]), #dummy 
+      self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), #dummy 
                                fc = colour_code_patch, 
                                ec = 'none',
                                zorder = patch_zorder,
@@ -159,6 +159,16 @@ class Shape:
     # updating the diamond
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
 
+  def redraw_on_axes(self):
+    what_to_redraw = self.get_what_to_move() + [self.diamond_patch]
+    for something in what_to_redraw:
+      if something is not None:
+        my_ax = something.axes
+        try:
+          my_ax.draw_artist(something)
+        except Exception as inst:
+          raise Exception(inst.args, _get_xy(something))
+
   def update_given_shapename(self, shapename, kwargs_shape, kwargs_common):
     self.update_xy_by_shapename(shapename, **kwargs_shape)
     self.set_new_diamond_and_shift(new_diamond_coords=kwargs_common['diamond'])
@@ -176,7 +186,8 @@ class Shape:
                                fc = 'none', 
                                ec = 'none',
                                zorder = self.patch_zorder)
-      self.ax.add_patch(self.clip_patch)
+      _ax = self.patch.axes
+      _ax.add_patch(self.clip_patch)
       self.patch.set_clip_path(self.clip_patch)
     
     if (self.outline is not None) or (self.line is not None): 
@@ -185,8 +196,12 @@ class Shape:
                                ec = 'none',
                                zorder = self.line_zorder)
       if self.outline is not None:
+        _ax = self.outline.axes
+        _ax.add_patch(self.clip_line)
         self.outline.set_clip_path(self.clip_line)
       if self.line is not None:
+        _ax = self.line.axes
+        _ax.add_patch(self.clip_line)
         self.line.set_clip_path(self.clip_line)
 
     add_to_layer_record(what_to_add=self.clip_line)
@@ -214,6 +229,8 @@ class Shape:
       for something in [self.line, self.clip_line]:
         if something is not None:
           something.set_visible(not val)
+    self.diamond_patch.set_visible(val is not None)
+
 
   def shift(self, shift):
     if shift is None:
@@ -239,7 +256,6 @@ class Shape:
       xy += shift
       _set_xy(something=something, xy=xy)
     self.update_diamond(new_diamond_coords = new_diamond_coords)
-
 
   def rotate(self, turn, diamond_override = None):
     if (turn is None) or (turn == 0):
@@ -282,7 +298,6 @@ class Shape:
                                                  diamond=diamond_to_use[1], 
                                                  stretch_coeff=stretch_y)
       _set_xy(something=something, xy=xy)
-
 
 def draw_given_shapename(ax, is_patch, shapename, kwargs_shape, kwargs_common, **kwargs):
   new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)

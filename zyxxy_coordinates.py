@@ -40,7 +40,7 @@ def link_contours(*arg):
       result = a
       continue
     if is_the_same_point(p1=result[-1], p2=a[0]):
-      result = conc_1_or_2_dim(result[:-1, :], a)
+      result = conc_1_or_2_dim(result[:-1], a)
     else:
       result = conc_1_or_2_dim(result, a)
   return result
@@ -142,14 +142,13 @@ def build_a_smile(dip): # assume that the width = 2
   if is_the_same_point(dip, 0.0): 
     result = np.empty([2, 2])
   else:
-    radius = (1 - dip**2) / (2 * dip)
-    angle = abs(asin_hours(sin_value = 1 / radius))
-    mid_angle = 0
-    if dip < 0:
-      mid_angle = 6
+    radius = abs((1 + dip**2) / (2 * dip))
+    angle = (asin_hours(sin_value = 1 / radius))
     # reusing build_arc
-    result = build_an_arc(angle_start=mid_angle-angle, 
-                          angle_end=mid_angle+angle) * radius
+    result = build_an_arc(angle_start=-angle, 
+                          angle_end=+angle) * radius - [0, radius-abs(dip)]
+    if dip < 0:
+      result[:, 1] *= -1
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [-1, 0]
   result[-1] = [1, 0]
