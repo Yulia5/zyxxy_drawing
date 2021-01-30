@@ -119,19 +119,17 @@ class Shape:
     
     if is_patch:
       self.line = None
-      dummy_line, = ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
-      self.outline = dummy_line
+      (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
       self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), #dummy 
                                fc = colour_code_patch, 
                                ec = 'none',
                                zorder = patch_zorder,
                                alpha = patch_alpha)
       self.ax.add_patch(self.patch)
-    else:
-      dummy_line, = ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
+    else: 
       self.patch = None
       self.outline = None
-      self.line, = dummy_line
+      (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
 
     self.diamond_patch = plt.Polygon(self.diamond_contour, 
       fc = _default_diamond_arguments['colour'], 
@@ -152,8 +150,12 @@ class Shape:
     if self.line is not None:
       _set_xy(self.line, contour)
     if self.outline is not None:
-      if (np.array(self.outline)).size > 3:
-        _set_xy(self.outline, np.append(contour, contour[0:2], axis=0))
+      if (np.array(contour)).size > 3:
+        contour_to_plot = np.append(contour, contour[0:2], axis=0)
+      else:
+        contour_to_plot = contour
+      _set_xy(self.outline, contour_to_plot)
+      # raise Exception(_get_xy(self.outline)) 
     if self.patch is not None:
       _set_xy(self.patch, contour)
     
