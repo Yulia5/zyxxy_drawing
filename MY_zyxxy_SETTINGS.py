@@ -83,8 +83,10 @@ my_default_demo_params = {"line" : {'colour' : 'black',
                                     'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
                           "patch" : {'alpha' : 0.5, 
                                      'zorder' : 1, 
-                                     'colour' : 'red'},
+                                     'colour' : 'none'},
                           "patch_outline" : {'colour' : 'black', 
                                              'linewidth' : 2, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1}}
+my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'cyan'},
+                           "right" : {"shape" : 'blue', 'diamond' : 'magenta'}}

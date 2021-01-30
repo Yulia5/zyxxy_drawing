@@ -98,8 +98,7 @@ def _set_xy(something, xy):
   return something
 
 class Shape:
-  def __init__(self, ax, is_patch, patch_zorder, patch_colour, patch_alpha, outline_colour, outline_linewidth, outline_joinstyle, outline_zorder,
-  line_colour, line_linewidth, line_joinstyle, line_zorder):
+  def __init__(self, ax, is_patch, diamond_colour, patch_zorder, patch_colour, patch_alpha, outline_colour, outline_linewidth, outline_joinstyle, outline_zorder, line_colour, line_linewidth, line_joinstyle, line_zorder):
     colour_code_patch = find_colour_code(colour_name = patch_colour)
     colour_code_line = find_colour_code(colour_name = line_colour)
     colour_code_outline = find_colour_code(colour_name = outline_colour)
@@ -131,8 +130,13 @@ class Shape:
       self.outline = None
       (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
 
+    if diamond_colour is None:
+      diamond_colour_to_use = _default_diamond_arguments['colour']
+    else:
+      diamond_colour_to_use = diamond_colour
+
     self.diamond_patch = plt.Polygon(self.diamond_contour, 
-      fc = _default_diamond_arguments['colour'], 
+      fc = diamond_colour_to_use, 
       ec = 'none',
       zorder = _default_diamond_arguments['zorder'],
       alpha = 1.0)
