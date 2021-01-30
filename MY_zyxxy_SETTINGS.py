@@ -39,7 +39,7 @@ my_default_colour_etc_settings = {
 
 # Diamond parameters!
 # Diamonds don't move when you turn the shapes
-my_default_diamond_size = 150
+my_default_diamond_size = 15
 my_default_diamond_colour = 'green' #  None # 
 
 # Font sizes and adjustment needed to fit them

@@ -138,6 +138,7 @@ class Shape:
       ec = 'none',
       zorder = _default_diamond_arguments['zorder'],
       alpha = 1.0)
+    self.ax.add_patch(self.diamond_patch)
 
     add_to_layer_record(what_to_add=self.patch)
     add_to_layer_record(what_to_add=self.line)
