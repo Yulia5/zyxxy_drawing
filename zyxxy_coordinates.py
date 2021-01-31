@@ -15,7 +15,8 @@
 ########################################################################
 
 import numpy as np
-from zyxxy_utils import sin_hours, cos_hours, tan_hours, asin_hours, acos_hours, is_the_same_point
+from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point
+from scipy.optimize import fsolve
 from math import sqrt
 
 #####################################################
@@ -110,7 +111,7 @@ def build_a_triangle():
 
 # arcs etc.
 def vertices_qty_in_circle():
-  return 60 
+  return 72 
 
 # an arc with different speeds ####################################
 def build_an_arc(angle_start, angle_end, speed_x=1.0, speed_y=1.0):
@@ -182,42 +183,45 @@ def build_an_elliptic_drop():
 
 # a heart (or an ice-cream) ########################################
 # the arcs are the circle arcs, no compression #####################
-# 0 for the heart, 6 for an ice-cream :) ###########################
-def build_a_heart(angle_middle=0, tip_addon=2):
-  angle_tip=6#!!!
-  # adding the right half-circle
-  right_arc = build_an_arc(angle_start=9+angle_middle/2, angle_end=15+angle_tip/2)
-  # moving the mid-point to 0
-  right_arc -= [right_arc[0, 0], 0]
-  # connecting left and right arcs
-  both_arcs = add_a_left_mirror(right_arc)
+# 3 for the heart, 0 for an ice-cream :) ###########################
+def build_a_heart(angle_top_middle, tip_addon):
+  radius = 1 / (1 + sin_hours(angle_top_middle)) # this ensures that the width = 2
 
-  # finding the tip y coordinate
-  tip_y = right_arc[-1, 1] + right_arc[-1, 0] / abs(tan_hours(angle_tip/2))
+  a = sin_hours(angle_top_middle) * radius
+  b = (1 + tip_addon) * radius
+  c = sqrt(a*a + b*b)
+
+  angle_bottom = atan_hours(a/b) + asin_hours(radius/c) 
+
+  # adding the right half-circle
+  right_arc = build_an_arc(angle_start=12-angle_top_middle, angle_end=3+angle_bottom) * radius
+  # moving the mid-point's x to 0
+  right_arc -= [right_arc[0, 0], 0]
   # adding the tip
-  contour = link_contours(both_arcs, [[0, tip_y]])
-  # moving the heart so that its centre were in the tip point
-  contour -= [0, -tip_y]
+  right_side = link_contours(right_arc, [[0, -radius * (1 + tip_addon)]])
+  # moving up so that the tip is in [0, 0]
+  right_side += [0, +radius * (1 + tip_addon)]
+  # adding up a left side
+  contour = add_a_left_mirror(right_side)
 
   return contour
 
 # an egg shape #######################################################
-def build_an_egg(width, height, where_it_bends, power):
-  wibr = where_it_bends/(1 - where_it_bends)
+def build_an_egg(power, tip_addon):
 
-  cos_alpha = 2 / (power * wibr + sqrt((power * wibr)**2 - 4 * (power - 1)))
+  h = lambda cos_alpha: cos_alpha * (1 - 1 / power) + 1 / (power * cos_alpha)
+  cos_alpha_solution = fsolve(h, 1 + tip_addon)
+  a = 1 / (cos_alpha_solution * power * ((1 - cos_alpha_solution*cos_alpha_solution) ** (power/2 - 1)))
 
-  alpha = acos_hours(cos_value=cos_alpha)
+  alpha_solution = acos_hours(cos_alpha_solution)
+  _arc = build_an_arc(angle_start=0, angle_end=6-alpha_solution)
 
-  a = height*where_it_bends - height *(1-where_it_bends)*cos_alpha/((0.5 * width * sqrt(1 - cos_alpha**2)) ** power)
+  pf_points_qty = int(vertices_qty_in_circle()/4)
 
-  diamond, arc_outline = build_an_arc(centre_x=0, centre_y=height*where_it_bends, radius_x=0.5*width, radius_y=height*(1-where_it_bends), angle_start=0, angle_end=3+alpha)
+  power_func_x = cos_alpha_solution * (1. - np.array([n/pf_points_qty for n in range(pf_points_qty+1)]))
+  power_func_2D = [[x, a * (x**power) - (1 + tip_addon)] for x in power_func_x]
 
-  power_func_x = np.linspace(start=0, stop=0.5*width, num=vertices_qty_in_circle()/2)
-
-  power_func_outline = a * power_func_x**power
-
-  right_half_contour = link_contours(arc_outline, power_func_outline[::-1, :]) 
+  right_half_contour = link_contours(_arc, power_func_2D) 
 
   # adding the left half and
   # moving the egg so that its centre were where needed

@@ -31,6 +31,7 @@ slider_range = {'half_way_0_1' : [0., 1., 0.5, 1],
                 'double_turn'  : [0, 24, 0, 1],
                 'long_turn'    : [0, 60, 0, 3],
                 'half_turn'    : [0,  6, 0, 1],
+                'quarter_turn' : [0,  6, 0, 1],
                 'minus_1_to_1' : [-1., 1., 0., .1],
                 'vertices'     : [1, 12, 5, 1],}
 
@@ -51,7 +52,8 @@ shape_names_params_dicts_definition = {
                             'a_regular_polygon': {'vertices_qty' : 'vertices'},
                             #'an_ellipse': {'radius_x' : [], 'radius_y' : []},
                             'a_double_smile': {'dip_1' : 'minus_1_to_1', 'dip_2' : 'minus_1_to_1'},
-                            'a_heart': {'angle_middle' : 'half_turn', 'tip_addon' : 'stretch'},
+                            'a_heart': {'angle_top_middle' : 'quarter_turn', 'tip_addon' : 'stretch'},
+                            'an_egg' : {'power' : 'vertices', 'tip_addon': 'stretch'},
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
                             'an_arc': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 

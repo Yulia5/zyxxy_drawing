@@ -88,5 +88,5 @@ my_default_demo_params = {"line" : {'colour' : 'black',
                                              'linewidth' : 2, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1}}
-my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'cyan'},
-                           "right" : {"shape" : 'blue', 'diamond' : 'magenta'}}
+my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'red'},
+                           "right" : {"shape" : 'blue', 'diamond' : 'blue'}}
