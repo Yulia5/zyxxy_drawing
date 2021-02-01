@@ -34,7 +34,10 @@ def conc_1_or_2_dim(a, b):
 def link_contours(*arg):
   result = np.empty((2, 0))
   for _a in arg:
-    a = np.array(_a)
+    if isinstance(_a, np.ndarray):
+      a = _a
+    else:
+      a = np.array(_a, np.float64)
     if (a.size == 0):
       continue
     if (result.size == 0):
@@ -209,16 +212,27 @@ def build_a_heart(angle_top_middle, tip_addon):
 # an egg shape #######################################################
 def build_an_egg(power, tip_addon):
 
-  h = lambda cos_alpha: cos_alpha * (1 - 1 / power) + 1 / (power * cos_alpha)
-  cos_alpha_solution = fsolve(h, 1 + tip_addon)
-  a = 1 / (cos_alpha_solution * power * ((1 - cos_alpha_solution*cos_alpha_solution) ** (power/2 - 1)))
 
-  alpha_solution = acos_hours(cos_alpha_solution)
+  h = lambda cos_alpha: cos_alpha * (1 - 1 / power) + 1 / (power * cos_alpha) - (1 + tip_addon)
+  cos_alpha_solution = fsolve(h , x0=.5)[0]
+
+  if cos_alpha_solution > 1.:
+    cos_alpha_solution = 1 / (cos_alpha_solution * (power-1))
+
+  if is_the_same_point(1., cos_alpha_solution):
+    a = 0
+  else:
+    a = (1 + tip_addon - cos_alpha_solution) / ((1 - cos_alpha_solution*cos_alpha_solution) ** (power/2))
+
+  try:
+    alpha_solution = acos_hours(cos_alpha_solution)
+  except:
+    raise Exception("power", power, "tip_addon", tip_addon, "cos_alpha_solution", cos_alpha_solution)
   _arc = build_an_arc(angle_start=0, angle_end=6-alpha_solution)
 
   pf_points_qty = int(vertices_qty_in_circle()/4)
 
-  power_func_x = cos_alpha_solution * (1. - np.array([n/pf_points_qty for n in range(pf_points_qty+1)]))
+  power_func_x = sqrt(1 - cos_alpha_solution*cos_alpha_solution) * (1. - np.array([n/pf_points_qty for n in range(pf_points_qty+1)]))
   power_func_2D = [[x, a * (x**power) - (1 + tip_addon)] for x in power_func_x]
 
   right_half_contour = link_contours(_arc, power_func_2D) 

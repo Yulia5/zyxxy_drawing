@@ -74,8 +74,8 @@ def tan_hours(turn):
   return math.tan(math.radians(turn * 30))
 
 def asin_hours(sin_value):
-  return math.degrees(math.asin(min(1.0, sin_value)))/30 
+  return math.degrees(math.asin(sin_value))/30 
 def acos_hours(cos_value):
-  return math.degrees(math.acos(min(1.0, cos_value)))/30 
+  return math.degrees(math.acos(cos_value))/30 
 def atan_hours(tan_value):
   return math.degrees(math.atan(tan_value))/30 
