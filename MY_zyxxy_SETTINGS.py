@@ -67,7 +67,7 @@ my_default_animation_repeat = False
 my_default_animation_FPS = 5
 
 my_default_demo_canvas_size = [16, 10]
-my_default_demo_figsize = [10.5*1.8/2, 8*1.8/2]
+my_default_demo_figsize = [10.5*1.8/1.5, 8*1.8/1.5]
 my_default_demo_dpi = 75
 my_default_demo_tick_step = 1
 
@@ -77,7 +77,7 @@ my_default_demo_widget_height = 0.02 * 1.5
 my_default_demo_widget_gap = 0.01
 my_default_demo_plot_gap = 0.05
 my_default_demo_plot_bottom_gap = 0.01
-my_default_demo_font_size = 20/2
+my_default_demo_font_size = 20/1.5
 
 my_default_demo_params = {"line" : {'colour' : 'black', 
                                     'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
@@ -90,3 +90,7 @@ my_default_demo_params = {"line" : {'colour' : 'black',
                                              'zorder' : 1}}
 my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'red'},
                            "right" : {"shape" : 'blue', 'diamond' : 'blue'}}
+
+
+# arcs etc.
+my_default_vertices_qty_in_circle = 72 

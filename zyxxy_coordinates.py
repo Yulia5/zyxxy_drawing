@@ -15,7 +15,7 @@
 ########################################################################
 
 import numpy as np
-from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point
+from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point, my_default_vertices_qty_in_circle
 from scipy.optimize import fsolve
 from math import sqrt
 
@@ -112,16 +112,12 @@ def build_a_triangle():
   contour_array = np.array([[-1/2, 1], [0, 0], [1/2, 1]]) 
   return contour_array
 
-# arcs etc.
-def vertices_qty_in_circle():
-  return 72 
-
 # an arc with different speeds ####################################
 def build_an_arc(angle_start, angle_end, speed_x=1.0, speed_y=1.0):
   if angle_start > angle_end:
     angle_end += 12
 
-  step = 12. / (max(abs(speed_x), abs(speed_y)) * vertices_qty_in_circle())
+  step = 12. / (max(abs(speed_x), abs(speed_y)) * my_default_vertices_qty_in_circle)
   angles = link_contours(np.arange(angle_start, angle_end, step), [angle_end])
 
   contour = np.array([[sin_hours(a * speed_x), cos_hours(a * speed_y)] for a in angles])
@@ -230,7 +226,7 @@ def build_an_egg(power, tip_addon):
     raise Exception("power", power, "tip_addon", tip_addon, "cos_alpha_solution", cos_alpha_solution)
   _arc = build_an_arc(angle_start=0, angle_end=6-alpha_solution)
 
-  pf_points_qty = int(vertices_qty_in_circle()/4)
+  pf_points_qty = int(my_default_vertices_qty_in_circle/4)
 
   power_func_x = sqrt(1 - cos_alpha_solution*cos_alpha_solution) * (1. - np.array([n/pf_points_qty for n in range(pf_points_qty+1)]))
   power_func_2D = [[x, a * (x**power) - (1 + tip_addon)] for x in power_func_x]
