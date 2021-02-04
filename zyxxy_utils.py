@@ -18,8 +18,11 @@ import math
 import random
 import numpy as np
 
+my_default_vertices_qty_in_circle = 72 
 tolerance = 0.0001
+full_turn_angle = 12 # 12 for hours
 
+##################################################################
 def is_the_same_point(p1, p2):
   diff = p1 - p2
   if isinstance(diff, (int, float)):
@@ -67,15 +70,15 @@ def random_element(list_to_choose_from):
 
 # auxiliary functions to define sin and cos of angles measured in hours
 def sin_hours(turn):
-  return math.sin(math.radians(turn * 30))
+  return math.sin(turn / full_turn_angle * (2 * math.pi))
 def cos_hours(turn):
-  return math.cos(math.radians(turn * 30))
+  return math.cos(turn / full_turn_angle * (2 * math.pi))
 def tan_hours(turn):
-  return math.tan(math.radians(turn * 30))
+  return math.tan(turn / full_turn_angle * (2 * math.pi))
 
 def asin_hours(sin_value):
-  return math.degrees(math.asin(sin_value))/30 
+  return math.asin(sin_value) / (2 * math.pi) * full_turn_angle
 def acos_hours(cos_value):
-  return math.degrees(math.acos(cos_value))/30 
+  return math.acos(cos_value) / (2 * math.pi) * full_turn_angle
 def atan_hours(tan_value):
-  return math.degrees(math.atan(tan_value))/30 
+  return math.atan(tan_value) / (2 * math.pi) * full_turn_angle

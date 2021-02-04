@@ -14,6 +14,7 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shapes_base import Shape
 from zyxxy_settings import set_fill_in_outline_kwarg_defaults
@@ -27,11 +28,11 @@ plt.rcParams.update({'font.size': my_default_demo_font_size})
 
 slider_range = {'half_way_0_1' : [0., 1., 0.5, 1],
                 'stretch'      : [0., 5, 1, 0.1],
-                'turn'         : [0, 12, 0, 1],
-                'double_turn'  : [0, 24, 0, 1],
-                'long_turn'    : [0, 60, 0, 3],
-                'half_turn'    : [0,  6, 0, 1],
-                'quarter_turn' : [0,  6, 0, 1],
+                'turn'         : [0, full_turn_angle, 0, full_turn_angle/12],
+                'double_turn'  : [0, 2*full_turn_angle, 0, full_turn_angle/12],
+                'long_turn'    : [0, 5*full_turn_angle, 0, full_turn_angle/4],
+                'half_turn'    : [0, full_turn_angle/2, 0, full_turn_angle/12],
+                'quarter_turn' : [0, full_turn_angle/4, 0, full_turn_angle/12],
                 'minus_1_to_1' : [-1., 1., 0., .1],
                 'vertices'     : [1, 12, 5, 1],}
 
@@ -42,6 +43,7 @@ common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'diamond_y' : 'half_way_0_1'}
 
 shape_names_params_dicts_definition = {
+                            'a_line' : {},
                             'a_circle': {}, 
                             'a_rhombus' : {},
                             'a_triangle': {}, 
@@ -51,11 +53,11 @@ shape_names_params_dicts_definition = {
                             'a_star': {'ends_qty' : 'vertices', 'radii_ratio' : 'stretch'},
                             'a_regular_polygon': {'vertices_qty' : 'vertices'},
                             #'an_ellipse': {'radius_x' : [], 'radius_y' : []},
-                            'a_double_smile': {'dip_1' : 'minus_1_to_1', 'dip_2' : 'minus_1_to_1'},
+                            'an_eye': {'dip_1' : 'minus_1_to_1', 'dip_2' : 'minus_1_to_1'},
                             'a_heart': {'angle_top_middle' : 'quarter_turn', 'tip_addon' : 'stretch'},
                             'an_egg' : {'power' : 'vertices', 'tip_addon': 'stretch'},
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
-                            'an_arc': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
+                            'an_arc_multispeed': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
 # finding the max number of widgets
 MAX_WIDGET_QTY = 0
