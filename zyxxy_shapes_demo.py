@@ -24,6 +24,10 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
 
+from zyxxy_coordinates import _build_an_arc
+
+_build_an_arc(angle_start=0, angle_end=3)
+
 plt.rcParams.update({'font.size': my_default_demo_font_size})
 
 slider_range = {'half_way_0_1' : [0., 1., 0.5, 1],
@@ -57,6 +61,7 @@ shape_names_params_dicts_definition = {
                             'a_heart': {'angle_top_middle' : 'quarter_turn', 'tip_addon' : 'stretch'},
                             'an_egg' : {'power' : 'vertices', 'tip_addon': 'stretch'},
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
+                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : 'stretch', 'speed_y' : 'minus_1_to_1', 'speed_out' : 'minus_1_to_1'},
                             'an_arc_multispeed': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
 # finding the max number of widgets

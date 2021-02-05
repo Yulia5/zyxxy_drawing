@@ -132,8 +132,8 @@ def _build_an_arc(angle_start, angle_end):
   turn_nb_start = angle_start // full_turn_angle
   turn_nb_end   =   angle_end // full_turn_angle
 
-  residual_start = ceil((angle_start % full_turn_angle) * my_default_vertices_qty_in_circle)
-  residual_end = floor((angle_end % full_turn_angle) * my_default_vertices_qty_in_circle)
+  residual_start = ceil((angle_start % full_turn_angle) / full_turn_angle * my_default_vertices_qty_in_circle)
+  residual_end = floor((angle_end % full_turn_angle) / full_turn_angle * my_default_vertices_qty_in_circle)
 
   if is_the_same_point(turn_nb_start, turn_nb_end):
     contour = sin_cos_std[residual_start : (residual_end+1)]
@@ -266,7 +266,7 @@ def build_a_heart(angle_top_middle, tip_addon):
   angle_bottom = atan_hours(a/b) + asin_hours(radius/c) 
 
   # adding the right half-circle
-  right_arc = build_an_arc(angle_start=12-angle_top_middle, angle_end=3+angle_bottom) * radius
+  right_arc = build_an_arc(angle_start=12-angle_top_middle, angle_end=15+angle_bottom) * radius
   # moving the mid-point's x to 0
   right_arc -= [right_arc[0, 0], 0]
   # adding the tip
