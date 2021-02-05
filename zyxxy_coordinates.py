@@ -186,25 +186,29 @@ def build_an_ellipse(radius_x, radius_y):
   return contour
 
 # a pig tail ######################################################
-def build_a_coil(angle_start, nb_turns, speed_y, speed_out):
+def build_a_coil(angle_start, nb_turns, speed_x, speed_out):
   contour, added_start, added_end = _build_an_arc(angle_start=angle_start, angle_end=angle_start+nb_turns*full_turn_angle)
 
   len_contour_m1 = contour.shape[0] - 1
 
   mult_xy = [1] + [speed_out**(1./my_default_vertices_qty_in_circle)] * len_contour_m1
-  add_y = [0] + [speed_y/my_default_vertices_qty_in_circle] * len_contour_m1
+  add_x = [0] + [speed_x/my_default_vertices_qty_in_circle] * len_contour_m1
   if added_start is not None:
     mult_xy[1] = mult_xy[1] ** added_start
-    add_y[1] *= added_start
+    add_x[1] *= added_start
   if added_end is not None:
     mult_xy[-1] = mult_xy[-1] ** added_end
-    add_y[-1] *= added_end
-  add_y = np.cumsum(add_y)
+    add_x[-1] *= added_end
+  
+  add_x = np.cumsum(add_x)
   mult_xy = np.cumprod(mult_xy)
 
-  contour[:, 0] *= mult_xy
-  contour[:, 1] *= mult_xy
-  contour[:, 1] += add_y
+  for l in range(contour.shape[0]):
+    contour[l, 0] *= mult_xy[l]
+    contour[l, 1] *= mult_xy[l]
+    contour[l, 0] += add_x[l]
+
+  #raise Exception(add_x, mult_xy, contour[:, 0], contour[:, 1])
 
   return contour
 

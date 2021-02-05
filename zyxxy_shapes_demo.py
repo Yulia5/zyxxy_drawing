@@ -24,9 +24,9 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 import numpy as np
 
-from zyxxy_coordinates import _build_an_arc
+from zyxxy_coordinates import build_a_coil
 
-_build_an_arc(angle_start=0, angle_end=3)
+build_a_coil(angle_start=0, nb_turns=2, speed_x=0, speed_out=2)
 
 plt.rcParams.update({'font.size': my_default_demo_font_size})
 
@@ -53,16 +53,16 @@ shape_names_params_dicts_definition = {
                             'a_triangle': {}, 
                             'a_square': {}, 
                             'an_elliptic_drop': {},
-                            'a_smile': {'dip' : 'minus_1_to_1'},
-                            'a_star': {'ends_qty' : 'vertices', 'radii_ratio' : 'stretch'},
+                            'a_smile': {'dip' : ['minus_1_to_1', -0.5]},
+                            'a_star': {'ends_qty' : 'vertices', 'radii_ratio' : ['stretch', 2]},
                             'a_regular_polygon': {'vertices_qty' : 'vertices'},
                             #'an_ellipse': {'radius_x' : [], 'radius_y' : []},
-                            'an_eye': {'dip_1' : 'minus_1_to_1', 'dip_2' : 'minus_1_to_1'},
-                            'a_heart': {'angle_top_middle' : 'quarter_turn', 'tip_addon' : 'stretch'},
-                            'an_egg' : {'power' : 'vertices', 'tip_addon': 'stretch'},
-                            'a_sector': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'radii_ratio' : 'stretch'},
-                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : 'stretch', 'speed_y' : 'minus_1_to_1', 'speed_out' : 'minus_1_to_1'},
-                            'an_arc_multispeed': {'angle_start' : 'turn', 'angle_end' : 'double_turn', 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
+                            'an_eye': {'dip_1' : ['minus_1_to_1', -0.5], 'dip_2' : ['minus_1_to_1', 0.5]},
+                            'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
+                            'an_egg' : {'power' : ['vertices', 3], 'tip_addon': 'stretch'},
+                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radii_ratio' : ['stretch', 2]},
+                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : 'stretch', 'speed_x' : 'minus_1_to_1', 'speed_out' : 'minus_1_to_1'},
+                            'an_arc_multispeed': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
 # finding the max number of widgets
 MAX_WIDGET_QTY = 0
@@ -124,7 +124,13 @@ def update_given_shapename_and_side(side, shapename):
 
 def place_shapes_and_widgets(side, shapename, count_shapes):
   this_shape_params_definition = shape_names_params_dicts_definition[shapename]
-  shape_params_dict = {key:np.copy(slider_range[value]) for key, value in this_shape_params_definition.items()}
+  shape_params_dict = {}
+  for key, value in this_shape_params_definition.items():
+    if isinstance(value, str):
+      shape_params_dict[key] = np.copy(slider_range[value])
+    else:
+      shape_params_dict[key] = np.copy(slider_range[value[0]]) 
+      shape_params_dict[key][2] = value[1]
 
   common_params_dict = {key:np.copy(slider_range[value]) for key, value in common_params_dict_definition.items()}
   
