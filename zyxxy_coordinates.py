@@ -129,11 +129,14 @@ def _build_an_arc(angle_start, angle_end):
   if angle_start > angle_end:
     angle_start, angle_end = angle_end, angle_start
 
-  turn_nb_start = angle_start // full_turn_angle
-  turn_nb_end   =   angle_end // full_turn_angle
+  angle_start_normalized = angle_start / full_turn_angle
+  angle_end_normalized   = angle_end   / full_turn_angle
 
-  residual_start = ceil((angle_start % full_turn_angle) / full_turn_angle * my_default_vertices_qty_in_circle)
-  residual_end = floor((angle_end % full_turn_angle) / full_turn_angle * my_default_vertices_qty_in_circle)
+  turn_nb_start = angle_start_normalized // 1
+  turn_nb_end   =   angle_end_normalized // 1
+
+  residual_start = ceil((angle_start_normalized % 1) * my_default_vertices_qty_in_circle)
+  residual_end = floor((angle_end_normalized % 1)  * my_default_vertices_qty_in_circle)
 
   if is_the_same_point(turn_nb_start, turn_nb_end):
     contour = sin_cos_std[residual_start : (residual_end+1)]
@@ -147,14 +150,14 @@ def _build_an_arc(angle_start, angle_end):
   if c_len == contour.size:
     added_start = None
   else:
-    added_start = residual_start - angle_start * my_default_vertices_qty_in_circle
+    added_start = residual_start - (angle_start_normalized % 1) * my_default_vertices_qty_in_circle
 
   c_len = contour.size 
   contour = link_contours(contour, [[sin_hours(angle_end), cos_hours(angle_end)]])
   if c_len == contour.size:
     added_end = None
   else:
-    added_end = -residual_end + angle_end * my_default_vertices_qty_in_circle
+    added_end = -residual_end + (angle_end_normalized % 1) * my_default_vertices_qty_in_circle
 
   return contour, added_start, added_end
 
@@ -207,8 +210,6 @@ def build_a_coil(angle_start, nb_turns, speed_x, speed_out):
     contour[l, 0] *= mult_xy[l]
     contour[l, 1] *= mult_xy[l]
     contour[l, 0] += add_x[l]
-
-  #raise Exception(add_x, mult_xy, contour[:, 0], contour[:, 1])
 
   return contour
 
@@ -296,10 +297,7 @@ def build_an_egg(power, tip_addon):
   else:
     a = (1 + tip_addon - cos_alpha_solution) / ((1 - cos_alpha_solution*cos_alpha_solution) ** (power/2))
 
-  try:
-    alpha_solution = acos_hours(cos_alpha_solution)
-  except:
-    raise Exception("power", power, "tip_addon", tip_addon, "cos_alpha_solution", cos_alpha_solution)
+  alpha_solution = acos_hours(cos_alpha_solution)
   _arc = build_an_arc(angle_start=0, angle_end=6-alpha_solution)
 
   pf_points_qty = int(my_default_vertices_qty_in_circle/4)

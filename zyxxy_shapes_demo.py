@@ -26,7 +26,7 @@ import numpy as np
 
 from zyxxy_coordinates import build_a_coil
 
-build_a_coil(angle_start=0, nb_turns=2, speed_x=0, speed_out=2)
+build_a_coil(angle_start=0, nb_turns=1.2, speed_x=0.1, speed_out=1)
 
 plt.rcParams.update({'font.size': my_default_demo_font_size})
 
@@ -61,7 +61,7 @@ shape_names_params_dicts_definition = {
                             'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
                             'an_egg' : {'power' : ['vertices', 3], 'tip_addon': 'stretch'},
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radii_ratio' : ['stretch', 2]},
-                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : 'stretch', 'speed_x' : 'minus_1_to_1', 'speed_out' : 'minus_1_to_1'},
+                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : 'stretch', 'speed_x' : 'stretch', 'speed_out' : 'stretch'},
                             'an_arc_multispeed': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'speed_x' : 'stretch', 'speed_y' : 'stretch'}}
 
 # finding the max number of widgets
