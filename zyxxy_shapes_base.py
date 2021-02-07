@@ -145,9 +145,13 @@ class Shape:
 
     # updating the shapes
     if self.line is not None:
-      _set_xy(self.line, contour)
+      if shapename not in ['a_line', 'a_coil']: # the only two open shapes
+        line_to_plot = np.append(contour, contour[0:2], axis=0)
+      else:
+        line_to_plot = contour
+      _set_xy(self.line, line_to_plot)
     if self.outline is not None:
-      if (np.array(contour)).size > 3:
+      if (np.array(contour)).shape[0] > 2:
         contour_to_plot = np.append(contour, contour[0:2], axis=0)
       else:
         contour_to_plot = contour

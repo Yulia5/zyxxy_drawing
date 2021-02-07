@@ -194,17 +194,14 @@ def switch_demo(side, shapename, switch_on):
     return
   _shape = shapes_by_side_by_shapename[side][shapename]
   _widgets = widgets_by_side_by_shapename[side][shapename]
-  if not switch_on:
-    _shape.set_visible(None)
-  else:
-    _shape.set_visible(True) # depends on the switch
+  _shape.set_visible(switch_on) # depends on the switch
 
   # widgets
-  _widgets['button'].ax.set_visible(switch_on)
+  _widgets['button'].ax.set_visible(switch_on is not None)
   for _s in _widgets['sliders_specific'].values():
-    _s.ax.set_visible(switch_on)
+    _s.ax.set_visible(switch_on is not None)
   for _s in _widgets['sliders_common'].values():
-    _s.ax.set_visible(switch_on)
+    _s.ax.set_visible(switch_on is not None)
 
 for side in ['left', 'right']:
   count_shapes = 0
@@ -218,7 +215,6 @@ def switch_demo_given_side(side):
   label = shape_switcher[side].value_selected
   switch_demo(side=side, shapename=active_shapename[side], switch_on=None)
   shape_type = get_shape_type_given_side(side=side)
-  print("shape_type", shape_type)
   switch_demo(side=side, shapename=label, switch_on=shape_type)
   active_shapename[side] = label
   plt.draw()
