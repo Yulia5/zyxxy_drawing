@@ -175,6 +175,8 @@ class Shape:
 
   def update_given_shapename(self, shapename, kwargs_shape, kwargs_common):
     self.update_xy_by_shapename(shapename, **kwargs_shape)
+    if kwargs_common['flip']:
+      self.flip()
     self.set_new_diamond_and_shift(new_diamond_coords=kwargs_common['diamond'])
     self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=kwargs_common['stretch_y'])
     self.rotate(turn=kwargs_common['turn'])
@@ -235,6 +237,14 @@ class Shape:
           something.set_visible(not val)
     self.diamond_patch.set_visible(val is not None)
 
+  def flip(self):
+    what_to_move = self.get_what_to_move()
+    for something in what_to_move:
+      if something is None:
+        continue
+      xy = _get_xy(something=something)
+      xy[:, 1] = 2 * self.diamond_coords[1] - xy[:, 1]
+      _set_xy(something=something, xy=xy)
 
   def shift(self, shift):
     if shift is None:

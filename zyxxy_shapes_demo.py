@@ -21,7 +21,7 @@ from zyxxy_settings import set_fill_in_outline_kwarg_defaults
 from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size, my_default_demo_colours
 
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button, RadioButtons
+from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 import numpy as np
 
 from zyxxy_coordinates import build_a_coil
@@ -127,6 +127,7 @@ def update_given_shapename_and_side(side, shapename):
   kwargs_common= {key:_sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
   kwargs_common['diamond'] = [_sliders_common['diamond_x'].val, 
                               _sliders_common['diamond_y'].val]
+  kwargs_common['flip'] = _widgets['flip_checkbox'].get_status()[0]
   _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
 
 def place_shapes_and_widgets(side, shapename, count_shapes):
@@ -154,6 +155,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
   diamond_colour = my_default_demo_colours[side]["diamond"]   
 
   button = Button(ax=plt.axes([widget_left, 0.025, 0.1, my_default_demo_widget_height]) , label='Reset')
+  flip_checkbox = None
 
   counter = MAX_WIDGET_QTY + 1
   sliders_specific = {}
@@ -165,9 +167,17 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
         colour = diamond_colour
       else:
         colour = shape_colour
-      target[param_name] = Slider(ax=plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter, 0.3, my_default_demo_widget_height]), label=param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3], color=colour)
+      rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter, 0.3, my_default_demo_widget_height])
+
+      target[param_name] = Slider(ax=rax, label=param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3], color=colour)
+    if flip_checkbox is None:
+      counter -= 1
+      rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter, 0.3, my_default_demo_widget_height])
+
+      flip_checkbox = CheckButtons(rax, ('Flip', ), (False, ))
 
   widgets_by_side_by_shapename[side][shapename] = {'sliders_specific': sliders_specific, 
+                                                   'flip_checkbox' : flip_checkbox,
                                                    'sliders_common': sliders_common, 
                                                    'button': button}
                                                
@@ -176,7 +186,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
   shapes_by_side_by_shapename[side][shapename] = Shape(ax=ax, 
                                                        diamond_colour = diamond_colour,
                                                        **colour_etc_kwargs)
-
+    
   def update(val):
     update_given_shapename_and_side(side=side, shapename=shapename)
 
@@ -187,6 +197,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
   for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
     _slider.on_changed(update)
 
+  flip_checkbox.on_clicked(update)
   button.on_clicked(reset)
 
 def switch_demo(side, shapename, switch_on):
@@ -198,6 +209,7 @@ def switch_demo(side, shapename, switch_on):
 
   # widgets
   _widgets['button'].ax.set_visible(switch_on is not None)
+  _widgets['flip_checkbox'].ax.set_visible(switch_on is not None)
   for _s in _widgets['sliders_specific'].values():
     _s.ax.set_visible(switch_on is not None)
   for _s in _widgets['sliders_common'].values():
