@@ -23,8 +23,6 @@ import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
 import matplotlib.lines, matplotlib.patches
 
-counter = 0
-
 ##################################################################
 ## CANVAS HELPERS                                               ## 
 ##################################################################
@@ -98,7 +96,7 @@ def _set_xy(something, xy):
   return something
 
 class Shape:
-  def __init__(self, ax, is_patch, diamond_colour, patch_zorder, patch_colour, patch_alpha, outline_colour, outline_linewidth, outline_joinstyle, outline_zorder, line_colour, line_linewidth, line_joinstyle, line_zorder):
+  def __init__(self, ax, diamond_colour, patch_zorder, patch_colour, patch_alpha, outline_colour, outline_linewidth, outline_joinstyle, outline_zorder, line_colour, line_linewidth, line_joinstyle, line_zorder):
     colour_code_patch = find_colour_code(colour_name = patch_colour)
     colour_code_line = find_colour_code(colour_name = line_colour)
     colour_code_outline = find_colour_code(colour_name = outline_colour)
@@ -116,19 +114,14 @@ class Shape:
     self.clip_patch = None
     self.clip_line = None
     
-    if is_patch:
-      self.line = None
-      (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
-      self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), #dummy 
+    (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
+    self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), #dummy 
                                fc = colour_code_patch, 
                                ec = 'none',
                                zorder = patch_zorder,
                                alpha = patch_alpha)
-      self.ax.add_patch(self.patch)
-    else: 
-      self.patch = None
-      self.outline = None
-      (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
+    self.ax.add_patch(self.patch)
+    (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
 
     if diamond_colour is None:
       diamond_colour_to_use = _default_diamond_arguments['colour']

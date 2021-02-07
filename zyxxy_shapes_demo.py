@@ -46,6 +46,8 @@ common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'diamond_x' : 'half_way_0_1', 
                                  'diamond_y' : 'half_way_0_1'}
 
+types_of_shapes = ["line", "patch", "none"] #clip?
+
 shape_names_params_dicts_definition = {
                             'a_line' : {},
                             'a_circle': {}, 
@@ -83,12 +85,17 @@ my_default_demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (my_default_demo_widget_heig
 # create the figure and the radio buttons
 both_rax_x_left = {'left' : my_default_demo_radio_side_margin, 'right' : (1 - my_default_demo_radio_side_margin - my_default_demo_radio_width)}
 shape_switcher = {}
-shape_switcher_options = shape_names_params_dicts_definition.keys()
+type_switcher = {}
 fig = plt.figure()
 for side, rax_x_left in both_rax_x_left.items():
-  rax = plt.axes([rax_x_left, my_default_demo_rax_bottom, my_default_demo_radio_width, my_default_demo_widget_height*len(shape_switcher_options)])
-  fig.add_axes(rax)
-  shape_switcher[side] = RadioButtons(rax, shape_switcher_options, active=2)
+  bottom_y = my_default_demo_rax_bottom
+  for options, switcher in [[shape_names_params_dicts_definition.keys(), shape_switcher],
+                            [types_of_shapes, type_switcher]]:
+    rax = plt.axes([rax_x_left, bottom_y, my_default_demo_radio_width, my_default_demo_widget_height*len(options)])
+    fig.add_axes(rax)
+    switcher[side] = RadioButtons(rax, options, active=1)
+    switcher[side].activecolor = my_default_demo_colours[side]["shape"]
+    bottom_y += my_default_demo_widget_height * (len(options) + 0.2)
 
 # Creating the canvas!
 
@@ -167,7 +174,6 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
   colour_etc_kwargs = set_fill_in_outline_kwarg_defaults({'patch_colour' : shape_colour,
                                                           'line_colour' : shape_colour}, defaults_for_demo=True)
   shapes_by_side_by_shapename[side][shapename] = Shape(ax=ax, 
-                                                       is_patch=True, 
                                                        diamond_colour = diamond_colour,
                                                        **colour_etc_kwargs)
 
@@ -210,10 +216,22 @@ plt.show(block=False)
 
 def switch_demo_given_side(side):
   label = shape_switcher[side].value_selected
-  switch_demo(side=side, shapename=active_shapename[side] , switch_on=False)
-  switch_demo(side=side, shapename=label, switch_on=True)
+  switch_demo(side=side, shapename=active_shapename[side], switch_on=None)
+  shape_type = get_shape_type_given_side(side=side)
+  print("shape_type", shape_type)
+  switch_demo(side=side, shapename=label, switch_on=shape_type)
   active_shapename[side] = label
   plt.draw()
+
+def get_shape_type_given_side(side):
+  label = type_switcher[side].value_selected
+  if label == types_of_shapes[0]:
+    return False
+  if label == types_of_shapes[1]:
+    return True
+  if label == types_of_shapes[2]:
+    return None  
+  raise Exception("Shape type not recognised: ", label)
 
 def switch_demo_left(label):
   switch_demo_given_side(side='left')
@@ -223,14 +241,14 @@ def switch_demo_right(label):
 for side in ['left', 'right']:
   for shapename in shape_names_params_dicts_definition.keys():
     update_given_shapename_and_side(side=side, shapename=shapename)
-    switch_demo(side=side, shapename=shapename, switch_on=False)
-    shape_switcher[side].activecolor = my_default_demo_colours[side]["shape"]
+    switch_demo(side=side, shapename=shapename, switch_on=None)
 
 shape_switcher['left'].on_clicked(switch_demo_left)
 shape_switcher['right'].on_clicked(switch_demo_right)
-
-switch_demo_left(shape_switcher['left'].value_selected)
-switch_demo_right(shape_switcher['right'].value_selected)
+type_switcher['left'].on_clicked(switch_demo_left)
+type_switcher['right'].on_clicked(switch_demo_right)
+switch_demo_given_side(side='left')
+switch_demo_given_side(side='right')
 
 fig.set_dpi(my_default_demo_dpi) 
 fig.set_size_inches(my_default_demo_figsize)
