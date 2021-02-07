@@ -145,7 +145,7 @@ class Shape:
 
     # updating the shapes
     if self.line is not None:
-      if shapename not in ['a_line', 'a_coil']: # the only two open shapes
+      if shapename not in ['a_line', 'a_smile', 'a_coil']: # the only three open shapes
         line_to_plot = np.append(contour, contour[0:2], axis=0)
       else:
         line_to_plot = contour

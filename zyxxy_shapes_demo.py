@@ -129,6 +129,7 @@ def update_given_shapename_and_side(side, shapename):
                               _sliders_common['diamond_y'].val]
   kwargs_common['flip'] = _widgets['flip_checkbox'].get_status()[0]
   _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+  plt.draw()
 
 def place_shapes_and_widgets(side, shapename, count_shapes):
   this_shape_params_definition = shape_names_params_dicts_definition[shapename]
@@ -174,7 +175,10 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
       counter -= 1
       rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter, 0.3, my_default_demo_widget_height])
 
-      flip_checkbox = CheckButtons(rax, ('Flip', ), (False, ))
+      flip_checkbox = CheckButtons(rax, ('flip_upside_down', ), (False, ))
+      for r in flip_checkbox.rectangles:
+        r.width = 0.2
+        r.height = 0.2
 
   widgets_by_side_by_shapename[side][shapename] = {'sliders_specific': sliders_specific, 
                                                    'flip_checkbox' : flip_checkbox,
