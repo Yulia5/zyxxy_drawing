@@ -110,18 +110,18 @@ def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, b
   return diamond_best_guess, contour_array
 
 # a line ######################################################
-def build_a_line():
-  contour = np.array([[0, 0], [0, 1]])
+def build_a_line(length):
+  contour = np.array([[0, 0], [0, length]])
   return contour
 
 # a square ######################################################
-def build_a_square():
-  contour = np.array([[0, 0], [0, 1], [1, 1], [1, 0]])
+def build_a_square(side):
+  contour = np.array([[0, 0], [0, 1], [1, 1], [1, 0]]) * side
   return contour
 
 # a triangle ######################################################
-def build_a_triangle():
-  contour_array = np.array([[-1/2, 1], [0, 0], [1/2, 1]]) 
+def build_a_triangle(width, height):
+  contour_array = np.array([[-1/2, 1], [0, 0], [1/2, 1]]) * [width, height]
   return contour_array
 
 # an arc ##########################################################
@@ -161,34 +161,33 @@ def _build_an_arc(angle_start, angle_end):
 
   return contour, added_start, added_end
 
-def build_an_arc(angle_start, angle_end):
+def build_an_arc(angle_start, angle_end, radius=1):
   contour, _, _ = _build_an_arc(angle_start=angle_start, angle_end=angle_end)
-  return contour
+  result = contour * radius
+  return result
 
 # an arc with different speeds ####################################
-def build_an_arc_multispeed(angle_start, angle_end, speed_x=1.0, speed_y=1.0):
+def build_an_arc_multispeed(angle_start, angle_end, speed_x, width, height):
   if angle_start > angle_end:
     angle_start, angle_end = angle_end, angle_start
 
-  step = full_turn_angle / (max(abs(speed_x), abs(speed_y)) * my_default_vertices_qty_in_circle)
+  step = full_turn_angle / (max(abs(speed_x), 1) * my_default_vertices_qty_in_circle)
   angles = link_contours(np.arange(angle_start, angle_end, step), [angle_end])
 
-  contour = np.array([[sin_hours(a * speed_x), cos_hours(a * speed_y)] for a in angles])
+  contour = np.array([[sin_hours(a * speed_x), cos_hours(a)] for a in angles])  * [width, height]
   return contour
 
 # a circle ########################################################
-def build_a_circle():
-  contour = build_an_arc(angle_start=0, angle_end=12)
+def build_a_circle(radius):
+  contour = build_an_arc(angle_start=0, angle_end=full_turn_angle) * radius
   return contour 
 
 # an ellipse ######################################################
-def build_an_ellipse(radius_x, radius_y):
-  contour = build_a_circle()
-  contour[:, 0] *= radius_x
-  contour[:, 1] *= radius_y
+def build_an_ellipse(width, height):
+  contour = build_an_arc(angle_start=0, angle_end=full_turn_angle) * [width/2, height/2]
   return contour
 
-# a pig tail ######################################################
+# a coil ##########################################################
 def build_a_coil(angle_start, nb_turns, speed_x, speed_out):
   contour, added_start, added_end = _build_an_arc(angle_start=angle_start, angle_end=angle_start+nb_turns*full_turn_angle)
 
@@ -206,56 +205,68 @@ def build_a_coil(angle_start, nb_turns, speed_x, speed_out):
   add_x = np.cumsum(add_x)
   mult_xy = np.cumprod(mult_xy)
 
-  for l in range(contour.shape[0]):
-    contour[l, 0] *= mult_xy[l]
-    contour[l, 1] *= mult_xy[l]
-    contour[l, 0] += add_x[l]
+  contour[:, 0] *= mult_xy
+  contour[:, 1] *= mult_xy
+  contour[:, 0] += add_x
+  contour -= contour[0]
 
   return contour
 
 # a smile ###########################################################
-# dip is middle_y_to_half_width
-def build_a_smile(dip): # assume that the width = 2
+# depth is middle_y_to_half_width
+def build_a_smile(width, depth): # assume that the width = 2
   # if mid_point is almost at the same hor line, assume it's a straight line
-  if is_the_same_point(dip, 0.0): 
+  if is_the_same_point(depth/width, 0.0): # this will be a segment
     result = np.empty([2, 2])
-  else:
-    radius = abs((1 + dip**2) / (2 * dip))
+  elif abs(depth/width) <= 1: # an arc of a circle
+    radius = abs((1 + (depth/width)**2) / (2 * depth/width))
     angle = (asin_hours(sin_value = 1 / radius))
     # reusing build_arc
     result = build_an_arc(angle_start=-angle, 
-                          angle_end=+angle) * radius - [0, radius-abs(dip)]
-    if dip < 0:
+                          angle_end=+angle) * radius - [0, radius-abs(depth/width)]
+    if depth < 0:
       result[:, 1] *= -1
+  else: # a half-ellipse
+    result = build_an_arc(angle_start=full_turn_angle/4, 
+                          angle_end=full_turn_angle*(3/4)) * [1, depth/width]
+
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [-1, 0]
   result[-1] = [1, 0]
+  # scaling!
+  result *= abs(width)
   # all done!
   return result
 
 # an eye ########################################################
-def build_an_eye(dip_1, dip_2): 
-  smile1 = build_a_smile(dip=dip_1)
-  smile2 = build_a_smile(dip=dip_2)
+def build_an_eye(width, depth_1, depth_2): 
+  smile1 = build_a_smile(width=width, depth=depth_1)
+  smile2 = build_a_smile(width=width, depth=depth_2)
   result = link_contours(smile1, smile2[::-1])
   return result
 
 # a sector ######################################################
-def build_a_sector(angle_start, angle_end, radii_ratio=0.):
+def build_a_sector(angle_start, angle_end, radius_1, radius_2):
+  # make sure radius_1 >= radius_2 >= 0
+  if abs(radius_1) > abs(radius_2):
+    radius_1, radius_2 = abs(radius_1), abs(radius_2)
+  else:
+    radius_2, radius_1 = abs(radius_1), abs(radius_2)
+
   contour = build_an_arc(angle_start=angle_start, angle_end=angle_end)
 
-  if is_the_same_point(radii_ratio, 0.0):
+  if is_the_same_point(radius_2, 0.0):
     # special case - just add the mid-point
-    result = link_contours(contour, [[0, 0]])
+    result = link_contours(contour, [[0, 0]]) * radius_1
   else:
     # add the arc
-    inner_arc = np.ndarray.copy(contour) * radii_ratio
-    result = link_contours(contour, inner_arc[::-1])
+    inner_arc = np.ndarray.copy(contour) * radius_2
+    result = link_contours(contour * radius_1, inner_arc[::-1])
   return result
 
 # a drop #########################################################
-def build_an_elliptic_drop():
-  contour = build_an_arc_multispeed(angle_start=3, angle_end=9, speed_x=2.0, speed_y=1.0)
+def build_an_elliptic_drop(width, height):
+  contour = build_an_arc_multispeed(angle_start=full_turn_angle/4, angle_end=full_turn_angle*3/4, speed_x=2.0, width=width, height=height)
   return contour
 
 # a heart (or an ice-cream) ########################################
@@ -271,7 +282,7 @@ def build_a_heart(angle_top_middle, tip_addon):
   angle_bottom = atan_hours(a/b) + asin_hours(radius/c) 
 
   # adding the right half-circle
-  right_arc = build_an_arc(angle_start=12-angle_top_middle, angle_end=15+angle_bottom) * radius
+  right_arc = build_an_arc(angle_start=full_turn_angle-angle_top_middle, angle_end=full_turn_angle*1.25+angle_bottom) * radius
   # moving the mid-point's x to 0
   right_arc -= [right_arc[0, 0], 0]
   # adding the tip
@@ -284,7 +295,7 @@ def build_a_heart(angle_top_middle, tip_addon):
   return contour
 
 # an egg shape #######################################################
-def build_an_egg(power, tip_addon):
+def _build_an_egg(power, tip_addon):
 
   h = lambda cos_alpha: cos_alpha * (1 - 1 / power) + 1 / (power * cos_alpha) - (1 + tip_addon)
   cos_alpha_solution = fsolve(h , x0=.5)[0]
@@ -298,7 +309,7 @@ def build_an_egg(power, tip_addon):
     a = (1 + tip_addon - cos_alpha_solution) / ((1 - cos_alpha_solution*cos_alpha_solution) ** (power/2))
 
   alpha_solution = acos_hours(cos_alpha_solution)
-  _arc = build_an_arc(angle_start=0, angle_end=6-alpha_solution)
+  _arc = build_an_arc(angle_start=0, angle_end=full_turn_angle/2-alpha_solution)
 
   pf_points_qty = int(my_default_vertices_qty_in_circle/4)
 
@@ -312,16 +323,22 @@ def build_an_egg(power, tip_addon):
   contour = add_a_left_mirror(right_half_contour)
   return contour
 
+def build_an_egg(width, height, height_widest_point, power):
+  tip_addon = height/(height - height_widest_point) - 2
+  _unscaled_egg = _build_an_egg(power=power, tip_addon=tip_addon)
+  contour = _unscaled_egg * [width, height]
+  return contour
+
 # a regular polygon ###################################################
-def build_a_regular_polygon(vertices_qty): 
-  angles = [(i * 12 / vertices_qty) for i in range(vertices_qty)]
-  contour = np.array([[sin_hours(a), cos_hours(a)] for a in angles])
+def build_a_regular_polygon(vertices_qty, radius): 
+  angles = [(i * full_turn_angle / vertices_qty) for i in range(vertices_qty)]
+  contour = np.array([[sin_hours(a), cos_hours(a)] for a in angles]) * radius
   return contour
 
 # a star #############################################################
-def build_a_star(ends_qty, radii_ratio): 
-  angles = [i * 12/(2*ends_qty) for i in range(2*ends_qty)]
-  radii = [radii_ratio * (i%2 == 0) + 1 * (i%2 == 1) for i in range(2*ends_qty)]
+def build_a_star(ends_qty, radius_1, radius_2): 
+  angles = [i * full_turn_angle/(2*ends_qty) for i in range(2*ends_qty)]
+  radii = [radius_1 * (i%2 == 0) + radius_2 * (i%2 == 1) for i in range(2*ends_qty)]
 
   contour = np.array([[radii[i] * sin_hours(angles[i]), 
                        radii[i] * cos_hours(angles[i])] for i in range(2*ends_qty)])
@@ -329,6 +346,6 @@ def build_a_star(ends_qty, radii_ratio):
   return  contour
 
 ## a rhombus ###########################################################
-def build_a_rhombus():
-  contour = build_a_regular_polygon(vertices_qty=4)
+def build_a_rhombus(width, height):
+  contour = build_a_regular_polygon(vertices_qty=4, radius=1) * [width/2, height/2]
   return contour
