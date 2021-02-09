@@ -24,10 +24,6 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 import numpy as np
 
-from zyxxy_coordinates import build_a_coil
-
-build_a_coil(angle_start=0, nb_turns=1.2, speed_x=0.1, speed_out=1)
-
 plt.rcParams.update({'font.size': my_default_demo_font_size})
 
 canvas_width = my_default_demo_canvas_size[0]
@@ -44,7 +40,7 @@ slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
                 'long_turn'    : [0, 5*full_turn_angle, 0, full_turn_angle/4],
                 'half_turn'    : [0, full_turn_angle/2, 0, full_turn_angle/12],
                 'quarter_turn' : [0, full_turn_angle/4, 0, full_turn_angle/12],
-                'minus_1_to_1' : [-1., 1., 0., .1],
+                'plus_minus_half_min_size' : [-half_min_size, half_min_size, -int(half_min_size/2), .1],
                 'vertices'     : [1, 12, 5, 1],}
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
@@ -58,21 +54,21 @@ types_of_shapes = ["line", "patch", "none"] #clip?
 shape_names_params_dicts_definition = {
                             'a_line' : {'length': 'half_min_size'},
                             'a_circle': {'radius' : 'half_min_size'}, 
-                            'a_rhombus' : {'width' : 'half_width', 'height' : 'half_height'},
-                            'a_triangle': {'width' : 'half_width', 'height' : 'half_height'}, 
-                            'a_square': {'side' : 'half_height'}, 
-                            'an_arc' : {'angle_start' : ['turn', full_turn_angle/4], 'angle_end' : 'turn', 'radius' : 'half_min_size'},
-                            'an_elliptic_drop': {'width' : 'half_width', 'height' : 'half_height'},
-                            'a_smile': {'width' : 'half_width', 'depth' : ['half_min_size', -2]},
-                            'a_star': {'ends_qty' : 'vertices', 'radius_1' : 'half_min_size', 'radius_2' : ['half_min_size', 2]},
+                            'a_rhombus' : {'width' : 'half_min_size', 'height' : 'half_min_size'},
+                            'a_triangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
+                            'a_square': {'side' : 'half_min_size'}, 
+                            'an_arc' : {'angle_start' : ['turn', full_turn_angle/4], 'angle_end' : ['turn', full_turn_angle/2], 'radius' : 'half_min_size'},
+                            'an_elliptic_drop': {'width' : ['half_min_size', int(half_min_size/4)], 'height' : 'half_min_size'},
+                            'a_smile': {'width' : 'half_min_size', 'depth' : 'plus_minus_half_min_size'},
+                            'a_star': {'ends_qty' : 'vertices', 'radius_1' : ['half_min_size', int(half_min_size*3/4)], 'radius_2' : 'half_min_size'},
                             'a_regular_polygon': {'radius' : 'half_min_size', 'vertices_qty' : 'vertices'},
                             #'an_ellipse': {'radius_x' : [], 'radius_y' : []},
-                            'an_eye': {'width' : 'half_width', 'depth_1' : ['half_min_size', -2], 'depth_2' : ['half_min_size', 2]},
+                            'an_eye': {'width' : 'half_min_size', 'depth_1' : ['plus_minus_half_min_size', -2], 'depth_2' : ['plus_minus_half_min_size', 2]},
                             'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
-                            'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 4], 'width' : 'half_width', 'height' : 'half_height'},
-                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : ['half_min_size', 2]},
-                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : 'stretch', 'speed_x' : 'stretch', 'speed_out' : 'stretch'},
-                            'an_arc_multispeed': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'speed_x' : 'stretch', 'width' : 'half_width', 'height' : 'half_height'}}
+                            'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
+                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : ['half_min_size', int(half_min_size*3/4)]},
+                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
+                            'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : 'half_width', 'height' : 'half_height'}}
 
 # finding the max number of widgets
 MAX_WIDGET_QTY = 0

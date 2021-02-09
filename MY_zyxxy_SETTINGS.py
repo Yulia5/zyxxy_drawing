@@ -73,9 +73,9 @@ my_default_demo_figsize = [10 / demo_screen_zoom, 7.5 / demo_screen_zoom]
 my_default_demo_dpi = 75
 my_default_demo_tick_step = 1
 
-my_default_demo_radio_width = 0.15*1.3
+my_default_demo_radio_width = 0.2
 my_default_demo_radio_side_margin = 0.025
-my_default_demo_widget_height = 0.02 * 1.5
+my_default_demo_widget_height = 0.025
 my_default_demo_widget_gap = 0.01
 my_default_demo_plot_gap = 0.05
 my_default_demo_plot_bottom_gap = 0.01

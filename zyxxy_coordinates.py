@@ -174,7 +174,7 @@ def build_an_arc_multispeed(angle_start, angle_end, speed_x, width, height):
   step = full_turn_angle / (max(abs(speed_x), 1) * my_default_vertices_qty_in_circle)
   angles = link_contours(np.arange(angle_start, angle_end, step), [angle_end])
 
-  contour = np.array([[sin_hours(a * speed_x), cos_hours(a)] for a in angles])  * [width, height]
+  contour = np.array([[sin_hours(a * speed_x), cos_hours(a)] for a in angles])  * [width/2, height/2]
   return contour
 
 # a circle ########################################################
@@ -216,25 +216,24 @@ def build_a_coil(angle_start, nb_turns, speed_x, speed_out):
 # depth is middle_y_to_half_width
 def build_a_smile(width, depth): # assume that the width = 2
   # if mid_point is almost at the same hor line, assume it's a straight line
-  if is_the_same_point(depth/width, 0.0): # this will be a segment
+  if is_the_same_point(depth/(width/2), 0.0): # this will be a segment
     result = np.empty([2, 2])
-  elif abs(depth/width) <= 1: # an arc of a circle
-    radius = abs((1 + (depth/width)**2) / (2 * depth/width))
+  elif abs(depth/(width/2)) <= 1: # an arc of a circle
+    radius = abs((1 + (depth/(width/2))**2) / (2 * depth/(width/2)))
     angle = (asin_hours(sin_value = 1 / radius))
     # reusing build_arc
     result = build_an_arc(angle_start=-angle, 
-                          angle_end=+angle) * radius - [0, radius-abs(depth/width)]
+                          angle_end=+angle) * radius - [0, radius-abs(depth/(width/2))]
     if depth < 0:
       result[:, 1] *= -1
   else: # a half-ellipse
     result = build_an_arc(angle_start=full_turn_angle/4, 
-                          angle_end=full_turn_angle*(3/4)) * [1, depth/width]
-
+                          angle_end=full_turn_angle*3/4) * [-1, -depth/(width/2)]
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [-1, 0]
   result[-1] = [1, 0]
   # scaling!
-  result *= abs(width)
+  result *= abs((width/2))
   # all done!
   return result
 
@@ -266,7 +265,7 @@ def build_a_sector(angle_start, angle_end, radius_1, radius_2):
 
 # a drop #########################################################
 def build_an_elliptic_drop(width, height):
-  contour = build_an_arc_multispeed(angle_start=full_turn_angle/4, angle_end=full_turn_angle*3/4, speed_x=2.0, width=width, height=height)
+  contour = build_an_arc_multispeed(angle_start=full_turn_angle/4, angle_end=full_turn_angle*3/4, speed_x=2.0, width=width, height=height*2)
   return contour
 
 # a heart (or an ice-cream) ########################################
@@ -326,7 +325,7 @@ def _build_an_egg(power, tip_addon):
 def build_an_egg(width, height, height_widest_point, power):
   tip_addon = height/(height - height_widest_point) - 2
   _unscaled_egg = _build_an_egg(power=power, tip_addon=tip_addon)
-  contour = _unscaled_egg * [width, height]
+  contour = _unscaled_egg * [width/2, height/(2+tip_addon)]
   return contour
 
 # a regular polygon ###################################################
