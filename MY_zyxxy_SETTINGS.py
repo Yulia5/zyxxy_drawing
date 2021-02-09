@@ -66,7 +66,7 @@ my_default_animation_blit = True
 my_default_animation_repeat = False
 my_default_animation_FPS = 5
 
-demo_screen_zoom = 4/5
+demo_screen_zoom = 1/2
 
 my_default_demo_canvas_size = [16, 10]
 my_default_demo_figsize = [10 / demo_screen_zoom, 7.5 / demo_screen_zoom]
