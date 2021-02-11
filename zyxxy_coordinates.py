@@ -23,7 +23,7 @@ from math import sqrt, ceil, floor
 ########################################################################
 
 angles_std = np.linspace(start=0, stop=full_turn_angle, num=my_default_vertices_qty_in_circle)
-
+angles_std = angles_std[:-1]
 sin_cos_std = [[sin_hours(a), cos_hours(a)] for a in angles_std]
 
 #####################################################
@@ -70,7 +70,7 @@ def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, b
 
   # checking that we the right number of inputs
   how_many_are_defined = {'x' : (left_x is not None) + (centre_x is not None) + (right_x is not None), 'y' :  (bottom_y is not None) + (centre_y is not None) + (top_y is not None)}
-  errorMsg = ['One and only one ' + key + ' coordinate should be defined, but ' + str(value) + ' are defined' for key, value in how_many_are_defined.items() if value != 1]
+  errorMsg = ['One and only one ' + key + ' coordinate should be defined, but ' + str(value) + ' are defined' for key, value in how_many_are_defined.items() if value > 1]
   if len(errorMsg) != 0:
     raise Exception('; '.join(errorMsg))
 
@@ -89,6 +89,9 @@ def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, b
       left_x = right_x - width
       centre_x = right_x - width / 2  
       diamond_best_guess[0] = right_x
+  if diamond_best_guess[0] is None:
+    diamond_best_guess[0] = 0
+    left_x, right_x = - width / 2, width / 2
 
   # defining coordinates that are undefined - y
   if bottom_y is not None:
@@ -104,10 +107,13 @@ def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, b
       bottom_y = top_y - height
       centre_y = top_y - height / 2 
       diamond_best_guess[1] = top_y
+  if diamond_best_guess[1] is None:
+    diamond_best_guess[1] = 0
+    bottom_y, top_y = - height / 2, height / 2
  
   contour_array = np.array([[left_x, bottom_y], [right_x,bottom_y], [right_x, top_y], [left_x, top_y]])
 
-  return diamond_best_guess, contour_array
+  return contour_array
 
 # a line ######################################################
 def build_a_line(length):
@@ -347,4 +353,89 @@ def build_a_star(ends_qty, radius_1, radius_2):
 ## a rhombus ###########################################################
 def build_a_rhombus(width, height):
   contour = build_a_regular_polygon(vertices_qty=4, radius=1) * [width/2, height/2]
+  return contour
+
+## a zigzag ###########################################################
+def build_a_wave(width, height, angle_start, nb_waves):
+
+  contour, added_start, added_end = _build_an_arc(angle_start=angle_start, 
+                                                    angle_end=angle_start+nb_waves*full_turn_angle)
+  # y's will be sin's, the x's of _build_an_arc's output, with normalization
+  contour[:, 1] = contour[:, 0] * height/2
+  # x's are mostly equidistant. We start by putting together an array of distances
+  contour[:, 0] = contour[:, 0] * 0 + 1
+  contour[0, 0] = 0
+  if added_start is not None:
+    contour[1, 0] = added_start
+  if added_end is not None:
+    contour[-1, 0] = added_end
+  # now computing x's and normalizing them
+  contour[:, 0] = np.cumsum(contour[:, 0])
+  contour[:, 0] *= width/ contour[-1, 0]
+  # adjust the starting point 
+  contour -= contour[0, :]
+
+  return contour
+
+## a zigzag ###########################################################
+def _build_a_V_sequence(start, end):
+  reverse = (start > end)
+  if start > end:
+    start, end = end, start
+
+  nb_start = ceil(start)
+  nb_end   = floor(end)
+
+  residual_start = nb_start - start
+  residual_end   =      end - nb_end  
+
+  # start and ending are in different V's
+  if nb_end > nb_start:
+    # repeted part
+    contour = [[start, 1]] + [[1/2, -1], [1/2, 1]] * (nb_end - nb_start - 1)
+    # adding custom start
+    if 0 < residual_start <= 1/2:
+      contour[0][0] = residual_start
+      contour = [[start, -3 + 4 * (1 - residual_start)]] + contour
+    elif 1/2 < residual_start:
+      contour[0][0] = 1/2
+      contour = [[start, 1 - 4 * (1 - residual_start)], [1/2 - residual_start, -1]] + contour
+    # adding custom ending
+    if 0 < residual_end <= 1/2:
+      contour += [[residual_end, 1 - 4 * residual_end]]
+    elif 1/2 < residual_end:
+      contour += [[1/2, -1], [residual_end - 1/2, -3 + 4 * residual_end]]
+  else: #same V
+    # both points are in \
+    if residual_end <= 1/2:
+      contour = [[start, 1 - 4 * residual_start], 
+                 [end - start, 1 - 4 * residual_end]]
+    # both points are in /
+    elif residual_start >= 1/2:
+      contour = [[start, -3 + 4 * residual_start], 
+                 [end - start, -3 + 4 * residual_end]]
+    # start < 1/2 + nb_start < end
+    else:
+      contour = [[start, 1 - 4 * residual_start], 
+                 [1/2 + nb_start - start, -1], 
+                 [end - (1/2 + nb_start), -3 + 4 * residual_end]]
+  contour = np.array(contour)
+  if reverse:
+    contour[:, 0] = contour[:, 0][::-1]
+
+  return contour
+
+
+def build_a_zigzag(width, height, angle_start, nb_segments):
+
+  angle_start_normalized = angle_start / full_turn_angle
+  angle_end_normalized   = angle_start_normalized + nb_segments / 2
+
+  contour = _build_a_V_sequence(start = angle_start_normalized - 1/4, end = angle_end_normalized - 1/4)
+    
+  contour -= contour[0]
+  contour[:, 0] = np.cumsum(contour[:, 0])
+  contour[:, 0] *= width / contour[-1, 0]
+  contour[:, 1] *= height/2
+
   return contour
