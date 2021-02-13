@@ -22,9 +22,8 @@ from math import sqrt, ceil, floor
 
 ########################################################################
 
-angles_std = np.linspace(start=0, stop=full_turn_angle, num=my_default_vertices_qty_in_circle)
-angles_std = angles_std[:-1]
-sin_cos_std = [[sin_hours(a), cos_hours(a)] for a in angles_std]
+sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle), 
+                cos_hours(a/my_default_vertices_qty_in_circle)] for a in range(my_default_vertices_qty_in_circle)]
 
 #####################################################
 ## contours manipulation                           ##
@@ -138,11 +137,11 @@ def _build_an_arc(angle_start, angle_end):
   angle_start_normalized = angle_start / full_turn_angle
   angle_end_normalized   = angle_end   / full_turn_angle
 
-  turn_nb_start = angle_start_normalized // 1
-  turn_nb_end   =   angle_end_normalized // 1
+  turn_nb_start = floor(angle_start_normalized)
+  turn_nb_end   = floor(  angle_end_normalized)
 
-  residual_start = ceil((angle_start_normalized % 1) * my_default_vertices_qty_in_circle)
-  residual_end = floor((angle_end_normalized % 1)  * my_default_vertices_qty_in_circle)
+  residual_start = ceil((angle_start_normalized - turn_nb_start) * my_default_vertices_qty_in_circle)
+  residual_end = floor((angle_end_normalized - turn_nb_end)  * my_default_vertices_qty_in_circle)
 
   if is_the_same_point(turn_nb_start, turn_nb_end):
     contour = sin_cos_std[residual_start : (residual_end+1)]
@@ -383,28 +382,33 @@ def _build_a_V_sequence(start, end):
   if start > end:
     start, end = end, start
 
-  nb_start = ceil(start)
+  nb_start = floor(start)
   nb_end   = floor(end)
 
-  residual_start = nb_start - start
+  residual_start = start - nb_start
   residual_end   =      end - nb_end  
 
   # start and ending are in different V's
   if nb_end > nb_start:
     # repeted part
-    contour = [[start, 1]] + [[1/2, -1], [1/2, 1]] * (nb_end - nb_start - 1)
+    contour = [[start, 1]]
+    if nb_end - nb_start > 1:
+      contour += [[1/2, -1], [1/2, 1]] * (nb_end - nb_start - 1)
     # adding custom start
-    if 0 < residual_start <= 1/2:
-      contour[0][0] = residual_start
-      contour = [[start, -3 + 4 * (1 - residual_start)]] + contour
-    elif 1/2 < residual_start:
+    if 1/2 < residual_start:
+      contour[0][0] = 1 - residual_start
+      contour = [[start, -3 + 4 * residual_start]] + contour
+    elif 0 < residual_start <= 1/2 :
       contour[0][0] = 1/2
-      contour = [[start, 1 - 4 * (1 - residual_start)], [1/2 - residual_start, -1]] + contour
+      contour = [[start, 1 - 4 * residual_start], [1/2 - residual_start, -1]] + contour
+    
     # adding custom ending
     if 0 < residual_end <= 1/2:
       contour += [[residual_end, 1 - 4 * residual_end]]
     elif 1/2 < residual_end:
       contour += [[1/2, -1], [residual_end - 1/2, -3 + 4 * residual_end]]
+
+    #raise Exception(start, nb_start, residual_start, nb_end, contour)
   else: #same V
     # both points are in \
     if residual_end <= 1/2:
@@ -433,8 +437,9 @@ def build_a_zigzag(width, height, angle_start, nb_segments):
 
   contour = _build_a_V_sequence(start = angle_start_normalized - 1/4, end = angle_end_normalized - 1/4)
     
-  contour -= contour[0]
+
   contour[:, 0] = np.cumsum(contour[:, 0])
+  contour -= contour[0]
   contour[:, 0] *= width / contour[-1, 0]
   contour[:, 1] *= height/2
 
