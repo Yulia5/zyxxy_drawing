@@ -394,10 +394,10 @@ def _build_a_V_sequence(start, end):
     if nb_end - nb_start > 1:
       contour += [[1/2, -1], [1/2, 1]] * (nb_end - nb_start - 1)
     # adding custom start
-    if 1/2 < residual_start:
+    if 1/2 <= residual_start:
       contour[0][0] = 1 - residual_start
       contour = [[start, -3 + 4 * residual_start]] + contour
-    elif 0 < residual_start <= 1/2 :
+    else:
       contour[0][0] = 1/2
       contour = [[start, 1 - 4 * residual_start], [1/2 - residual_start, -1]] + contour
     
@@ -407,7 +407,6 @@ def _build_a_V_sequence(start, end):
     elif 1/2 < residual_end:
       contour += [[1/2, -1], [residual_end - 1/2, -3 + 4 * residual_end]]
 
-    #raise Exception(start, nb_start, residual_start, nb_end, contour)
   else: #same V
     # both points are in \
     if residual_end <= 1/2:

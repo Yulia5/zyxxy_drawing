@@ -68,7 +68,7 @@ shape_names_params_dicts_definition = {
                             'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
                             'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : ['half_min_size', int(half_min_size*3/4)]},
-                            'a_zigzag' : {'width': ['half_min_size', 1], 'height': 'half_min_size', 'angle_start': ['turn', 0], 'nb_segments': ['vertices', 2]},
+                            'a_zigzag' : {'width': ['half_min_size', 1], 'height': 'half_min_size', 'angle_start': ['turn', 3], 'nb_segments': ['vertices', 2]},
                             'a_wave' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_waves': 'vertices'},
                             'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
                             'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : 'half_width', 'height' : 'half_height'}}
