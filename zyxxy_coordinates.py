@@ -22,8 +22,7 @@ from math import sqrt, ceil, floor
 
 ########################################################################
 
-sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle), 
-                cos_hours(a/my_default_vertices_qty_in_circle)] for a in range(my_default_vertices_qty_in_circle)]
+sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle*full_turn_angle), cos_hours(a/my_default_vertices_qty_in_circle*full_turn_angle)] for a in range(my_default_vertices_qty_in_circle)]
 
 #####################################################
 ## contours manipulation                           ##
