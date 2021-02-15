@@ -110,7 +110,7 @@ def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, b
     bottom_y, top_y = - height / 2, height / 2
  
   contour_array = np.array([[left_x, bottom_y], [right_x,bottom_y], [right_x, top_y], [left_x, top_y]])
-
+  contour_array -= diamond_best_guess
   return contour_array
 
 # a segment ######################################################

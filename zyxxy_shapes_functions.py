@@ -17,7 +17,7 @@
 
 from zyxxy_utils import full_turn_angle
 from zyxxy_shapes_base import Shape
-
+import zyxxy_coordinates
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'stretch_y' : 'stretch',
@@ -48,33 +48,61 @@ shape_names_params_dicts_definition = {
                             'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
                             'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : 'half_width', 'height' : 'half_height'}}
 
-def build_a_shape(ax, shapename, shapetype, **kwargs):
+bespoke_diamonds = { 'a_coil' : 'start',
+                     'a_wave' : 'start',
+                     'a_segment' : 'start',
+                     'a_zigzag' : 'start',
+                     'a_heart' : 'tip',
+                     'a_triangle' : 'tip',
+                     'an_elliptic_drop' : 'tip',
+                     'a_square' : ['left', 'bottom']} 
+
+
+def _get_diamond_label(shapename):
+  if isinstance(shapename, str):
+    for key, value in bespoke_diamonds.items():
+      if key == shapename:
+        return value
+    return 'centre'
+  return 'diamond'
+
+def get_diamond_label(shapename, dim=None):
+  result = _get_diamond_label(shapename=shapename)
+  if dim is not None:
+    if isinstance(result, str):
+      result += '_' + dim
+    else:
+      if dim == 'x':
+        result = result[0]
+      elif dim == 'y':
+        result = result[1]
+      else:
+        raise Exception(dim, "is not a recognised dimension")
+  return result
+
+def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
   colour_etc_kwargs = {}
   _shape = Shape(ax=ax, **colour_etc_kwargs)
-  _shape.set_visible(val)
-  kwargs_shape = {}
+  _shape.set_visible(val=is_patch_not_line)
+  
   kwargs_common = {}
-  _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+  if isinstance(shapename, str):
+    kwargs_shape = {}
+    _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+  else:
+    _shape.update_xy_given_contour(contour=shapename)
+    _shape.move(**kwargs_common)
+  
+  return _shape
 
+def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None, ax=None, **kwargs):
+  contour = zyxxy_coordinates.build_a_rectangle(width=width, height=height, 
+    left_x=left, centre_x=centre_x, right_x=right, bottom_y=bottom, centre_y=centre_y, top_y=top)
+  result = draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=True, **kwargs)
+  return result
 
-def draw_given_shapename(ax, is_patch, shapename, kwargs_shape, kwargs_common, **kwargs):
-  new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
-  new_shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
-  return new_shape
+def draw_a_broken_line(contour, ax=None, **kwargs):
+  draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=False, **kwargs)
 
-def draw_given_contour(ax, is_patch, contour, diamond, stretch_x, stretch_y, turn, **kwargs):
-  new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
-  new_shape.update_xy_given_contour(contour=contour)
-  new_shape.shift(shift=diamond)
-  new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
-  new_shape.rotate(turn=turn)
-  return new_shape
-
-def draw_a_rectangle(ax, width, height, left_x=None, centre_x=None, right_x=None, bottom_y=None, centre_y=None, top_y=None, **kwargs):
-  #zyxxy_coordinates.build_a_rectangle
-  diamond_best_guess, contour = Shape(  width=width, height=height, 
-    left_x=left_x, centre_x=centre_x, right_x=right_x, bottom_y=bottom_y, centre_y=centre_y, top_y=top_y)
-  draw_given_contour(ax=ax, is_patch=True, contour=contour, diamond_x=diamond_best_guess[0], diamond_y=diamond_best_guess[1], stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs)
-
-def draw_broken_line(contour, ax=None, diamond=None, stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs):
-  draw_given_contour(ax=ax, is_patch=False, contour=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y, turn=turn, **kwargs)
+def draw_a_patch(contour, ax=None, **kwargs):
+  draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=True, **kwargs)

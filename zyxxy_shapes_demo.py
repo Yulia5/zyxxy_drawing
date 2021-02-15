@@ -17,7 +17,7 @@
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shapes_base import Shape
-from zyxxy_shapes_functions import common_params_dict_definition, shape_names_params_dicts_definition
+from zyxxy_shapes_functions import common_params_dict_definition, shape_names_params_dicts_definition, get_diamond_label
 from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size, my_default_demo_colours
 
 import matplotlib.pyplot as plt
@@ -111,7 +111,8 @@ def update_given_shapename_and_side(side, shapename):
   kwargs_common['diamond'] = [_sliders_common['diamond_x'].val, 
                               _sliders_common['diamond_y'].val]
   kwargs_common['flip'] = _widgets['flip_checkbox'].get_status()[0]
-  _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+  _shape.update_xy_by_shapename(shapename, **kwargs_shape)
+  _shape.move(**kwargs_common)
   plt.draw()
 
 def place_shapes_and_widgets(side, shapename, count_shapes):
@@ -145,11 +146,12 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
       counter -= 1
       if param_name.startswith("diamond"):
         colour = diamond_colour
+        label = get_diamond_label(shapename=shapename, dim=param_name[-1])
       else:
         colour = shape_colour
-      rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])
-
-      target[param_name] = Slider(ax=rax, label=param_name, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3], color=colour)
+        label = param_name
+      rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])      
+      target[param_name] = Slider(ax=rax, label=label, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3], color=colour)
     if flip_checkbox is None:
       counter -= 1
       rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])

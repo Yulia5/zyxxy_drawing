@@ -125,13 +125,17 @@ class Shape:
         except Exception as inst:
           raise Exception(inst.args, _get_xy(something))
 
-  def update_given_shapename(self, shapename, kwargs_shape, kwargs_common):
-    self.update_xy_by_shapename(shapename, **kwargs_shape)
-    if kwargs_common['flip']:
+  def move(self, **kwargs_common):
+    if 'flip' in kwargs_common and kwargs_common['flip']:
       self.flip()
-    self.set_new_diamond_and_shift(new_diamond_coords=kwargs_common['diamond'])
-    self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=kwargs_common['stretch_y'])
-    self.rotate(turn=kwargs_common['turn'])
+    if 'diamond' in kwargs_common:
+      self.set_new_diamond_and_shift(new_diamond_coords=kwargs_common['diamond'])
+    if 'stretch_y' in kwargs_common:
+      self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=1)
+    if 'stretch_y' in kwargs_common:
+      self.stretch(stretch_x=1, stretch_y=kwargs_common['stretch_y'])
+    if 'turn' in kwargs_common:
+      self.rotate(turn=kwargs_common['turn'])
 
   def add_clip_outline(self, clip_outline):
     if type(clip_outline) is plt.Polygon:
