@@ -17,8 +17,7 @@
 import numpy as np
 from matplotlib import animation
 import matplotlib.pyplot as plt
-from zyxxy_shapes_base import set_diamond_style, draw_a_rectangle
-from zyxxy_settings import set_all_colour_etc_settings
+from zyxxy_shapes_colour_style import set_diamond_style, get_patch_style
 
 from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_colour_etc_settings
 
@@ -40,15 +39,11 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_title_font_size,
                            axes_label_font_size = my_default_axes_label_font_size,
                            axes_tick_font_size = my_default_axes_tick_font_size,
-                           colour_etc_settings=my_default_colour_etc_settings,
                            ax = None):
   global background_rectangle
 
   if ax is None:
     _, ax = plt.subplots()
-
-  # set line and outline styles
-  set_all_colour_etc_settings(colour_etc_settings=colour_etc_settings)
 
   ax.set_title(title, fontdict={'size': title_font_size})
 
@@ -73,7 +68,12 @@ def create_canvas_and_axes(canvas_width,
     ax.set_xticks(ticks = [])
     ax.set_yticks(ticks = [])
     if background_colour is not None:
-      draw_a_rectangle(ax=ax, width=canvas_width, height=canvas_height, left_x=left_x, bottom_y=bottom_y, colour=background_colour, zorder=-1)
+      background_rectangle = plt.Polygon([[left_x, bottom_y], 
+                                      [left_x+canvas_width, bottom_y], 
+                                      [left_x+canvas_width, bottom_y+canvas_height], 
+                                      [left_x, bottom_y+canvas_height]], 
+                                      **get_patch_style("background"))
+      ax.add_patch(background_rectangle)
 
   # show diamond points if and only if we show the axis and grid
   set_diamond_style(show = (tick_step is not None))

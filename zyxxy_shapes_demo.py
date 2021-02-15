@@ -17,7 +17,7 @@
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shapes_base import Shape
-from zyxxy_settings import set_fill_in_outline_kwarg_defaults
+from zyxxy_shapes_functions import common_params_dict_definition, shape_names_params_dicts_definition
 from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size, my_default_demo_colours
 
 import matplotlib.pyplot as plt
@@ -31,47 +31,20 @@ canvas_height = my_default_demo_canvas_size[1]
 half_min_size = min(canvas_width, canvas_height) * 0.5
 
 slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
+                'plus_minus_half_min_size' : [-half_min_size, half_min_size, -int(half_min_size/2), .1],
+                'half_min_size_34' : [0., half_min_size, int(half_min_size*3/4), 1],
                 'half_width'   : [0., canvas_width, int(canvas_width/2), 1],
                 'half_height'  : [0., canvas_height, int(canvas_height/2), 1],
-                'half_way_0_1' : [0., 1., 0.5, 1],
                 'stretch'      : [0., 5, 1, 0.1],
                 'turn'         : [0, full_turn_angle, 0, full_turn_angle/12],
                 'double_turn'  : [0, 2*full_turn_angle, 0, full_turn_angle/12],
                 'long_turn'    : [0, 5*full_turn_angle, 0, full_turn_angle/4],
                 'half_turn'    : [0, full_turn_angle/2, 0, full_turn_angle/12],
                 'quarter_turn' : [0, full_turn_angle/4, 0, full_turn_angle/12],
-                'plus_minus_half_min_size' : [-half_min_size, half_min_size, -int(half_min_size/2), .1],
                 'vertices'     : [1, 12, 5, 1],}
-
-common_params_dict_definition = {'stretch_x' : 'stretch',
-                                 'stretch_y' : 'stretch',
-                                 'turn' : 'turn',
-                                 'diamond_x' : 'half_width', 
-                                 'diamond_y' : 'half_height'}
 
 types_of_shapes = ["line", "patch", "none"] #clip?
 
-shape_names_params_dicts_definition = {
-                            'a_line' : {'length': 'half_min_size'},               
-                            'a_triangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
-                            'a_square': {'side' : 'half_min_size'}, 
-                            'a_rectangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
-                            'a_rhombus' : {'width' : 'half_min_size', 'height' : 'half_min_size'},
-                            'a_circle': {'radius' : 'half_min_size'},
-                            'an_ellipse': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
-                            'an_arc' : {'angle_start' : ['turn', full_turn_angle/4], 'angle_end' : ['turn', full_turn_angle/2], 'radius' : 'half_min_size'},
-                            'an_elliptic_drop': {'width' : ['half_min_size', int(half_min_size/4)], 'height' : 'half_min_size'},
-                            'a_smile': {'width' : 'half_min_size', 'depth' : 'plus_minus_half_min_size'},
-                            'a_star': {'ends_qty' : 'vertices', 'radius_1' : ['half_min_size', int(half_min_size*3/4)], 'radius_2' : 'half_min_size'},
-                            'a_regular_polygon': {'radius' : 'half_min_size', 'vertices_qty' : 'vertices'},
-                            'an_eye': {'width' : 'half_min_size', 'depth_1' : ['plus_minus_half_min_size', -2], 'depth_2' : ['plus_minus_half_min_size', 2]},
-                            'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
-                            'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
-                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : ['half_min_size', int(half_min_size*3/4)]},
-                            'a_zigzag' : {'width': ['half_min_size', 1], 'height': 'half_min_size', 'angle_start': ['turn', 3], 'nb_segments': ['vertices', 2]},
-                            'a_wave' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_waves': 'vertices'},
-                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
-                            'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : 'half_width', 'height' : 'half_height'}}
 
 # finding the max number of widgets
 MAX_WIDGET_QTY = 0
@@ -197,11 +170,11 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
                                                    'sliders_common': sliders_common, 
                                                    'button': button}
                                                
-  colour_etc_kwargs = set_fill_in_outline_kwarg_defaults({'patch_colour' : shape_colour,
-                                                          'line_colour' : shape_colour}, defaults_for_demo=True)
   shapes_by_side_by_shapename[side][shapename] = Shape(ax=ax, 
-                                                       diamond_colour = diamond_colour,
-                                                       **colour_etc_kwargs)
+                                                       diamond_colour=diamond_colour,
+                                                       patch_colour=shape_colour,
+                                                       line_colour=shape_colour,
+                                                       defaults_for_demo=True)
     
   def update(val):
     update_given_shapename_and_side(side=side, shapename=shapename)

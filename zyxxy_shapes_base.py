@@ -16,12 +16,11 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 
-from MY_zyxxy_SETTINGS import my_default_diamond_size, my_default_diamond_colour, my_colour_palette
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
 import matplotlib.lines, matplotlib.patches
+from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, get_line_style, get_patch_style
 
 ##################################################################
 ## CANVAS HELPERS                                               ## 
@@ -38,38 +37,6 @@ def get_height(ax=None):
   ylims = ax.set_ylim()
   return (ylims[1] - ylims[0])
 
-##################################################################
-## DIAMOND HELPERS                                              ## 
-##################################################################
-_default_diamond_arguments = {
-  'show' : False,
-  'zorder' : 1000, 
-  'size' : my_default_diamond_size,
-  'colour' : my_default_diamond_colour
-}
-
-def set_diamond_style(show=None):
-  global _default_diamond_arguments
-  if show is not None:
-    _default_diamond_arguments['show'] = show
-
-##################################################################
-## COLOUR HELPERS                                               ## 
-##################################################################
-
-# Find colour that should be used. 
-# Assume that it's a name of a standard colour.
-# Attention, names are case-sensitive
-def find_colour_code(colour_name):
-  if colour_name is None:
-    return 'none'
-  if colour_name in my_colour_palette:
-    return my_colour_palette[colour_name] 
-  if colour_name in mcolors.CSS4_COLORS:
-    return colour_name # matplotlib knows how to handle it
-  # If we are here, the colour name has not been recognised
-  # Assuming that it is a colour code.
-  return colour_name
 
 ##################################################################
 ## MOVEMENT HELPERS                                             ## 
@@ -96,48 +63,33 @@ def _set_xy(something, xy):
   return something
 
 class Shape:
-  def __init__(self, ax, diamond_colour, patch_zorder, patch_colour, patch_alpha, outline_colour, outline_linewidth, outline_joinstyle, outline_zorder, line_colour, line_linewidth, line_joinstyle, line_zorder):
-    colour_code_patch = find_colour_code(colour_name = patch_colour)
-    colour_code_line = find_colour_code(colour_name = line_colour)
-    colour_code_outline = find_colour_code(colour_name = outline_colour)
+  def __init__(self, ax, defaults_for_demo=False, **kwargs):
 
     if ax is None:
       self.ax = plt.gfa()
     else:
       self.ax = ax
 
-    self.patch_zorder = patch_zorder
-    self.line_zorder = line_zorder
+    kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs, 
+                                                defaults_for_demo=defaults_for_demo)
+
     self.diamond_coords = np.array([0, 0])
     self.diamond_contour = (np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * 
-                    (get_width(ax=ax)*_default_diamond_arguments['size']/1000))
+                                   (get_width(ax=ax)*kwargs["diamond_size"]))
     self.clip_patch = None
     self.clip_line = None
+
+    (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("line", kwargs))    
+    (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("outline", kwargs))
     
-    (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=outline_linewidth, color=colour_code_outline, zorder=outline_zorder, solid_joinstyle=outline_joinstyle)
-    self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), #dummy 
-                               fc = colour_code_patch, 
-                               ec = 'none',
-                               zorder = patch_zorder,
-                               alpha = patch_alpha)
+    self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), **get_patch_style("patch", kwargs))
     self.ax.add_patch(self.patch)
-    (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], lw=line_linewidth, color=colour_code_line, zorder=line_zorder, solid_joinstyle=line_joinstyle)
 
-    if diamond_colour is None:
-      diamond_colour_to_use = _default_diamond_arguments['colour']
-    else:
-      diamond_colour_to_use = diamond_colour
-
-    self.diamond_patch = plt.Polygon(self.diamond_contour, 
-      fc = diamond_colour_to_use, 
-      ec = 'none',
-      zorder = _default_diamond_arguments['zorder'],
-      alpha = 1.0)
+    self.diamond_patch = plt.Polygon(self.diamond_contour, **get_patch_style("diamond", kwargs))
     self.ax.add_patch(self.diamond_patch)
 
-    add_to_layer_record(what_to_add=self.patch)
-    add_to_layer_record(what_to_add=self.line)
-    add_to_layer_record(what_to_add=self.outline)
+    for s in [self.patch, self.line, self.outline]:
+      add_to_layer_record(what_to_add=s)
 
   def update_xy_by_shapename(self, shapename, **kwargs):
     method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
@@ -312,28 +264,6 @@ class Shape:
                                                  diamond=diamond_to_use[1], 
                                                  stretch_coeff=stretch_y)
       _set_xy(something=something, xy=xy)
-
-def draw_given_shapename(ax, is_patch, shapename, kwargs_shape, kwargs_common, **kwargs):
-  new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
-  new_shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
-  return new_shape
-
-def draw_given_contour(ax, is_patch, contour, diamond, stretch_x, stretch_y, turn, **kwargs):
-  new_shape = Shape(ax=ax, is_patch=is_patch, **kwargs)
-  new_shape.update_xy_given_contour(contour=contour)
-  new_shape.shift(shift=diamond)
-  new_shape.stretch(stretch_x=stretch_x, stretch_y=stretch_y)
-  new_shape.rotate(turn=turn)
-  return new_shape
-
-def draw_a_rectangle(ax, width, height, left_x=None, centre_x=None, right_x=None, bottom_y=None, centre_y=None, top_y=None, **kwargs):
-  diamond_best_guess, contour = zyxxy_coordinates.build_a_rectangle(
-    width=width, height=height, 
-    left_x=left_x, centre_x=centre_x, right_x=right_x, bottom_y=bottom_y, centre_y=centre_y, top_y=top_y)
-  draw_given_contour(ax=ax, is_patch=True, contour=contour, diamond_x=diamond_best_guess[0], diamond_y=diamond_best_guess[1], stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs)
-
-def draw_broken_line(contour, ax=None, diamond=None, stretch_x=1.0, stretch_y=1.0, turn=0, **kwargs):
-  draw_given_contour(ax=ax, is_patch=False, contour=contour, diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y, turn=turn, **kwargs)
   
 ########################################################################
 # handling shapes per layers

@@ -113,8 +113,8 @@ def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, b
 
   return contour_array
 
-# a line ######################################################
-def build_a_line(length):
+# a segment ######################################################
+def build_a_segment(length):
   contour = np.array([[0, 0], [0, length]])
   return contour
 
