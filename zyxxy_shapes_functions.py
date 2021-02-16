@@ -18,6 +18,7 @@
 from zyxxy_utils import full_turn_angle
 from zyxxy_shapes_base import Shape
 import zyxxy_coordinates
+from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'stretch_y' : 'stretch',
@@ -57,7 +58,6 @@ bespoke_diamonds = { 'a_coil' : 'start',
                      'an_elliptic_drop' : 'tip',
                      'a_square' : ['left', 'bottom']} 
 
-
 def _get_diamond_label(shapename):
   if isinstance(shapename, str):
     for key, value in bespoke_diamonds.items():
@@ -66,25 +66,34 @@ def _get_diamond_label(shapename):
     return 'centre'
   return 'diamond'
 
-def get_diamond_label(shapename, dim=None):
+def get_diamond_label(shapename, original_label=None):
   result = _get_diamond_label(shapename=shapename)
-  if dim is not None:
+  if original_label is not None:
     if isinstance(result, str):
-      result += '_' + dim
+      result += '_' + original_label[-1]
     else:
-      if dim == 'x':
+      if original_label == 'diamond_x':
         result = result[0]
-      elif dim == 'y':
+      elif original_label == 'diamond_y':
         result = result[1]
       else:
-        raise Exception(dim, "is not a recognised dimension")
+        raise Exception(original_label, "is not a recognised diamond label")
   return result
 
+def get_diamond_alias(shapename):
+  return {get_diamond_label(shapename=shapename, original_label='diamond_x') : 'diamond_x',
+          get_diamond_label(shapename=shapename, original_label='diamond_y') : 'diamond_y'}
+
+
 def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
-  colour_etc_kwargs = {}
+  # get colour params
+  colour_etc_kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs)
+
+  # create a shape
   _shape = Shape(ax=ax, **colour_etc_kwargs)
   _shape.set_visible(val=is_patch_not_line)
   
+
   kwargs_common = {}
   if isinstance(shapename, str):
     kwargs_shape = {}

@@ -146,7 +146,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
       counter -= 1
       if param_name.startswith("diamond"):
         colour = diamond_colour
-        label = get_diamond_label(shapename=shapename, dim=param_name[-1])
+        label = get_diamond_label(shapename=shapename, original_label=param_name)
       else:
         colour = shape_colour
         label = param_name
@@ -171,7 +171,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
                                                    'flip_checkbox' : flip_checkbox,
                                                    'sliders_common': sliders_common, 
                                                    'button': button}
-                                               
+                                            
   shapes_by_side_by_shapename[side][shapename] = Shape(ax=ax, 
                                                        diamond_colour=diamond_colour,
                                                        patch_colour=shape_colour,
@@ -184,6 +184,8 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
   def reset(event):
     for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
       _slider.reset()
+    if flip_checkbox.get_status()[0]:
+      flip_checkbox.set_active(index=0)
 
   for _slider in ([v for v in sliders_specific.values()] + [v for v in sliders_common.values()]):
     _slider.on_changed(update)

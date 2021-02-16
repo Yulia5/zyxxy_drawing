@@ -22,7 +22,8 @@ from MY_zyxxy_SETTINGS import my_colour_palette
 
 line_arg_types = ["colour", "width", "joinstyle", "zorder"]
 patch_arg_types = ["colour", "alpha", "zorder"]
-diamond_arg_types = ["colour", "size", "zorder", "show"]
+diamond_arg_types = ["colour", "size", "zorder", "show", 'alpha']
+background_arg_types = ['colour', 'zorder']
 
 format_arg_dict = { "line"    : line_arg_types, 
                     "patch"   : patch_arg_types, 
@@ -30,27 +31,6 @@ format_arg_dict = { "line"    : line_arg_types,
                     "diamond" : diamond_arg_types}
 
 _default_arguments = my_default_colour_etc_settings
-
-
-########################################################################
-
-def _set_dictionary_from_kwargs(target_dict, kwargs, dict_keys, kwargs_prefix=""):
-  processed_arguments = []
-  for dk in dict_keys:
-    if dk in kwargs:
-      target_dict[dk] = kwargs[kwargs_prefix + dk]
-      processed_arguments.append(kwargs_prefix + dk)
-  return processed_arguments
-
-def _raise_Exception_if_not_processed(kwarg_keys, processed_keys):
-  not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in processed_keys]
-  if not not_processed.empty():
-    raise Exception("Arguments", ', '.join(not_processed), " are not recognised")
-
-def _fill_in_missing_values(target, default_values, target_prefix=''):
-  for key in default_values.keys():
-    if (target_prefix + key) not in target:
-      target[target_prefix + key] = default_values[key]
 
 ##################################################################
 ## DIAMOND HELPERS                                              ## 
@@ -143,16 +123,38 @@ def set_patch_style(kwargs):
   _raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
                                     processed_keys=used_for_outline+used_for_patch)
 
+########################################################################
+
 def set_fill_in_outline_kwarg_defaults(kwargs, defaults_for_demo=False):
   if defaults_for_demo:
     defaults_to_use = my_default_demo_params
   else:
     defaults_to_use = _default_arguments
+
+  result = {}
   for fa in format_arg_dict.keys(): 
     try:
-      _fill_in_missing_values(target=kwargs, 
-                            default_values=defaults_to_use[fa], 
-                            target_prefix=fa+'_')
+      for _arg in format_arg_dict[fa]:
+        param_name = fa + '_' + _arg
+        if param_name in kwargs:
+          result[param_name] = kwargs[param_name]
+        else:
+          result[param_name] = defaults_to_use[fa][_arg]
     except:
       raise Exception(kwargs, fa, defaults_to_use)
-  return kwargs
+  return result
+
+########################################################################
+
+def _set_dictionary_from_kwargs(target_dict, kwargs, dict_keys, kwargs_prefix=""):
+  processed_arguments = []
+  for dk in dict_keys:
+    if dk in kwargs:
+      target_dict[dk] = kwargs[kwargs_prefix + dk]
+      processed_arguments.append(kwargs_prefix + dk)
+  return processed_arguments
+
+def _raise_Exception_if_not_processed(kwarg_keys, processed_keys):
+  not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in processed_keys]
+  if not not_processed.empty():
+    raise Exception("Arguments", ', '.join(not_processed), " are not recognised")

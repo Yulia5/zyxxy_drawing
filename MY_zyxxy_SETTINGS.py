@@ -42,9 +42,12 @@ my_default_colour_etc_settings = {
                                   'show' : True,
                                   'colour' : 'green', #  None #
                                   'alpha' : 1.0,
-                                  'zorder' : 1000},
-                     "background" : {'colour' : 'none',
-                                     'zorder' : -1000}} 
+                                  'zorder' : 1000}} 
+
+my_default_background_settings =  {'fc' : 'none', 
+                                   'ec' : 'none',
+                                   'zorder' : -1000,
+                                   'alpha' : 1}               
 
 # Font sizes and adjustment needed to fit them
 my_default_title_font_size = 18

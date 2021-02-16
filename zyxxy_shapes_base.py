@@ -70,6 +70,8 @@ class Shape:
     else:
       self.ax = ax
 
+    # raise Exception(kwargs)
+
     kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs, 
                                                 defaults_for_demo=defaults_for_demo)
 

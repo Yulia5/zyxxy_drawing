@@ -19,7 +19,7 @@ from matplotlib import animation
 import matplotlib.pyplot as plt
 from zyxxy_shapes_colour_style import set_diamond_style, get_patch_style
 
-from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_colour_etc_settings
+from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_colour_etc_settings, my_default_background_settings
 
 background_rectangle = None
 
@@ -72,8 +72,9 @@ def create_canvas_and_axes(canvas_width,
                                       [left_x+canvas_width, bottom_y], 
                                       [left_x+canvas_width, bottom_y+canvas_height], 
                                       [left_x, bottom_y+canvas_height]], 
-                                      **get_patch_style("background"))
+                                      **my_default_background_settings)
       ax.add_patch(background_rectangle)
+      set_background_colour(new_background_colour=background_colour)
 
   # show diamond points if and only if we show the axis and grid
   set_diamond_style(show = (tick_step is not None))
