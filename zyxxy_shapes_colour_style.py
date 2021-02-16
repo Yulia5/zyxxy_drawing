@@ -101,7 +101,7 @@ def set_line_style(kwargs):
   _set_dictionary_from_kwargs(target_dict=_default_arguments['line'], 
                               kwargs=kwargs, 
                               dict_keys=line_arg_types)
-  _raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
+  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
                                     processed_keys=line_arg_types)
 
 def set_patch_style(kwargs):
@@ -120,7 +120,7 @@ def set_patch_style(kwargs):
                                                  dict_keys=line_arg_types, 
                                                  kwargs_prefix="outline_")
 
-  _raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
+  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
                                     processed_keys=used_for_outline+used_for_patch)
 
 ########################################################################
@@ -132,17 +132,16 @@ def set_fill_in_outline_kwarg_defaults(kwargs, defaults_for_demo=False):
     defaults_to_use = _default_arguments
 
   result = {}
+  param_names_used = []
   for fa in format_arg_dict.keys(): 
-    try:
-      for _arg in format_arg_dict[fa]:
-        param_name = fa + '_' + _arg
-        if param_name in kwargs:
-          result[param_name] = kwargs[param_name]
-        else:
-          result[param_name] = defaults_to_use[fa][_arg]
-    except:
-      raise Exception(kwargs, fa, defaults_to_use)
-  return result
+    for _arg in format_arg_dict[fa]:
+      param_name = fa + '_' + _arg
+      if param_name in kwargs:
+        result[param_name] = kwargs[param_name]
+        param_names_used.append(param_name)
+      else:
+        result[param_name] = defaults_to_use[fa][_arg]
+  return param_names_used, result
 
 ########################################################################
 
@@ -154,7 +153,7 @@ def _set_dictionary_from_kwargs(target_dict, kwargs, dict_keys, kwargs_prefix=""
       processed_arguments.append(kwargs_prefix + dk)
   return processed_arguments
 
-def _raise_Exception_if_not_processed(kwarg_keys, processed_keys):
+def raise_Exception_if_not_processed(kwarg_keys, processed_keys):
   not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in processed_keys]
-  if not not_processed.empty():
+  if len(not_processed) > 0:
     raise Exception("Arguments", ', '.join(not_processed), " are not recognised")

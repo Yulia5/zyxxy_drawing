@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
 import matplotlib.lines, matplotlib.patches
-from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, get_line_style, get_patch_style
+from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, get_line_style, get_patch_style, raise_Exception_if_not_processed
 
 ##################################################################
 ## CANVAS HELPERS                                               ## 
@@ -62,6 +62,11 @@ def _set_xy(something, xy):
     raise Exception("Data type ", type(something), " is not handled")
   return something
 
+
+##################################################################
+## SHAPE                                                        ## 
+##################################################################
+
 class Shape:
   def __init__(self, ax, defaults_for_demo=False, **kwargs):
 
@@ -72,22 +77,23 @@ class Shape:
 
     # raise Exception(kwargs)
 
-    kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs, 
-                                                defaults_for_demo=defaults_for_demo)
+    param_names_used, kwargs_colour_style = set_fill_in_outline_kwarg_defaults(kwargs=kwargs, 
+                                                             defaults_for_demo=defaults_for_demo)
+    raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=param_names_used)
 
     self.diamond_coords = np.array([0, 0])
     self.diamond_contour = (np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * 
-                                   (get_width(ax=ax)*kwargs["diamond_size"]))
+                                   (get_width(ax=ax)*kwargs_colour_style["diamond_size"]))
     self.clip_patch = None
     self.clip_line = None
 
-    (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("line", kwargs))    
-    (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("outline", kwargs))
+    (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("line", kwargs_colour_style))    
+    (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("outline", kwargs_colour_style))
     
-    self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), **get_patch_style("patch", kwargs))
+    self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), **get_patch_style("patch", kwargs_colour_style))
     self.ax.add_patch(self.patch)
 
-    self.diamond_patch = plt.Polygon(self.diamond_contour, **get_patch_style("diamond", kwargs))
+    self.diamond_patch = plt.Polygon(self.diamond_contour, **get_patch_style("diamond", kwargs_colour_style))
     self.ax.add_patch(self.diamond_patch)
 
     for s in [self.patch, self.line, self.outline]:

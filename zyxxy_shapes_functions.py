@@ -18,7 +18,7 @@
 from zyxxy_utils import full_turn_angle
 from zyxxy_shapes_base import Shape
 import zyxxy_coordinates
-from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults
+from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, raise_Exception_if_not_processed
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'stretch_y' : 'stretch',
@@ -80,27 +80,40 @@ def get_diamond_label(shapename, original_label=None):
         raise Exception(original_label, "is not a recognised diamond label")
   return result
 
-def get_diamond_alias(shapename):
-  return {get_diamond_label(shapename=shapename, original_label='diamond_x') : 'diamond_x',
-          get_diamond_label(shapename=shapename, original_label='diamond_y') : 'diamond_y'}
-
+def get_common_kwargs(kwargs, shapename):
+  common_keys = {key : key for key in common_params_dict_definition.keys() if not key.startswith('diamond_')}
+  common_keys['diamond_x'] = get_diamond_label(shapename=shapename, original_label='diamond_x')
+  common_keys['diamond_y'] = get_diamond_label(shapename=shapename, original_label='diamond_y')
+  used_keys = []
+  common_kwargs = {}
+  for key, value in common_keys.items():
+    if key in kwargs:
+      common_kwargs[value] = kwargs[key]
+      used_keys.append(key)
+  return used_keys, common_kwargs
 
 def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
   # get colour params
-  colour_etc_kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs)
+  param_names_used_colour, colour_etc_kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs)
+  param_names_used = param_names_used_colour
 
   # create a shape
   _shape = Shape(ax=ax, **colour_etc_kwargs)
   _shape.set_visible(val=is_patch_not_line)
-  
 
   kwargs_common = {}
   if isinstance(shapename, str):
-    kwargs_shape = {}
-    _shape.update_given_shapename(shapename=shapename, kwargs_shape=kwargs_shape, kwargs_common=kwargs_common)
+    kwargs_shape = {key : value for key, value in kwargs.items() if key in shape_names_params_dicts_definition[shapename].keys()}
+    param_names_used += [k for k in kwargs_shape.keys()]
+    _shape.update_xy_by_shapename(shapename=shapename, **kwargs_shape)
   else:
     _shape.update_xy_given_contour(contour=shapename)
-    _shape.move(**kwargs_common)
+
+  used_common_keys, kwargs_common = get_common_kwargs(kwargs=kwargs, shapename=shapename)
+  _shape.move(**kwargs_common)
+  param_names_used += used_common_keys
+
+  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=param_names_used)
   
   return _shape
 
