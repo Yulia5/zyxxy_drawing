@@ -15,8 +15,8 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from zyxxy_utils import full_turn_angle
 from zyxxy_shapes_base import Shape
+from functools import partial
 import zyxxy_coordinates
 from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, raise_Exception_if_not_processed
 
@@ -25,29 +25,6 @@ common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'turn' : 'turn',
                                  'diamond_x' : 'half_width', 
                                  'diamond_y' : 'half_height'}
-
-
-shape_names_params_dicts_definition = {
-                            'a_segment' : {'length': 'half_min_size'},               
-                            'a_triangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
-                            'a_square': {'side' : 'half_min_size'}, 
-                            'a_rectangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
-                            'a_rhombus' : {'width' : 'half_min_size', 'height' : 'half_min_size'},
-                            'a_circle': {'radius' : 'half_min_size'},
-                            'an_ellipse': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
-                            'an_arc' : {'angle_start' : ['turn', full_turn_angle/4], 'angle_end' : ['turn', full_turn_angle/2], 'radius' : 'half_min_size'},
-                            'an_elliptic_drop': {'width' : 'half_min_size', 'height' : 'half_min_size_34'},
-                            'a_smile': {'width' : 'half_min_size', 'depth' : 'plus_minus_half_min_size'},
-                            'a_star': {'ends_qty' : 'vertices', 'radius_1' : 'half_min_size_34', 'radius_2' : 'half_min_size'},
-                            'a_regular_polygon': {'radius' : 'half_min_size', 'vertices_qty' : 'vertices'},
-                            'an_eye': {'width' : 'half_min_size', 'depth_1' : ['plus_minus_half_min_size', -2], 'depth_2' : ['plus_minus_half_min_size', 2]},
-                            'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
-                            'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
-                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : 'half_min_size_34'},
-                            'a_zigzag' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_segments': 'vertices'},
-                            'a_wave' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_waves': 'vertices'},
-                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
-                            'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : 'half_width', 'height' : 'half_height'}}
 
 bespoke_diamonds = { 'a_coil' : 'start',
                      'a_wave' : 'start',
@@ -87,9 +64,9 @@ def get_common_kwargs(kwargs, shapename):
   used_keys = []
   common_kwargs = {}
   for key, value in common_keys.items():
-    if key in kwargs:
-      common_kwargs[value] = kwargs[key]
-      used_keys.append(key)
+    if value in kwargs:
+      common_kwargs[key] = kwargs[value]
+      used_keys.append(value)
   return used_keys, common_kwargs
 
 def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
@@ -103,7 +80,7 @@ def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
 
   kwargs_common = {}
   if isinstance(shapename, str):
-    kwargs_shape = {key : value for key, value in kwargs.items() if key in shape_names_params_dicts_definition[shapename].keys()}
+    kwargs_shape = {key : value for key, value in kwargs.items() if key in zyxxy_coordinates.shape_names_params_dicts_definition[shapename].keys()}
     param_names_used += [k for k in kwargs_shape.keys()]
     _shape.update_xy_by_shapename(shapename=shapename, **kwargs_shape)
   else:
@@ -126,5 +103,15 @@ def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom
 def draw_a_broken_line(contour, ax=None, **kwargs):
   draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=False, **kwargs)
 
-def draw_a_patch(contour, ax=None, **kwargs):
+def draw_a_polygon(contour, ax=None, **kwargs):
   draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=True, **kwargs)
+
+for shapename in zyxxy_coordinates.shape_names_params_dicts_definition.keys():
+  if shapename == "a_rectangle":
+    pass
+  is_patch_not_line = not (shapename in zyxxy_coordinates.zyxxy_line_shapes)
+  globals()["draw_" + shapename] = partial(
+      draw_a_shape,
+      shapename=shapename,
+      is_patch_not_line=is_patch_not_line,
+    )

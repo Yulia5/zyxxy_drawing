@@ -107,9 +107,7 @@ def update_given_shapename_and_side(side, shapename):
   _sliders_common = _widgets['sliders_common']
 
   kwargs_shape = {key:_sliders_specific[key].val for key in _sliders_specific.keys()}
-  kwargs_common= {key:_sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y']}
-  kwargs_common['diamond'] = [_sliders_common['diamond_x'].val, 
-                              _sliders_common['diamond_y'].val]
+  kwargs_common= {key:_sliders_common[key].val for key in ['turn', 'stretch_x', 'stretch_y', 'diamond_x', 'diamond_y']}
   kwargs_common['flip'] = _widgets['flip_checkbox'].get_status()[0]
   _shape.update_xy_by_shapename(shapename, **kwargs_shape)
   _shape.move(**kwargs_common)

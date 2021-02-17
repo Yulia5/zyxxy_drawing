@@ -26,7 +26,8 @@ background_rectangle = None
 def set_background_colour(new_background_colour):
   global background_rectangle
   if background_rectangle is not None:
-    background_rectangle.set_fc(new_background_colour)
+    if new_background_colour is not None:
+      background_rectangle.set_fc(new_background_colour)
 
 # create the axis, set their sizes, 
 # add the grid and ticks if needed

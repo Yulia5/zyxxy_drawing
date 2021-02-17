@@ -20,6 +20,30 @@ from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours
 from scipy.optimize import fsolve
 from math import sqrt, ceil, floor
 
+zyxxy_line_shapes = ['a_segment', 'a_smile', 'a_coil', 'an_arc', 'a_zigzag', 'a_wave']
+
+shape_names_params_dicts_definition = {
+                            'a_segment' : {'length': 'half_min_size'},               
+                            'a_triangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
+                            'a_square': {'side' : 'half_min_size'}, 
+                            'a_rectangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
+                            'a_rhombus' : {'width' : 'half_min_size', 'height' : 'half_min_size'},
+                            'a_circle': {'radius' : 'half_min_size'},
+                            'an_ellipse': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
+                            'an_arc' : {'angle_start' : ['turn', full_turn_angle/4], 'angle_end' : ['turn', full_turn_angle/2], 'radius' : 'half_min_size'},
+                            'an_elliptic_drop': {'width' : 'half_min_size', 'height' : 'half_min_size_34'},
+                            'a_smile': {'width' : 'half_min_size', 'depth' : 'plus_minus_half_min_size'},
+                            'a_star': {'ends_qty' : 'vertices', 'radius_1' : 'half_min_size_34', 'radius_2' : 'half_min_size'},
+                            'a_regular_polygon': {'radius' : 'half_min_size', 'vertices_qty' : 'vertices'},
+                            'an_eye': {'width' : ['half_min_size', 4], 'depth_1' : ['plus_minus_half_min_size', -1], 'depth_2' : ['plus_minus_half_min_size', 1]},
+                            'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
+                            'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
+                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : 'half_min_size_34'},
+                            'a_zigzag' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_segments': 'vertices'},
+                            'a_wave' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_waves': 'vertices'},
+                            'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
+                            'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : 'half_width', 'height' : 'half_height'}}
+
 ########################################################################
 
 sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle*full_turn_angle), cos_hours(a/my_default_vertices_qty_in_circle*full_turn_angle)] for a in range(my_default_vertices_qty_in_circle)]

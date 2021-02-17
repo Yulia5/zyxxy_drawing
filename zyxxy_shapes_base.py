@@ -105,7 +105,7 @@ class Shape:
 
     # updating the shapes
     if self.line is not None:
-      if shapename not in ['a_line', 'a_smile', 'a_coil', 'an_arc', 'a_zigzag', 'a_wave']: # the only open shapes
+      if shapename not in zyxxy_coordinates.zyxxy_line_shapes: # the only open shapes
         line_to_plot = np.append(contour, contour[0:2], axis=0)
       else:
         line_to_plot = contour
@@ -136,8 +136,12 @@ class Shape:
   def move(self, **kwargs_common):
     if 'flip' in kwargs_common and kwargs_common['flip']:
       self.flip()
-    if 'diamond' in kwargs_common:
-      self.set_new_diamond_and_shift(new_diamond_coords=kwargs_common['diamond'])
+    diamond = [0., 0.]
+    if 'diamond_x' in kwargs_common:
+      diamond[0] = kwargs_common['diamond_x']
+    if 'diamond_y' in kwargs_common:
+      diamond[1] = kwargs_common['diamond_y']
+    self.set_new_diamond_and_shift(new_diamond_coords=diamond)
     if 'stretch_y' in kwargs_common:
       self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=1)
     if 'stretch_y' in kwargs_common:

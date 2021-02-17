@@ -23,7 +23,6 @@ from MY_zyxxy_SETTINGS import my_colour_palette
 line_arg_types = ["colour", "width", "joinstyle", "zorder"]
 patch_arg_types = ["colour", "alpha", "zorder"]
 diamond_arg_types = ["colour", "size", "zorder", "show", 'alpha']
-background_arg_types = ['colour', 'zorder']
 
 format_arg_dict = { "line"    : line_arg_types, 
                     "patch"   : patch_arg_types, 
@@ -96,7 +95,7 @@ def new_layer():
   for fa in args_for_layer: 
     _default_arguments[fa]['zorder'] = new_layer_nb
 
-def set_line_style(kwargs):
+def set_line_style(**kwargs):
   global _default_arguments
   _set_dictionary_from_kwargs(target_dict=_default_arguments['line'], 
                               kwargs=kwargs, 
@@ -104,7 +103,7 @@ def set_line_style(kwargs):
   raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
                                     processed_keys=line_arg_types)
 
-def set_patch_style(kwargs):
+def set_patch_style(**kwargs):
   global _default_arguments
 
   used_for_patch = _set_dictionary_from_kwargs(target_dict=_default_arguments['patch'], 
