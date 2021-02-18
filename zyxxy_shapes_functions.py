@@ -70,19 +70,19 @@ def get_common_kwargs(kwargs, shapename):
 
 def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
   # create a shape
-  _shape = Shape(ax=ax, is_patch_not_line=is_patch_not_line, defaults_for_demo=True)
+  _shape = Shape(ax=ax, is_patch_not_line=is_patch_not_line, defaults_for_demo=False)
 
   # get colour params
-  exceptions = []
-  if shapename == "a_triangle":
-    exceptions = ["width"]
-  colour_etc_kwargs = extract_colour_etc_kwargs(kwargs, exceptions=exceptions)
+  colour_etc_kwargs = extract_colour_etc_kwargs(kwargs)
   _shape.set_colours_etc(**colour_etc_kwargs)
   param_names_used = [k for k in colour_etc_kwargs.keys()]
 
   kwargs_common = {}
   if isinstance(shapename, str):
-    kwargs_shape = {key : value for key, value in kwargs.items() if key in zyxxy_coordinates.shape_names_params_dicts_definition[shapename].keys()}
+    admissible_shape_args = [k for k in zyxxy_coordinates.shape_names_params_dicts_definition[shapename].keys()]
+    if shapename == "a_rectangle":
+      admissible_shape_args += ['left', 'right', 'bottom', 'top']
+    kwargs_shape = {key : value for key, value in kwargs.items() if key in admissible_shape_args}
     param_names_used += [k for k in kwargs_shape.keys()]
     _shape.update_xy_by_shapename(shapename=shapename, **kwargs_shape)
   else:

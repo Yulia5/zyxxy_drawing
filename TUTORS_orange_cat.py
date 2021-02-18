@@ -1,9 +1,9 @@
 #######################################################
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_settings import set_shape_style, set_line_style, new_layer
-from zyxxy_patches import draw_a_circle, draw_a_triangle, draw_an_ellipse, draw_a_rectangle
-from zyxxy_lines import draw_a_smile, draw_a_line
+from zyxxy_shapes_colour_style import set_patch_style, set_outline_style,  set_line_style, new_layer
+from zyxxy_shapes_functions import draw_a_circle, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment
+
 
 #######################################################
 ## CREATING THE DRAWING!                             ##
@@ -16,8 +16,9 @@ axes = create_canvas_and_axes(canvas_width = 120,
 # Now let's draw the shapes!                         ##
 
 # settings
-set_shape_style(outline_width=2)
+set_outline_style(linewidth=2)
 set_line_style(linewidth=2)
+set_patch_style(colour='darkorange')
 
 # the ears
 
@@ -49,7 +50,7 @@ for i, bh in enumerate(height_body):
   draw_a_triangle(ax=axes, tip_x=50, tip_y=60, height=bh, width=bh, colour=colour, turn=6)
 
 #head
-_, contour_head = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25, colour='darkorange')
+contour_head = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25, colour='darkorange')
 
 # neck
 draw_a_circle(ax=axes, centre_x=50, centre_y=60, radius=1, colour='black')
@@ -57,19 +58,19 @@ draw_a_circle(ax=axes, centre_x=50, centre_y=60, radius=1, colour='black')
 # stripes on the face
 
 #outlines are not clippable, so we will cancel them for now
-set_shape_style(outline_width=0)
+set_outline_style(width=0)
 
 # vertical stripes
 for c, b in [[40, 101], [45, 100], [50, 101]]:
-  draw_a_rectangle(ax=axes, centre_x=c, bottom_y=b, width=3, height=20, colour='black', clip_outline=contour_head)
+  draw_a_rectangle(ax=axes, centre_x=c, bottom=b, width=3, height=20, colour='black')#, clip_outline=contour_head)
 
 # horizontal stripes
 for c, x in [[70, 16], [75, 15], [80, 18]]:
-  draw_a_rectangle(ax=axes, right_x=50-x, centre_y=c, width=20, height=3, colour='black', clip_outline=contour_head)
-  draw_a_rectangle(ax=axes, left_x=50+x, centre_y=c, width=20, height=3, colour='black', clip_outline=contour_head)
+  draw_a_rectangle(ax=axes, right=50-x, centre_y=c, width=20, height=3, colour='black')#, clip_outline=contour_head)
+  draw_a_rectangle(ax=axes, left=50+x, centre_y=c, width=20, height=3, colour='black')#, clip_outline=contour_head)
 
 # adding the outline back
-set_shape_style(outline_width=2)
+set_outline_style(outline_width=2)
 
 # next layer
 new_layer()
@@ -81,14 +82,14 @@ draw_a_triangle(ax=axes, tip_x=62, tip_y=20, height=20, width=20, colour='darkor
 # eyes
 for centre_x in [38, 62]:
   draw_a_circle(ax=axes, centre_x=centre_x, centre_y=90, radius=8, colour='white')
-  draw_an_ellipse(ax=axes, centre_x=centre_x, centre_y=90, radius_x=4, radius_y=8, colour='springgreen')
+  draw_an_ellipse(ax=axes, centre_x=centre_x, centre_y=90, width=8, height=16, colour='springgreen')
   draw_a_circle(ax=axes, centre_x=centre_x, centre_y=90, radius=2, colour='black')
 
 # nose
 draw_a_triangle(ax=axes, tip_x=50, tip_y=72, height=8, width=10, colour='pink')
 
 # smile
-draw_a_line(ax=axes, start_x=50, start_y=72, length=7, linewidth=2, colour='black', turn=6)
-draw_a_smile(ax=axes, centre_x=50, bottom_y=65, top_y=72, width=20)
+draw_a_segment(ax=axes, start_x=50, start_y=72, length=7, linewidth=2, colour='black', turn=6)
+draw_a_smile(ax=axes, centre_x=50, centre_y=72, depth=-7, width=20)
 
 show_drawing_and_save_if_needed()

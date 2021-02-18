@@ -88,52 +88,52 @@ def add_a_left_mirror(contour, mirror_x=0):
 #####################################################
 #####################################################
 # a rectangle ####################################################
-def build_a_rectangle(width, height, left_x=None, centre_x=None, right_x=None, bottom_y=None, centre_y=None, top_y=None):
+def build_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None):
 
   # checking that we the right number of inputs
-  how_many_are_defined = {'x' : (left_x is not None) + (centre_x is not None) + (right_x is not None), 'y' :  (bottom_y is not None) + (centre_y is not None) + (top_y is not None)}
+  how_many_are_defined = {'x' : (left is not None) + (centre_x is not None) + (right is not None), 'y' :  (bottom is not None) + (centre_y is not None) + (top is not None)}
   errorMsg = ['One and only one ' + key + ' coordinate should be defined, but ' + str(value) + ' are defined' for key, value in how_many_are_defined.items() if value > 1]
   if len(errorMsg) != 0:
     raise Exception('; '.join(errorMsg))
 
   diamond_best_guess = [None, None]
   # defining coordinates that are undefined - x
-  if left_x is not None:
-    centre_x = left_x + width / 2
-    right_x = left_x + width
-    diamond_best_guess[0] = left_x
+  if left is not None:
+    centre_x = left + width / 2
+    right = left + width
+    diamond_best_guess[0] = left
   else:
     if centre_x is not None:
-      left_x = centre_x - width / 2
-      right_x = centre_x + width / 2
+      left = centre_x - width / 2
+      right = centre_x + width / 2
       diamond_best_guess[0] = centre_x
-    elif right_x is not None:
-      left_x = right_x - width
-      centre_x = right_x - width / 2  
-      diamond_best_guess[0] = right_x
+    elif right is not None:
+      left = right - width
+      centre_x = right - width / 2  
+      diamond_best_guess[0] = right
   if diamond_best_guess[0] is None:
     diamond_best_guess[0] = 0
-    left_x, right_x = - width / 2, width / 2
+    left, right = - width / 2, width / 2
 
   # defining coordinates that are undefined - y
-  if bottom_y is not None:
-    centre_y = bottom_y + height / 2
-    top_y = bottom_y + height
-    diamond_best_guess[1] = bottom_y
+  if bottom is not None:
+    centre_y = bottom + height / 2
+    top = bottom + height
+    diamond_best_guess[1] = bottom
   else:
     if centre_y is not None:
-      bottom_y = centre_y - height / 2
-      top_y = centre_y + height / 2
+      bottom = centre_y - height / 2
+      top = centre_y + height / 2
       diamond_best_guess[1] = centre_y
-    elif top_y is not None:
-      bottom_y = top_y - height
-      centre_y = top_y - height / 2 
-      diamond_best_guess[1] = top_y
+    elif top is not None:
+      bottom = top - height
+      centre_y = top - height / 2 
+      diamond_best_guess[1] = top
   if diamond_best_guess[1] is None:
     diamond_best_guess[1] = 0
-    bottom_y, top_y = - height / 2, height / 2
+    bottom, top = - height / 2, height / 2
  
-  contour_array = np.array([[left_x, bottom_y], [right_x,bottom_y], [right_x, top_y], [left_x, top_y]])
+  contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]])
   contour_array -= diamond_best_guess
   return contour_array
 

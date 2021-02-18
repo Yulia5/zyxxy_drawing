@@ -22,7 +22,7 @@ from MY_zyxxy_SETTINGS import my_colour_palette, my_default_demo_params, my_defa
 
 ########################################################################
 
-line_arg_types = ["colour", "width", "joinstyle", "zorder"]
+line_arg_types = ["colour", "linewidth", "joinstyle", "zorder"]
 patch_arg_types = ["colour", "alpha", "zorder"]
 
 format_arg_dict = { "line"    : line_arg_types, 
@@ -110,9 +110,8 @@ def get_default_arguments(defaults_for_demo):
     defaults_to_use = _default_arguments
   return defaults_to_use
 
-def extract_colour_etc_kwargs(kwargs, exceptions):
+def extract_colour_etc_kwargs(kwargs):
   possible_keys = line_arg_types + patch_arg_types + ["outline_" + a for a in line_arg_types] + ["diamond_" + a for a in patch_arg_types]
-  possible_keys = [k for k in possible_keys if k not in exceptions]
  
   result = {key : value for key, value in kwargs.items() if key in possible_keys}
   return result
@@ -124,8 +123,8 @@ def _set_style(something, **kwargs):
       something.set_color(find_colour_code( kwargs['colour'] ))
     if "zorder" in kwargs:
       something.set_zorder(kwargs['zorder'])
-    if "width" in kwargs:
-      something.set_lw(kwargs['width'])
+    if "linewidth" in kwargs:
+      something.set_lw(kwargs['linewidth'])
     if "joinstyle" in kwargs:
       something.set_solid_joinstyle(kwargs['joinstyle'])
 
