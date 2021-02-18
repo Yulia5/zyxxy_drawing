@@ -18,7 +18,7 @@
 from zyxxy_shapes_base import Shape
 from functools import partial
 import zyxxy_coordinates
-from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, raise_Exception_if_not_processed
+from zyxxy_shapes_colour_style import raise_Exception_if_not_processed, extract_colour_etc_kwargs
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'stretch_y' : 'stretch',
@@ -35,16 +35,15 @@ bespoke_diamonds = { 'a_coil' : 'start',
                      'an_elliptic_drop' : 'tip',
                      'a_square' : ['left', 'bottom']} 
 
-def _get_diamond_label(shapename):
-  if isinstance(shapename, str):
-    for key, value in bespoke_diamonds.items():
-      if key == shapename:
-        return value
-    return 'centre'
-  return 'diamond'
-
 def get_diamond_label(shapename, original_label=None):
-  result = _get_diamond_label(shapename=shapename)
+  if isinstance(shapename, str):   
+    if shapename in bespoke_diamonds:
+      result = bespoke_diamonds[shapename]
+    else:
+      result = 'centre'
+  else:
+    result = 'diamond'
+
   if original_label is not None:
     if isinstance(result, str):
       result += '_' + original_label[-1]
@@ -70,13 +69,13 @@ def get_common_kwargs(kwargs, shapename):
   return used_keys, common_kwargs
 
 def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
-  # get colour params
-  param_names_used_colour, colour_etc_kwargs = set_fill_in_outline_kwarg_defaults(kwargs=kwargs)
-  param_names_used = param_names_used_colour
-
   # create a shape
-  _shape = Shape(ax=ax, **colour_etc_kwargs)
-  _shape.set_visible(val=is_patch_not_line)
+  _shape = Shape(ax=ax, is_patch_not_line=is_patch_not_line, defaults_for_demo=True)
+
+  # get colour params
+  colour_etc_kwargs = extract_colour_etc_kwargs(kwargs)
+  _shape.set_colours_etc(**colour_etc_kwargs)
+  param_names_used = colour_etc_kwargs.keys()
 
   kwargs_common = {}
   if isinstance(shapename, str):

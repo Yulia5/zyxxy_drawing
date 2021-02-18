@@ -15,89 +15,79 @@
 ########################################################################
 
 import numpy as np
-import matplotlib.pyplot as plt
-
+from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-import matplotlib.lines, matplotlib.patches
-from zyxxy_shapes_colour_style import set_fill_in_outline_kwarg_defaults, get_line_style, get_patch_style, raise_Exception_if_not_processed
-
-##################################################################
-## CANVAS HELPERS                                               ## 
-##################################################################
-def get_width(ax=None):
-  if ax is None:
-    ax = plt.gca()
-  xlims = ax.set_xlim()
-  return (xlims[1] - xlims[0])
-
-def get_height(ax=None):
-  if ax is None:
-    ax = plt.gca()
-  ylims = ax.set_ylim()
-  return (ylims[1] - ylims[0])
-
-
-##################################################################
-## MOVEMENT HELPERS                                             ## 
-##################################################################
-def _get_xy(something):
-  if isinstance(something, np.ndarray):
-    return something
-  elif isinstance(something, matplotlib.lines.Line2D):
-    return something.get_xydata()
-  elif isinstance(something, matplotlib.patches.Polygon):
-    return something.get_xy()
-  raise Exception("Data type ", type(something), " is not handled")
-
-def _set_xy(something, xy):
-  if isinstance(something, np.ndarray):
-    something = xy
-  elif isinstance(something, matplotlib.lines.Line2D):
-    something.set_xdata(xy[:, 0])
-    something.set_ydata(xy[:, 1])
-  elif isinstance(something, matplotlib.patches.Polygon):
-    something.set_xy(xy)
-  else:
-    raise Exception("Data type ", type(something), " is not handled")
-  return something
-
+from zyxxy_shapes_colour_style import _set_style, raise_Exception_if_not_processed, get_diamond_size, _set_xy, _get_xy, format_arg_dict, get_default_arguments
 
 ##################################################################
 ## SHAPE                                                        ## 
 ##################################################################
 
 class Shape:
-  def __init__(self, ax, defaults_for_demo=False, **kwargs):
-
-    if ax is None:
-      self.ax = plt.gfa()
-    else:
-      self.ax = ax
-
-    # raise Exception(kwargs)
-
-    param_names_used, kwargs_colour_style = set_fill_in_outline_kwarg_defaults(kwargs=kwargs, 
-                                                             defaults_for_demo=defaults_for_demo)
-    raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=param_names_used)
+  def __init__(self, ax, is_patch_not_line, defaults_for_demo):
 
     self.diamond_coords = np.array([0, 0])
-    self.diamond_contour = (np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * 
-                                   (get_width(ax=ax)*kwargs_colour_style["diamond_size"]))
+    
     self.clip_patch = None
     self.clip_line = None
 
-    (self.line, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("line", kwargs_colour_style))    
-    (self.outline, ) = self.ax.plot([0, 0, 1], [0, 1, 1], **get_line_style("outline", kwargs_colour_style))
-    
-    self.patch = plt.Polygon(np.array([[0,0], [0,1], [1,1]]), **get_patch_style("patch", kwargs_colour_style))
-    self.ax.add_patch(self.patch)
+    if is_patch_not_line:  
+      self.patch = Polygon(np.array([[0,0], [0,1], [1,1]]))
+      ax.add_patch(self.patch)
+      (self.outline, ) = ax.plot([0, 0, 1], [0, 1, 1])
+      self.line = None
+    else:
+      self.patch = None
+      self.outline = None
+      (self.line, ) = ax.plot([0, 0, 1], [0, 1, 1]) 
 
-    self.diamond_patch = plt.Polygon(self.diamond_contour, **get_patch_style("diamond", kwargs_colour_style))
-    self.ax.add_patch(self.diamond_patch)
+    diamond_size = get_diamond_size(ax)
+    if diamond_size is not None:
+      self.diamond_contour = np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * diamond_size
+      self.diamond = Polygon(self.diamond_contour)
+      ax.add_patch(self.diamond)
+    else:
+      self.diamond_contour = None
+      self.diamond = None
+
+    defaults_to_use = get_default_arguments(defaults_for_demo = defaults_for_demo)
+    for attr_name in format_arg_dict.keys():
+      _attr = getattr(self, attr_name)
+      if _attr is not None:
+        _set_style(_attr, **defaults_to_use[attr_name])
 
     for s in [self.patch, self.line, self.outline]:
-      add_to_layer_record(what_to_add=s)
+      if s is not None:
+        add_to_layer_record(what_to_add=s)
+
+  def set_visible(self, s):
+    for attr_name in format_arg_dict.keys():
+      _attr = getattr(self, attr_name)
+      if _attr is not None:
+        _attr.set_visible(s)   
+
+  def set_colours_etc(self, **kwargs):
+
+    used_args = []
+    for attr_name, arg_types in format_arg_dict.items():
+      _attr = getattr(self, attr_name)
+      if _attr is None:
+        continue
+
+      if attr_name in ["patch", "line"]:
+        prefix = ""
+      else:
+        prefix = attr_name + "_"
+
+      keys_for_kwargs = [prefix + at for at in arg_types]
+      
+      _kwargs = {key[len(prefix):] : value for key, value in kwargs.items() if key in keys_for_kwargs}
+      _set_style(_attr, **_kwargs)
+      used_args += [prefix + k for k in _kwargs.keys()]
+
+    raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=used_args)
+
 
   def update_xy_by_shapename(self, shapename, **kwargs):
     method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
@@ -124,7 +114,7 @@ class Shape:
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
 
   def redraw_on_axes(self):
-    what_to_redraw = self.get_what_to_move() + [self.diamond_patch]
+    what_to_redraw = self.get_what_to_move() + [self.diamond]
     for something in what_to_redraw:
       if something is not None:
         my_ax = something.axes
@@ -150,13 +140,13 @@ class Shape:
       self.rotate(turn=kwargs_common['turn'])
 
   def add_clip_outline(self, clip_outline):
-    if type(clip_outline) is plt.Polygon:
+    if type(clip_outline) is Polygon:
       clip_contour = clip_outline.get_xy()
     else:
       clip_contour = clip_outline
 
     if self.patch is not None:
-      self.clip_patch = plt.Polygon(clip_contour, 
+      self.clip_patch = Polygon(clip_contour, 
                                fc = 'none', 
                                ec = 'none',
                                zorder = self.patch_zorder)
@@ -165,7 +155,7 @@ class Shape:
       self.patch.set_clip_path(self.clip_patch)
     
     if (self.outline is not None) or (self.line is not None): 
-      self.clip_line = plt.Polygon(clip_contour, 
+      self.clip_line = Polygon(clip_contour, 
                                fc = 'none', 
                                ec = 'none',
                                zorder = self.line_zorder)
@@ -183,27 +173,12 @@ class Shape:
   
   def update_diamond(self, new_diamond_coords):
     self.diamond_coords = np.array(new_diamond_coords)
-    if self.diamond_patch is not None:                  
-      _set_xy(something=self.diamond_patch, 
+    if self.diamond is not None:                  
+      _set_xy(something=self.diamond, 
               xy=self.diamond_coords+self.diamond_contour)
 
   def get_what_to_move(self):
     return [self.line, self.patch, self.outline, self.clip_patch, self.clip_line]
-
-  def set_visible(self, val):
-    if val is None:
-      what_to_hide = self.get_what_to_move()
-      for something in what_to_hide:
-        if something is not None:
-          something.set_visible(False)
-    else:
-      for something in [self.patch, self.outline, self.clip_patch]:
-        if something is not None:
-          something.set_visible(val)
-      for something in [self.line, self.clip_line]:
-        if something is not None:
-          something.set_visible(not val)
-    self.diamond_patch.set_visible(val is not None)
 
   def flip(self):
     what_to_move = self.get_what_to_move()

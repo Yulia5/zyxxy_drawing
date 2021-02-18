@@ -17,7 +17,8 @@
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shapes_base import Shape
-from zyxxy_shapes_functions import common_params_dict_definition, shape_names_params_dicts_definition, get_diamond_label
+from zyxxy_coordinates import zyxxy_line_shapes, shape_names_params_dicts_definition
+from zyxxy_shapes_functions import common_params_dict_definition, get_diamond_label
 from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size, my_default_demo_colours
 
 import matplotlib.pyplot as plt
@@ -43,8 +44,7 @@ slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
                 'quarter_turn' : [0, full_turn_angle/4, 0, full_turn_angle/12],
                 'vertices'     : [1, 12, 5, 1],}
 
-types_of_shapes = ["line", "patch", "none"] #clip?
-
+#clip?
 
 # finding the max number of widgets
 MAX_WIDGET_QTY = 0
@@ -65,12 +65,11 @@ demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (my_default_demo_widget_height + my_def
 # create the figure and the radio buttons
 both_rax_x_left = {'left' : my_default_demo_radio_side_margin, 'right' : (1 - my_default_demo_radio_side_margin - my_default_demo_radio_width)}
 shape_switcher = {}
-type_switcher = {}
+colour_switcher = {}
 fig = plt.figure()
 for side, rax_x_left in both_rax_x_left.items():
   bottom_y = demo_rax_bottom
-  for options, switcher in [[shape_names_params_dicts_definition.keys(), shape_switcher],
-                            [types_of_shapes, type_switcher]]:
+  for options, switcher in [[shape_names_params_dicts_definition.keys(), shape_switcher]]:
     rax = plt.axes([rax_x_left, bottom_y, my_default_demo_radio_width, my_default_demo_widget_height*len(options)])
     fig.add_axes(rax)
     switcher[side] = RadioButtons(rax, options, active=1)
@@ -170,11 +169,9 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
                                                    'sliders_common': sliders_common, 
                                                    'button': button}
                                             
-  shapes_by_side_by_shapename[side][shapename] = Shape(ax=ax, 
-                                                       diamond_colour=diamond_colour,
-                                                       patch_colour=shape_colour,
-                                                       line_colour=shape_colour,
-                                                       defaults_for_demo=True)
+  _shape = Shape(ax=ax, is_patch_not_line=(shapename not in zyxxy_line_shapes), defaults_for_demo=True)
+  _shape.set_colours_etc(colour=shape_colour, diamond_colour=diamond_colour)
+  shapes_by_side_by_shapename[side][shapename] = _shape
     
   def update(val):
     update_given_shapename_and_side(side=side, shapename=shapename)
@@ -218,20 +215,10 @@ plt.show(block=False)
 def switch_demo_given_side(side):
   label = shape_switcher[side].value_selected
   switch_demo(side=side, shapename=active_shapename[side], switch_on=None)
-  shape_type = get_shape_type_given_side(side=side)
+  shape_type = label not in zyxxy_line_shapes
   switch_demo(side=side, shapename=label, switch_on=shape_type)
   active_shapename[side] = label
   plt.draw()
-
-def get_shape_type_given_side(side):
-  label = type_switcher[side].value_selected
-  if label == types_of_shapes[0]:
-    return False
-  if label == types_of_shapes[1]:
-    return True
-  if label == types_of_shapes[2]:
-    return None  
-  raise Exception("Shape type not recognised: ", label)
 
 def switch_demo_left(label):
   switch_demo_given_side(side='left')
@@ -244,7 +231,6 @@ for side, func in [['left', switch_demo_left], ['right', switch_demo_right]]:
     switch_demo(side=side, shapename=shapename, switch_on=None)
   switch_demo_given_side(side=side)
   shape_switcher[side].on_clicked(func)
-  type_switcher[side].on_clicked(func)
 
 fig.set_dpi(my_default_demo_dpi) 
 fig.set_size_inches(my_default_demo_figsize)

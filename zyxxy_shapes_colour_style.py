@@ -14,30 +14,75 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from MY_zyxxy_SETTINGS import my_default_demo_params, my_default_colour_etc_settings
+import numpy as np
+import matplotlib.lines, matplotlib.patches
+import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
-from MY_zyxxy_SETTINGS import my_colour_palette
+from MY_zyxxy_SETTINGS import my_colour_palette, my_default_demo_params, my_default_colour_etc_settings, my_default_diamond_size
 
 ########################################################################
 
 line_arg_types = ["colour", "width", "joinstyle", "zorder"]
 patch_arg_types = ["colour", "alpha", "zorder"]
-diamond_arg_types = ["colour", "size", "zorder", "show", 'alpha']
 
 format_arg_dict = { "line"    : line_arg_types, 
                     "patch"   : patch_arg_types, 
                     "outline" : line_arg_types,
-                    "diamond" : diamond_arg_types}
+                    "diamond" : patch_arg_types}
 
 _default_arguments = my_default_colour_etc_settings
+
+_show_diamond = True
+
+##################################################################
+## CANVAS HELPERS                                               ## 
+##################################################################
+def get_width(ax=None):
+  if ax is None:
+    ax = plt.gca()
+  xlims = ax.set_xlim()
+  return (xlims[1] - xlims[0])
+
+def get_height(ax=None):
+  if ax is None:
+    ax = plt.gca()
+  ylims = ax.set_ylim()
+  return (ylims[1] - ylims[0])
+
+##################################################################
+## MOVEMENT HELPERS                                             ## 
+##################################################################
+def _get_xy(something):
+  if isinstance(something, np.ndarray):
+    return something
+  elif isinstance(something, matplotlib.lines.Line2D):
+    return something.get_xydata()
+  elif isinstance(something, matplotlib.patches.Polygon):
+    return something.get_xy()
+  raise Exception("Data type ", type(something), " is not handled")
+
+def _set_xy(something, xy):
+  if isinstance(something, np.ndarray):
+    something = xy
+  elif isinstance(something, matplotlib.lines.Line2D):
+    something.set_xdata(xy[:, 0])
+    something.set_ydata(xy[:, 1])
+  elif isinstance(something, matplotlib.patches.Polygon):
+    something.set_xy(xy)
+  else:
+    raise Exception("Data type ", type(something), " is not handled")
+  return something
 
 ##################################################################
 ## DIAMOND HELPERS                                              ## 
 ##################################################################
 
-def set_diamond_style(show=None):
-  if show is not None:
-    _default_arguments['diamond']['show'] = show
+def set_diamond_style(show):
+  global _show_diamond
+  _show_diamond = show
+
+def get_diamond_size(ax):
+  return get_width(ax=ax) * my_default_diamond_size * int(_show_diamond)
 
 ##################################################################
 ## COLOUR HELPERS                                               ## 
@@ -58,34 +103,43 @@ def find_colour_code(colour_name):
 
 ########################################################################
 
-def get_patch_style(patch_name, kwargs=None):
-  if kwargs is None:
-    kwargs = _default_arguments
-  patch_dict = {key[len(patch_name)+1:] : value for key, value in kwargs.items()
-                                              if key.startswith(patch_name + "_")}
+def get_default_arguments(defaults_for_demo):
+  if defaults_for_demo:
+    defaults_to_use = my_default_demo_params
+  else:
+    defaults_to_use = _default_arguments
+  return defaults_to_use
 
-  colour_to_use = find_colour_code( patch_dict['colour'])
-  if 'show' in patch_dict and not patch_dict['show']:
-    colour_to_use = 'none'
-  result = {'fc' : colour_to_use, 
-            'ec' : 'none',
-            'zorder' : patch_dict['zorder'],
-            'alpha' : patch_dict['alpha']}
+def extract_colour_etc_kwargs(kwargs):
+  possible_keys = line_arg_types + patch_arg_types + ["outline_" + a for a in line_arg_types] + ["diamond_" + a for a in patch_arg_types]
+ 
+  result = {key : value for key, value in kwargs.items() if key in possible_keys}
   return result
 
-def get_line_style(line_name, kwargs=None):
-  if kwargs is None:
-    kwargs = _default_arguments
-  line_dict = {key[len(line_name)+1:] : value for key, value in kwargs.items()
-                                            if key.startswith(line_name + "_")}
-  try:
-    result = {'color' : find_colour_code( line_dict['colour'] ), 
-            'lw' : line_dict['width'],
-            'zorder' : line_dict['zorder'],
-            'solid_joinstyle' : line_dict['joinstyle']}
-  except:
-    raise Exception(line_dict)
-  return result
+def _set_style(something, **kwargs):
+
+  if isinstance(something, matplotlib.lines.Line2D):
+    if "colour" in kwargs:
+      something.set_color(find_colour_code( kwargs['colour'] ))
+    if "zorder" in kwargs:
+      something.set_zorder(kwargs['zorder'])
+    if "width" in kwargs:
+      something.set_lw(kwargs['width'])
+    if "joinstyle" in kwargs:
+      something.set_solid_joinstyle(kwargs['joinstyle'])
+
+  elif isinstance(something, matplotlib.patches.Polygon):
+    something.set_ec('none')
+    if "colour" in kwargs:
+      something.set_fc(find_colour_code( kwargs['colour'] ))
+    if "zorder" in kwargs:
+      something.set_zorder(kwargs['zorder'])
+    if "alpha" in kwargs:
+      something.set_alpha(kwargs['alpha'])
+
+  else:
+    raise Exception("Data type ", type(something), " is not handled")
+
 
 ########################################################################
 
@@ -96,61 +150,25 @@ def new_layer():
     _default_arguments[fa]['zorder'] = new_layer_nb
 
 def set_line_style(**kwargs):
-  global _default_arguments
-  _set_dictionary_from_kwargs(target_dict=_default_arguments['line'], 
-                              kwargs=kwargs, 
-                              dict_keys=line_arg_types)
-  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
-                                    processed_keys=line_arg_types)
+  _set_default_style(what='line', dict_keys=line_arg_types)
 
 def set_patch_style(**kwargs):
+  _set_default_style(what='patch', dict_keys=patch_arg_types)
+                
+def set_outline_style(**kwargs):
+  _set_default_style(what='outline', dict_keys=line_arg_types)
+ 
+def _set_default_style(what, dict_keys, **kwargs):
   global _default_arguments
 
-  used_for_patch = _set_dictionary_from_kwargs(target_dict=_default_arguments['patch'], 
-                                               kwargs=kwargs, 
-                                               dict_keys=patch_arg_types, 
-                                               kwargs_prefix="patch_")
-
-  if 'outline_zorder' not in kwargs:
-    kwargs['outline_zorder'] = _default_arguments['patch']['zorder']
-
-  used_for_outline = _set_dictionary_from_kwargs(target_dict=_default_arguments['outline'], 
-                                                 wargs=kwargs, 
-                                                 dict_keys=line_arg_types, 
-                                                 kwargs_prefix="outline_")
+  used_args = [dk for dk in dict_keys if dk in kwargs]
+  for ua in used_args:
+    _default_arguments[what][ua] = kwargs[ua]
 
   raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
-                                    processed_keys=used_for_outline+used_for_patch)
+                                    processed_keys=used_args)
 
 ########################################################################
-
-def set_fill_in_outline_kwarg_defaults(kwargs, defaults_for_demo=False):
-  if defaults_for_demo:
-    defaults_to_use = my_default_demo_params
-  else:
-    defaults_to_use = _default_arguments
-
-  result = {}
-  param_names_used = []
-  for fa in format_arg_dict.keys(): 
-    for _arg in format_arg_dict[fa]:
-      param_name = fa + '_' + _arg
-      if param_name in kwargs:
-        result[param_name] = kwargs[param_name]
-        param_names_used.append(param_name)
-      else:
-        result[param_name] = defaults_to_use[fa][_arg]
-  return param_names_used, result
-
-########################################################################
-
-def _set_dictionary_from_kwargs(target_dict, kwargs, dict_keys, kwargs_prefix=""):
-  processed_arguments = []
-  for dk in dict_keys:
-    if dk in kwargs:
-      target_dict[dk] = kwargs[kwargs_prefix + dk]
-      processed_arguments.append(kwargs_prefix + dk)
-  return processed_arguments
 
 def raise_Exception_if_not_processed(kwarg_keys, processed_keys):
   not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in processed_keys]

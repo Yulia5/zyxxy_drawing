@@ -38,16 +38,16 @@ my_default_colour_etc_settings = {
                                              'width' : 0, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1},
-                     "diamond" : {'size' : 0.015,
-                                  'show' : True,
-                                  'colour' : 'green', #  None #
+                     "diamond" : {'colour' : 'green', #  None #
                                   'alpha' : 1.0,
                                   'zorder' : 1000}} 
 
 my_default_background_settings =  {'fc' : 'none', 
                                    'ec' : 'none',
                                    'zorder' : -1000,
-                                   'alpha' : 1}               
+                                   'alpha' : 1}   
+
+my_default_diamond_size = 0.015         
 
 # Font sizes and adjustment needed to fit them
 my_default_title_font_size = 18
@@ -97,8 +97,7 @@ my_default_demo_params = {"line" : {'colour' : 'black',
                                              'width' : 2, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1},
-                         "diamond" : {'size' : 0.015,
-                                  'show' : True,
+                         "diamond" : {
                                   'colour' : 'green', #  None #
                                   'alpha' : 1.0,
                                   'zorder' : 1000}}
