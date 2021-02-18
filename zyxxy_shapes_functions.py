@@ -73,9 +73,12 @@ def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
   _shape = Shape(ax=ax, is_patch_not_line=is_patch_not_line, defaults_for_demo=True)
 
   # get colour params
-  colour_etc_kwargs = extract_colour_etc_kwargs(kwargs)
+  exceptions = []
+  if shapename == "a_triangle":
+    exceptions = ["width"]
+  colour_etc_kwargs = extract_colour_etc_kwargs(kwargs, exceptions=exceptions)
   _shape.set_colours_etc(**colour_etc_kwargs)
-  param_names_used = colour_etc_kwargs.keys()
+  param_names_used = [k for k in colour_etc_kwargs.keys()]
 
   kwargs_common = {}
   if isinstance(shapename, str):
@@ -93,6 +96,7 @@ def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
   
   return _shape
 
+# code for three special draw_* functions
 def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None, ax=None, **kwargs):
   contour = zyxxy_coordinates.build_a_rectangle(width=width, height=height, 
     left_x=left, centre_x=centre_x, right_x=right, bottom_y=bottom, centre_y=centre_y, top_y=top)
@@ -100,11 +104,14 @@ def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom
   return result
 
 def draw_a_broken_line(contour, ax=None, **kwargs):
-  draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=False, **kwargs)
+  _shape = draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=False, **kwargs)
+  return _shape
 
 def draw_a_polygon(contour, ax=None, **kwargs):
-  draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=True, **kwargs)
+  _shape = draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=True, **kwargs)
+  return _shape
 
+# autogenerate all other draw_* functions
 for shapename in zyxxy_coordinates.shape_names_params_dicts_definition.keys():
   if shapename == "a_rectangle":
     pass

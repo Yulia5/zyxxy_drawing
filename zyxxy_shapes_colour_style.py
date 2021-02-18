@@ -110,8 +110,9 @@ def get_default_arguments(defaults_for_demo):
     defaults_to_use = _default_arguments
   return defaults_to_use
 
-def extract_colour_etc_kwargs(kwargs):
+def extract_colour_etc_kwargs(kwargs, exceptions):
   possible_keys = line_arg_types + patch_arg_types + ["outline_" + a for a in line_arg_types] + ["diamond_" + a for a in patch_arg_types]
+  possible_keys = [k for k in possible_keys if k not in exceptions]
  
   result = {key : value for key, value in kwargs.items() if key in possible_keys}
   return result
