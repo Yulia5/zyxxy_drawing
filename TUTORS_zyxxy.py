@@ -10,9 +10,10 @@ from zyxxy_shapes_colour_style import set_line_style, new_layer
 # Creating the canvas!                               ##
 ax = create_canvas_and_axes(canvas_width = 12,
                             canvas_height = 10, 
-                            title = "Hello, I am Zyxxy!")
+                            title = "Hello, I am Zyxxy!",
+                            tick_step = 1)
 
-set_line_style(width=2)
+set_line_style(linewidth=2)
 #######################################################
 # Now let's draw the shapes!                         ##
 

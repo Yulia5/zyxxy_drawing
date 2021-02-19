@@ -28,14 +28,14 @@ my_colour_palette = {'Bubble_blue'     : '#0099ff',
 # Colours, alphas and linewidths!
 my_default_colour_etc_settings = {
                      "line" : {'colour' : 'black', 
-                               'width' : 2, 
+                               'linewidth' : 2, 
                                'joinstyle' : 'miter', 
                                'zorder' : 1}, 
                      "patch" : {'alpha' : 1.0, 
                                 'zorder' : 1, 
                                 'colour' : 'none'},
                      "outline" : {'colour' : 'black', 
-                                             'width' : 0, 
+                                             'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1},
                      "diamond" : {'colour' : 'green', #  None #
@@ -89,12 +89,12 @@ my_default_demo_plot_bottom_gap = 0.01
 my_default_demo_font_size = 10 / demo_screen_zoom
 
 my_default_demo_params = {"line" : {'colour' : 'black', 
-                                    'width' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
+                                    'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
                           "patch" : {'alpha' : 0.5, 
                                      'zorder' : 1, 
                                      'colour' : 'none'},
                           "outline" : {'colour' : 'black', 
-                                             'width' : 2, 
+                                             'linewidth' : 2, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1},
                          "diamond" : {

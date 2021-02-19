@@ -31,7 +31,6 @@ format_arg_dict = { "line"    : line_arg_types,
                     "diamond" : patch_arg_types}
 
 _default_arguments = my_default_colour_etc_settings
-
 _show_diamond = True
 
 ##################################################################
@@ -150,23 +149,18 @@ def new_layer():
     _default_arguments[fa]['zorder'] = new_layer_nb
 
 def set_line_style(**kwargs):
-  _set_default_style(what='line', dict_keys=line_arg_types)
+  _set_default_style(what='line', **kwargs)
 
 def set_patch_style(**kwargs):
-  _set_default_style(what='patch', dict_keys=patch_arg_types)
+  _set_default_style(what='patch', **kwargs)
                 
 def set_outline_style(**kwargs):
-  _set_default_style(what='outline', dict_keys=line_arg_types)
+  _set_default_style(what='outline', **kwargs)
  
-def _set_default_style(what, dict_keys, **kwargs):
+def _set_default_style(what, **kwargs):
   global _default_arguments
-
-  used_args = [dk for dk in dict_keys if dk in kwargs]
-  for ua in used_args:
+  for ua in kwargs.keys():
     _default_arguments[what][ua] = kwargs[ua]
-
-  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
-                                    processed_keys=used_args)
 
 ########################################################################
 

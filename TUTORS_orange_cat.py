@@ -22,9 +22,9 @@ set_patch_style(colour='darkorange')
 
 # the ears
 
-draw_a_triangle(ax=axes, tip_x=20, tip_y=114, height=50, width=30, colour='darkorange', turn=4 + 1/2)
+draw_a_triangle(ax=axes, tip_x=20, tip_y=114, height=50, width=30, turn=4 + 1/2)
 draw_a_triangle(ax=axes, tip_x=28, tip_y=106, height=40, width=24, colour='black', turn=4 + 1/2)
-draw_a_triangle(ax=axes, tip_x=80, tip_y=114, height=50, width=30, colour='darkorange', turn=7 + 1/2)
+draw_a_triangle(ax=axes, tip_x=80, tip_y=114, height=50, width=30, turn=7 + 1/2)
 draw_a_triangle(ax=axes, tip_x=72, tip_y=106, height=40, width=24, colour='black', turn=7 + 1/2)
 
 # the tail
@@ -50,7 +50,7 @@ for i, bh in enumerate(height_body):
   draw_a_triangle(ax=axes, tip_x=50, tip_y=60, height=bh, width=bh, colour=colour, turn=6)
 
 #head
-contour_head = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25, colour='darkorange')
+contour_head = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25)
 
 # neck
 draw_a_circle(ax=axes, centre_x=50, centre_y=60, radius=1, colour='black')
@@ -76,8 +76,8 @@ set_outline_style(outline_width=2)
 new_layer()
 
 # feet
-draw_a_triangle(ax=axes, tip_x=38, tip_y=20, height=20, width=20, colour='darkorange', turn=6)
-draw_a_triangle(ax=axes, tip_x=62, tip_y=20, height=20, width=20, colour='darkorange', turn=6)
+draw_a_triangle(ax=axes, tip_x=38, tip_y=20, height=20, width=20, turn=6)
+draw_a_triangle(ax=axes, tip_x=62, tip_y=20, height=20, width=20, turn=6)
 
 # eyes
 for centre_x in [38, 62]:
