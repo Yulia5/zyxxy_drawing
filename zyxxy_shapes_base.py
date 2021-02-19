@@ -57,6 +57,7 @@ class Shape:
       if _attr is not None:
         _set_style(_attr, **defaults_to_use[attr_name])
 
+    self.clip_patches = []
     for s in [self.patch, self.line, self.outline]:
       if s is not None:
         add_to_layer_record(what_to_add=s)
@@ -139,37 +140,30 @@ class Shape:
     if 'turn' in kwargs_common:
       self.rotate(turn=kwargs_common['turn'])
 
-  def add_clip_outline(self, clip_outline):
-    if type(clip_outline) is Polygon:
-      clip_contour = clip_outline.get_xy()
-    else:
-      clip_contour = clip_outline
-
+  def get_xy(self):
     if self.patch is not None:
-      self.clip_patch = Polygon(clip_contour, 
-                               fc = 'none', 
-                               ec = 'none',
-                               zorder = self.patch_zorder)
-      _ax = self.patch.axes
-      _ax.add_patch(self.clip_patch)
-      self.patch.set_clip_path(self.clip_patch)
-    
-    if (self.outline is not None) or (self.line is not None): 
-      self.clip_line = Polygon(clip_contour, 
-                               fc = 'none', 
-                               ec = 'none',
-                               zorder = self.line_zorder)
-      if self.outline is not None:
-        _ax = self.outline.axes
-        _ax.add_patch(self.clip_line)
-        self.outline.set_clip_path(self.clip_line)
-      if self.line is not None:
-        _ax = self.line.axes
-        _ax.add_patch(self.clip_line)
-        self.line.set_clip_path(self.clip_line)
+      return _get_xy(self.patch)
+    if self.line is not None:
+      return _get_xy(self.line)
+    raise Exception("Unable to identify xy")
 
-    add_to_layer_record(what_to_add=self.clip_line)
-    add_to_layer_record(what_to_add=self.clip_patch)
+  def clip(self, clip_outline):
+    if self.patch is None:
+      return
+    if isinstance(clip_outline, Shape):
+      clip_xy = clip_outline.get_xy()
+    else:
+      clip_xy = _get_xy(clip_outline)
+    clip_patch = Polygon(clip_xy, 
+                               fc = 'none', 
+                               ec = 'none',
+                               zorder = self.patch.get_zorder())
+    self.patch.axes.add_patch(clip_patch)
+    self.patch.set_clip_path(clip_patch)
+
+    self.clip_patches.append(clip_patch)
+    
+    # TODO: investigate if lines are clippable
   
   def update_diamond(self, new_diamond_coords):
     self.diamond_coords = np.array(new_diamond_coords)

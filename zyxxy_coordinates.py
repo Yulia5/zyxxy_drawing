@@ -96,41 +96,35 @@ def build_a_rectangle(width, height, left=None, centre_x=None, right=None, botto
   if len(errorMsg) != 0:
     raise Exception('; '.join(errorMsg))
 
-  diamond_best_guess = [None, None]
+  diamond_best_guess = [0, 0]
+  if centre_x is not None:
+    diamond_best_guess[0] = centre_x
+  if centre_y is not None:
+    diamond_best_guess[1] = centre_y
   # defining coordinates that are undefined - x
   if left is not None:
     centre_x = left + width / 2
     right = left + width
-    diamond_best_guess[0] = left
-  else:
-    if centre_x is not None:
+  elif centre_x is not None:
       left = centre_x - width / 2
       right = centre_x + width / 2
-      diamond_best_guess[0] = centre_x
-    elif right is not None:
+  elif right is not None:
       left = right - width
       centre_x = right - width / 2  
-      diamond_best_guess[0] = right
-  if diamond_best_guess[0] is None:
-    diamond_best_guess[0] = 0
+  else:
     left, right = - width / 2, width / 2
 
   # defining coordinates that are undefined - y
   if bottom is not None:
     centre_y = bottom + height / 2
     top = bottom + height
-    diamond_best_guess[1] = bottom
-  else:
-    if centre_y is not None:
+  elif centre_y is not None:
       bottom = centre_y - height / 2
       top = centre_y + height / 2
-      diamond_best_guess[1] = centre_y
-    elif top is not None:
+  elif top is not None:
       bottom = top - height
       centre_y = top - height / 2 
-      diamond_best_guess[1] = top
-  if diamond_best_guess[1] is None:
-    diamond_best_guess[1] = 0
+  else:
     bottom, top = - height / 2, height / 2
  
   contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]])

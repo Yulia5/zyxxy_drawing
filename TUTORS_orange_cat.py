@@ -10,8 +10,8 @@ from zyxxy_shapes_functions import draw_a_circle, draw_a_triangle, draw_an_ellip
 #######################################################
 ## Creating the canvas!                               ##  
 axes = create_canvas_and_axes(canvas_width = 120,
-                                canvas_height = 120,
-                                background_colour = 'lightyellow')
+                              canvas_height = 120,
+                              background_colour = 'lightyellow')
 #######################################################
 # Now let's draw the shapes!                         ##
 
@@ -30,12 +30,10 @@ draw_a_triangle(ax=axes, tip_x=72, tip_y=106, height=40, width=24, colour='black
 # the tail
 
 tail_length = [30, 22, 20, 12, 10]
-for i, tl in enumerate(tail_length):
-  if i%2 == 0:
-    colour='darkorange'
-  else:
-    colour='black'
-  draw_a_triangle(ax=axes, tip_x=88, tip_y=30, height=tl, width=tl/2, colour=colour, turn=7)
+for i, tl in enumerate(tail_length): 
+  triangle_tail = draw_a_triangle(ax=axes, tip_x=88, tip_y=30, height=tl, width=tl/2, turn=7)
+  if i%2 == 1:
+    triangle_tail.set_colours_etc(colour='black')
 
 # next layer
 new_layer()
@@ -43,34 +41,9 @@ new_layer()
 # body
 height_body = [60, 57, 54, 38, 35, 19, 16]
 for i, bh in enumerate(height_body):
-  if i%2 == 0:
-    colour='darkorange'
-  else:
-    colour='black'
-  draw_a_triangle(ax=axes, tip_x=50, tip_y=60, height=bh, width=bh, colour=colour, turn=6)
-
-#head
-contour_head = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25)
-
-# neck
-draw_a_circle(ax=axes, centre_x=50, centre_y=60, radius=1, colour='black')
-
-# stripes on the face
-
-#outlines are not clippable, so we will cancel them for now
-set_outline_style(width=0)
-
-# vertical stripes
-for c, b in [[40, 101], [45, 100], [50, 101]]:
-  draw_a_rectangle(ax=axes, centre_x=c, bottom=b, width=3, height=20, colour='black')#, clip_outline=contour_head)
-
-# horizontal stripes
-for c, x in [[70, 16], [75, 15], [80, 18]]:
-  draw_a_rectangle(ax=axes, right=50-x, centre_y=c, width=20, height=3, colour='black')#, clip_outline=contour_head)
-  draw_a_rectangle(ax=axes, left=50+x, centre_y=c, width=20, height=3, colour='black')#, clip_outline=contour_head)
-
-# adding the outline back
-set_outline_style(outline_width=2)
+  triangle_body = draw_a_triangle(ax=axes, tip_x=50, tip_y=60, height=bh, width=bh, turn=6)
+  if i%2 == 1:
+    triangle_body.set_colours_etc(colour='black')
 
 # next layer
 new_layer()
@@ -78,6 +51,34 @@ new_layer()
 # feet
 draw_a_triangle(ax=axes, tip_x=38, tip_y=20, height=20, width=20, turn=6)
 draw_a_triangle(ax=axes, tip_x=62, tip_y=20, height=20, width=20, turn=6)
+
+#head
+head_circle = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25)
+
+#from this line, the default colour is black
+set_patch_style(colour='black')
+
+# neck
+draw_a_circle(ax=axes, centre_x=50, centre_y=60, radius=1)
+
+# stripes on the face
+
+stripes = []
+# vertical stripes
+for c, b in [[40, 101], [45, 100], [50, 101]]:
+  stripe = draw_a_rectangle(ax=axes, centre_x=c, bottom=b, width=3, height=20)
+  stripes += [stripe]
+
+# horizontal stripes
+for c, x in [[70, 16], [75, 15], [80, 18]]:
+  stripe_l = draw_a_rectangle(ax=axes, right=50-x, centre_y=c, width=20, height=3)
+  stripe_r = draw_a_rectangle(ax=axes, left=50+x, centre_y=c, width=20, height=3)
+  stripes += [stripe_l, stripe_r]
+
+for stripe in stripes:
+  #outlines are not clippable, so we will cancel them for now
+  stripe.set_colours_etc(outline_linewidth = 0)
+  stripe.clip(clip_outline = head_circle)
 
 # eyes
 for centre_x in [38, 62]:
@@ -89,7 +90,7 @@ for centre_x in [38, 62]:
 draw_a_triangle(ax=axes, tip_x=50, tip_y=72, height=8, width=10, colour='pink')
 
 # smile
-draw_a_segment(ax=axes, start_x=50, start_y=72, length=7, linewidth=2, colour='black', turn=6)
+draw_a_segment(ax=axes, start_x=50, start_y=72, length=7, linewidth=2, turn=6)
 draw_a_smile(ax=axes, centre_x=50, centre_y=72, depth=-7, width=20)
 
 show_drawing_and_save_if_needed()
