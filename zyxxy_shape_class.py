@@ -135,11 +135,7 @@ class Shape:
     what_to_redraw = self.get_what_to_move() + [self.diamond]
     for something in what_to_redraw:
       if something is not None:
-        my_ax = something.axes
-        try:
-          my_ax.draw_artist(something)
-        except Exception as inst:
-          raise Exception(inst.args, _get_xy(something))
+        something.axes.draw_artist(something)
 
   def move(self, **kwargs_common):
     if 'flip' in kwargs_common and kwargs_common['flip']:

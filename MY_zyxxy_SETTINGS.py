@@ -51,7 +51,7 @@ my_default_colour_etc_settings = {
                                              'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
                                              'zorder' : 1},
-                     "diamond" : {'colour' : 'green', #  None #
+                     "diamond" : {'colour' : 'blue', #  None #
                                   'alpha' : 1.0,
                                   'zorder' : 1000}} 
 

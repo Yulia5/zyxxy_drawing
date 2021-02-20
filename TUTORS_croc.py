@@ -106,6 +106,7 @@ eye_y = top_body
 for radius, colour in [[8, 'BrightGreen'], [5, 'white'], [3, 'black']]:
   for eye_x in [right_body, right_body+12]:
     draw_a_circle(ax=ax, centre_x=eye_x, centre_y=eye_y, radius=radius, colour=colour)
+
 # ... and the eyelids. Saving them in array for future use   
 eyelids = []
 eyelid_width = 12
@@ -125,9 +126,9 @@ for nostril_x in [right_head-r_nostrils, right_head-3*r_nostrils]:
 # teeth
 draw_a_polygon(ax=ax, contour=upper_teeth, colour='white')
 # upper lip
-lipline_top = build_an_arc(radius=lip_r, angle_start=6, angle_end=9) + [right_body-lip_r, lip_y+lip_r]
-lipline_top = link_contours([[right_head, lip_y]], lipline_top)
-draw_a_broken_line(ax=ax, contour=lipline_top, colour='green', linewidth=2)
+lipline_arc = build_an_arc(radius=lip_r, angle_start=6, angle_end=9) + [right_body-lip_r, lip_y+lip_r]
+lipline = link_contours([[right_head, lip_y]], lipline_arc)
+draw_a_broken_line(ax=ax, contour=lipline, colour='green', linewidth=2)
 
 # now for the animation!
 scenarios = {}

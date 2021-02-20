@@ -136,6 +136,8 @@ def set_default_outline_style(**kwargs):
  
 def _set_default_style(what, **kwargs):
   global _default_arguments
+  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
+                                   processed_keys=_default_arguments[what].keys())
   for ua in kwargs.keys():
     _default_arguments[what][ua] = kwargs[ua]
 
