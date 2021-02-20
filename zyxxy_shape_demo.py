@@ -170,7 +170,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
                                                    'button': button}
                                             
   _shape = Shape(ax=ax, is_patch_not_line=(shapename not in zyxxy_line_shapes), defaults_for_demo=True)
-  _shape.set_colours_etc(colour=shape_colour, diamond_colour=diamond_colour)
+  _shape.set_style(colour=shape_colour, diamond_colour=diamond_colour)
   shapes_by_side_by_shapename[side][shapename] = _shape
     
   def update(val):

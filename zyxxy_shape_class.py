@@ -74,7 +74,7 @@ class Shape:
       if _attr is not None:
         _attr.set_visible(s)   
 
-  def set_colours_etc(self, **kwargs):
+  def set_style(self, **kwargs):
 
     used_args = []
     for attr_name, arg_types in format_arg_dict.items():
@@ -144,7 +144,7 @@ class Shape:
     if 'diamond_y' in kwargs_common:
       diamond[1] = kwargs_common['diamond_y']
     self.set_new_diamond_and_shift(new_diamond_coords=diamond)
-    if 'stretch_y' in kwargs_common:
+    if 'stretch_x' in kwargs_common:
       self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=1)
     if 'stretch_y' in kwargs_common:
       self.stretch(stretch_x=1, stretch_y=kwargs_common['stretch_y'])

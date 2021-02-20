@@ -1,12 +1,13 @@
 #######################################################
 ## Importing functions that we will use below        ##
-from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_patches import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_a_double_smile
-from zyxxy_lines import draw_a_broken_line
-from zyxxy_coordinates import build_an_arc, link_contours, build_a_double_smile
-from zyxxy_settings import new_layer
-from zyxxy_shapes_base import shift_layer, rotate_layer, get_all_shapes_in_layers, set_xy
 import numpy as np
+
+from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
+from zyxxy_shape_functions import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_an_eye, draw_a_broken_line
+from zyxxy_coordinates import build_an_arc, link_contours, build_an_eye
+from zyxxy_shape_style import new_layer
+from zyxxy_shape_class import shift_layer, rotate_layer, get_all_shapes_in_layers
+
 
 #########################################################
 ## CREATING THE DRAWING!                               ##
@@ -56,20 +57,20 @@ for shift, colour in [[0, 'green'], [-17, 'lime']]:
   for x in [50, 100]:
     x_coord = x + shift
     # draw a leg
-    draw_a_rectangle(ax=ax, left_x=x_coord, top_y=bottom_body, height=leg_length, width=leg_width, colour=colour)
+    draw_a_rectangle(ax=ax, left=x_coord, top=bottom_body, height=leg_length, width=leg_width, colour=colour)
     # draw a feet
     draw_a_sector(ax=ax, centre_x=x_coord+feel_length/2, centre_y=bottom_body-leg_length, radius=feel_length/2, stretch_y=feet_height/(feel_length/2), angle_start=9, angle_end=3, colour=colour)
 
 new_layer()
 
 # body
-draw_a_rectangle(ax=ax, left_x=left_body, bottom_y=bottom_body, height=top_body-bottom_body, width=right_body-left_body, colour='lime')
+draw_a_rectangle(ax=ax, left=left_body, bottom=bottom_body, height=top_body-bottom_body, width=right_body-left_body, colour='lime')
 
 # backside
 draw_a_sector(ax=ax, centre_x=left_body, centre_y=centre_backside, radius=centre_backside-bottom_body,angle_start=6, angle_end=12, colour='lime')
 
 # tail
-draw_a_rectangle(ax=ax, left_x=left_body, top_y=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body, colour='lime')
+draw_a_rectangle(ax=ax, left=left_body, top=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body, colour='lime')
 
 draw_a_sector(ax=ax, centre_x=tail_right, centre_y=2*centre_backside-bottom_body, radius=tail_width,angle_start=3, angle_end=6, colour='lime')
 
@@ -99,7 +100,7 @@ eyelid_width = 12
 for eye_x in [right_body, right_body+12]:
   for td in [-1, 1]:
     mid_y = eye_y + td * eyelid_width / 2
-    _, eyelid = draw_a_double_smile(ax=ax, centre_x=eye_x, width=eyelid_width, corners_y=eye_y, mid1_y=mid_y, mid2_y=mid_y, colour='green')
+    eyelid = draw_an_eye(ax=ax, centre_x=eye_x, centre_y=eye_y, width=eyelid_width, depth_1=mid_y, depth_2=mid_y, colour='green')
     eyelids.append(eyelid)
 
 # ... and the nostrils
@@ -124,7 +125,7 @@ for eyelid_shape_nb in range(blink_frames):
   eyelid_outlines = []
   for eye_x in [right_body, right_body+12]:
     for td in [-1, 1]:
-      _, eyelid_outline = build_a_double_smile(centre_x=eye_x, width=eyelid_width, corners_y=eye_y, 
+      _, eyelid_outline = build_an_eye(centre_x=eye_x, width=eyelid_width, corners_y=eye_y, 
       mid1_y=eye_y + td * eyelid_width / 2, 
       mid2_y=eye_y + td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1))
       eyelid_outlines.append(eyelid_outline)

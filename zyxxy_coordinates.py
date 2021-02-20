@@ -38,7 +38,7 @@ shape_names_params_dicts_definition = {
                             'an_eye': {'width' : ['half_min_size', 4], 'depth_1' : ['plus_minus_half_min_size', -1], 'depth_2' : ['plus_minus_half_min_size', 1]},
                             'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
                             'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
-                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius_1' : 'half_min_size', 'radius_2' : 'half_min_size_34'},
+                            'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius' : 'half_min_size', 'radius_2' : 'half_min_size_34'},
                             'a_zigzag' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_segments': 'vertices'},
                             'a_wave' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_waves': 'vertices'},
                             'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
@@ -267,22 +267,22 @@ def build_an_eye(width, depth_1, depth_2):
   return result
 
 # a sector ######################################################
-def build_a_sector(angle_start, angle_end, radius_1, radius_2):
+def build_a_sector(angle_start, angle_end, radius, radius_2=0):
   # make sure radius_1 >= radius_2 >= 0
-  if abs(radius_1) > abs(radius_2):
-    radius_1, radius_2 = abs(radius_1), abs(radius_2)
+  if abs(radius) > abs(radius_2):
+    radius, radius_2 = abs(radius), abs(radius_2)
   else:
-    radius_2, radius_1 = abs(radius_1), abs(radius_2)
+    radius_2, radius = abs(radius), abs(radius_2)
 
   contour = build_an_arc(angle_start=angle_start, angle_end=angle_end)
 
   if is_the_same_point(radius_2, 0.0):
     # special case - just add the mid-point
-    result = link_contours(contour, [[0, 0]]) * radius_1
+    result = link_contours(contour, [[0, 0]]) * radius
   else:
     # add the arc
     inner_arc = np.ndarray.copy(contour) * radius_2
-    result = link_contours(contour * radius_1, inner_arc[::-1])
+    result = link_contours(contour * radius, inner_arc[::-1])
   return result
 
 # a drop #########################################################

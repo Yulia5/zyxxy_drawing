@@ -25,7 +25,7 @@ tail_length = [30, 22, 20, 12, 10]
 for i, tl in enumerate(tail_length): 
   triangle_tail = draw_a_triangle(ax=axes, tip_x=88, tip_y=30, height=tl, width=tl/2, turn=7)
   if i%2 == 1:
-    triangle_tail.set_colours_etc(colour='black')
+    triangle_tail.set_style(colour='black')
 
 
 # body
@@ -33,7 +33,7 @@ height_body = [60, 57, 54, 38, 35, 19, 16]
 for i, bh in enumerate(height_body):
   triangle_body = draw_a_triangle(ax=axes, tip_x=50, tip_y=60, height=bh, width=bh, turn=6)
   if i%2 == 1:
-    triangle_body.set_colours_etc(colour='black')
+    triangle_body.set_style(colour='black')
 
 # feet
 draw_a_triangle(ax=axes, tip_x=38, tip_y=20, height=20, width=20, turn=6)

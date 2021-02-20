@@ -74,7 +74,7 @@ def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
 
   # get colour params
   colour_etc_kwargs = extract_colour_etc_kwargs(kwargs)
-  _shape.set_colours_etc(**colour_etc_kwargs)
+  _shape.set_style(**colour_etc_kwargs)
   param_names_used = [k for k in colour_etc_kwargs.keys()]
 
   kwargs_common = {}
@@ -86,7 +86,7 @@ def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
     param_names_used += [k for k in kwargs_shape.keys()]
     _shape.update_xy_by_shapename(shapename=shapename, **kwargs_shape)
   else:
-    _shape.update_xy_given_contour(contour=shapename)
+    _shape.update_xy_by_shapename(shapename=shapename)
 
   used_common_keys, kwargs_common = get_common_kwargs(kwargs=kwargs, shapename=shapename)
   _shape.move(**kwargs_common)
