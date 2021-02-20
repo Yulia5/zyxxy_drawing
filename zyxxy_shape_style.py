@@ -49,30 +49,6 @@ def get_height(ax=None):
   return (ylims[1] - ylims[0])
 
 ##################################################################
-## MOVEMENT HELPERS                                             ## 
-##################################################################
-def _get_xy(something):
-  if isinstance(something, np.ndarray):
-    return something
-  elif isinstance(something, matplotlib.lines.Line2D):
-    return something.get_xydata()
-  elif isinstance(something, matplotlib.patches.Polygon):
-    return something.get_xy()
-  raise Exception("Data type ", type(something), " is not handled")
-
-def _set_xy(something, xy):
-  if isinstance(something, np.ndarray):
-    something = xy
-  elif isinstance(something, matplotlib.lines.Line2D):
-    something.set_xdata(xy[:, 0])
-    something.set_ydata(xy[:, 1])
-  elif isinstance(something, matplotlib.patches.Polygon):
-    something.set_xy(xy)
-  else:
-    raise Exception("Data type ", type(something), " is not handled")
-  return something
-
-##################################################################
 ## DIAMOND HELPERS                                              ## 
 ##################################################################
 
@@ -115,7 +91,7 @@ def extract_colour_etc_kwargs(kwargs):
   result = {key : value for key, value in kwargs.items() if key in possible_keys}
   return result
 
-def _set_line_style(something, **kwargs):
+def set_line_style(something, **kwargs):
 
     something.set_fc('none')
     something.set_linestyle('solid') # 'dotted'
@@ -129,7 +105,7 @@ def _set_line_style(something, **kwargs):
     if "joinstyle" in kwargs:
       something.set_joinstyle(kwargs['joinstyle'])
 
-def _set_patch_style(something, **kwargs):
+def set_patch_style(something, **kwargs):
 
     something.set_ec('none')
     if "colour" in kwargs:
@@ -149,13 +125,13 @@ def new_layer():
     _default_arguments[fa]['zorder'] = new_layer_nb
   return new_layer_nb
 
-def set_line_style(**kwargs):
+def set_default_line_style(**kwargs):
   _set_default_style(what='line', **kwargs)
 
-def set_patch_style(**kwargs):
+def set_default_patch_style(**kwargs):
   _set_default_style(what='patch', **kwargs)
                 
-def set_outline_style(**kwargs):
+def set_default_outline_style(**kwargs):
   _set_default_style(what='outline', **kwargs)
  
 def _set_default_style(what, **kwargs):

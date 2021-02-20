@@ -18,7 +18,25 @@ import numpy as np
 from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-from zyxxy_shape_style import _set_patch_style, _set_line_style, raise_Exception_if_not_processed, get_diamond_size, _set_xy, _get_xy, format_arg_dict, get_default_arguments
+from zyxxy_shape_style import set_patch_style, set_line_style, raise_Exception_if_not_processed, get_diamond_size, format_arg_dict, get_default_arguments
+
+
+##################################################################
+def _get_xy(something):
+  if isinstance(something, np.ndarray):
+    return something
+  elif isinstance(something, Polygon):
+    return something.get_xy()
+  raise Exception("Data type ", type(something), " is not handled")
+
+def _set_xy(something, xy):
+  if isinstance(something, np.ndarray):
+    something = xy
+  elif isinstance(something, Polygon):
+    something.set_xy(xy)
+  else:
+    raise Exception("Data type ", type(something), " is not handled")
+  return something
 
 ##################################################################
 ## SHAPE                                                        ## 
@@ -28,9 +46,6 @@ class Shape:
   def __init__(self, ax, is_patch_not_line, defaults_for_demo):
 
     self.diamond_coords = np.array([0, 0])
-    
-    self.clip_patch = None
-    self.clip_line = None
 
     if is_patch_not_line:  
       self.patch = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=True, closed=True)
@@ -59,9 +74,9 @@ class Shape:
       if _attr is None:
         continue
       if "line" in attr_name:
-        _set_line_style(_attr, **defaults_to_use[attr_name])
+        set_line_style(_attr, **defaults_to_use[attr_name])
       else:
-        _set_patch_style(_attr, **defaults_to_use[attr_name])
+        set_patch_style(_attr, **defaults_to_use[attr_name])
 
     self.clip_patches = []
     for s in [self.patch, self.line, self.outline]:
@@ -92,9 +107,9 @@ class Shape:
       _kwargs = {key[len(prefix):] : value for key, value in kwargs.items() if key in keys_for_kwargs}
 
       if "line" in attr_name:
-        _set_line_style(_attr, **_kwargs)
+        set_line_style(_attr, **_kwargs)
       else:
-        _set_patch_style(_attr, **_kwargs)
+        set_patch_style(_attr, **_kwargs)
 
       used_args += [prefix + k for k in _kwargs.keys()]
 
@@ -108,22 +123,10 @@ class Shape:
     else:
       contour = shapename
 
-    # updating the shapes
-    if self.line is not None:
-      if shapename not in zyxxy_coordinates.zyxxy_line_shapes: # the only open shapes
-        line_to_plot = contour # np.append(contour, contour[0:2], axis=0)
-      else:
-        line_to_plot = contour
-      _set_xy(self.line, line_to_plot)
-    if self.outline is not None:
-      if (np.array(contour)).shape[0] > 2:
-        contour_to_plot = contour # np.append(contour, contour[0:2], axis=0)
-      else:
-        contour_to_plot = contour
-      _set_xy(self.outline, contour_to_plot)
-      # raise Exception(_get_xy(self.outline)) 
-    if self.patch is not None:
-      _set_xy(self.patch, contour)
+    # updating the elements
+    for what in [self.line, self.outline, self.patch]:
+      if what is not None:
+        _set_xy(what, contour)
     
     # updating the diamond
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
@@ -177,8 +180,6 @@ class Shape:
       what.set_clip_path(clip_patch)
 
       self.clip_patches.append(clip_patch)
-    
-    # TODO: investigate if lines are clippable
   
   def update_diamond(self, new_diamond_coords):
     self.diamond_coords = np.array(new_diamond_coords)
@@ -187,7 +188,7 @@ class Shape:
               xy=self.diamond_coords+self.diamond_contour)
 
   def get_what_to_move(self):
-    return [self.line, self.patch, self.outline, self.clip_patch, self.clip_line]
+    return [self.line, self.patch, self.outline] + self.clip_patches
 
   def flip(self):
     what_to_move = self.get_what_to_move()

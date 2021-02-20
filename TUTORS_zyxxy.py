@@ -2,7 +2,7 @@
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_functions import draw_a_triangle, draw_a_circle, draw_a_segment
-from zyxxy_shape_style import set_line_style, new_layer
+from zyxxy_shape_style import set_default_line_style
 
 #########################################################
 ## CREATING THE DRAWING!                               ##
@@ -12,7 +12,7 @@ ax = create_canvas_and_axes(canvas_width = 12,
                             canvas_height = 10, 
                             title = "Hello, I am Zyxxy!")
 
-set_line_style(linewidth=2)
+set_default_line_style(linewidth=2)
 #######################################################
 # Now let's draw the shapes!                         ##
 

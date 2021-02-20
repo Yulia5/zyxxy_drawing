@@ -1,7 +1,7 @@
 #######################################################
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_shape_style import set_patch_style, set_outline_style, set_line_style, new_layer
+from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer
 from zyxxy_shape_functions import draw_a_circle, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment
 
 
@@ -16,9 +16,9 @@ axes = create_canvas_and_axes(canvas_width = 120,
 # Now let's draw the shapes!                         ##
 
 # settings
-set_outline_style(linewidth=2)
-set_line_style(linewidth=2)
-set_patch_style(colour='Yellow')#darkorange
+set_default_outline_style(linewidth=2)
+set_default_line_style(linewidth=2)
+set_default_patch_style(colour='Yellow')#darkorange
 
 # the tail
 tail_length = [30, 22, 20, 12, 10]
@@ -53,7 +53,7 @@ draw_a_triangle(ax=axes, tip_x=72, tip_y=106, height=40, width=24, colour='black
 head_circle = draw_a_circle(ax=axes, centre_x=50, centre_y=85, radius=25)
 
 #from this line, the default colour is black
-set_patch_style(colour='black')
+set_default_patch_style(colour='black')
 
 # neck
 draw_a_circle(ax=axes, centre_x=50, centre_y=60, radius=1)

@@ -5,7 +5,7 @@ import numpy as np
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_functions import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_an_eye, draw_a_broken_line
 from zyxxy_coordinates import build_an_arc, link_contours, build_an_eye, build_a_circle, build_a_zigzag
-from zyxxy_shape_style import new_layer, set_patch_style
+from zyxxy_shape_style import new_layer, set_default_patch_style
 from zyxxy_shape_class import shift_layer, rotate_layer, get_all_shapes_in_layers
 
 
@@ -52,7 +52,7 @@ jump_frames = 3
 size_jump = 20
 nb_wait_frames = 2
 
-set_patch_style(colour='BrightGreen')
+set_default_patch_style(colour='BrightGreen')
 
 # legs
 
@@ -194,12 +194,12 @@ def animate(i):
       except:
         raise Exception((eyelid_shape))
   # lift legs
-  shift_layer(layer_nb=0, shift=[0, scenarios['leg_lift'][i]])
+  shift_layer(layer_nb=leg_layer_nb, shift=[0, scenarios['leg_lift'][i]])
   # lift body, head & upper jaw
-  shift_layer(layer_nb=1, shift=[0, scenarios['body_lift'][i]])
-  shift_layer(layer_nb=2, shift=[0, scenarios['body_lift'][i]])
+  shift_layer(layer_nb=body_layer_nb, shift=[0, scenarios['body_lift'][i]])
+  shift_layer(layer_nb=upper_jaw_layer_nb, shift=[0, scenarios['body_lift'][i]])
   # upper jaw
-  rotate_layer(layer_nb=2, turn=scenarios['jaw_turn'][i], diamond=[right_body-lip_r, lip_y+lip_r])
+  rotate_layer(layer_nb=upper_jaw_layer_nb, turn=scenarios['jaw_turn'][i], diamond=[right_body-lip_r, lip_y+lip_r])
   # return the list of the shapes that are moved by animation
   return get_all_shapes_in_layers(0, 1, 2)
 
