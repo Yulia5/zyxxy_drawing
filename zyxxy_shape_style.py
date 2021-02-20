@@ -115,19 +115,22 @@ def extract_colour_etc_kwargs(kwargs):
   result = {key : value for key, value in kwargs.items() if key in possible_keys}
   return result
 
-def _set_style(something, **kwargs):
+def _set_line_style(something, **kwargs):
 
-  if isinstance(something, matplotlib.lines.Line2D):
+    something.set_fc('none')
+    something.set_linestyle('solid') # 'dotted'
     if "colour" in kwargs:
-      something.set_color(find_colour_code( kwargs['colour'] ))
+      something.set_ec(find_colour_code( kwargs['colour'] ))
     if "zorder" in kwargs:
       something.set_zorder(kwargs['zorder'])
+
     if "linewidth" in kwargs:
       something.set_lw(kwargs['linewidth'])
     if "joinstyle" in kwargs:
-      something.set_solid_joinstyle(kwargs['joinstyle'])
+      something.set_joinstyle(kwargs['joinstyle'])
 
-  elif isinstance(something, matplotlib.patches.Polygon):
+def _set_patch_style(something, **kwargs):
+
     something.set_ec('none')
     if "colour" in kwargs:
       something.set_fc(find_colour_code( kwargs['colour'] ))
@@ -135,9 +138,6 @@ def _set_style(something, **kwargs):
       something.set_zorder(kwargs['zorder'])
     if "alpha" in kwargs:
       something.set_alpha(kwargs['alpha'])
-
-  else:
-    raise Exception("Data type ", type(something), " is not handled")
 
 
 ########################################################################

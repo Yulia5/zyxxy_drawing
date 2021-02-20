@@ -18,7 +18,7 @@ import numpy as np
 from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-from zyxxy_shape_style import _set_style, raise_Exception_if_not_processed, get_diamond_size, _set_xy, _get_xy, format_arg_dict, get_default_arguments
+from zyxxy_shape_style import _set_patch_style, _set_line_style, raise_Exception_if_not_processed, get_diamond_size, _set_xy, _get_xy, format_arg_dict, get_default_arguments
 
 ##################################################################
 ## SHAPE                                                        ## 
@@ -33,19 +33,21 @@ class Shape:
     self.clip_line = None
 
     if is_patch_not_line:  
-      self.patch = Polygon(np.array([[0,0], [0,1], [1,1]]))
+      self.patch = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=True, closed=True)
       ax.add_patch(self.patch)
-      (self.outline, ) = ax.plot([0, 0, 1], [0, 1, 1])
+      self.outline = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=False, closed=True) 
+      ax.add_patch(self.outline)
       self.line = None
     else:
       self.patch = None
       self.outline = None
-      (self.line, ) = ax.plot([0, 0, 1], [0, 1, 1]) 
+      self.line = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=False, closed=False) 
+      ax.add_patch(self.line)
 
     diamond_size = get_diamond_size(ax)
     if diamond_size is not None:
       self.diamond_contour = np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * diamond_size
-      self.diamond = Polygon(self.diamond_contour)
+      self.diamond = Polygon(self.diamond_contour, fill=True, closed=True)
       ax.add_patch(self.diamond)
     else:
       self.diamond_contour = None
@@ -54,8 +56,12 @@ class Shape:
     defaults_to_use = get_default_arguments(defaults_for_demo = defaults_for_demo)
     for attr_name in format_arg_dict.keys():
       _attr = getattr(self, attr_name)
-      if _attr is not None:
-        _set_style(_attr, **defaults_to_use[attr_name])
+      if _attr is None:
+        continue
+      if "line" in attr_name:
+        _set_line_style(_attr, **defaults_to_use[attr_name])
+      else:
+        _set_patch_style(_attr, **defaults_to_use[attr_name])
 
     self.clip_patches = []
     for s in [self.patch, self.line, self.outline]:
@@ -84,7 +90,12 @@ class Shape:
       keys_for_kwargs = [prefix + at for at in arg_types]
       
       _kwargs = {key[len(prefix):] : value for key, value in kwargs.items() if key in keys_for_kwargs}
-      _set_style(_attr, **_kwargs)
+
+      if "line" in attr_name:
+        _set_line_style(_attr, **_kwargs)
+      else:
+        _set_patch_style(_attr, **_kwargs)
+
       used_args += [prefix + k for k in _kwargs.keys()]
 
     raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=used_args)
