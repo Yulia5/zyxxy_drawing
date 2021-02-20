@@ -1,8 +1,8 @@
 #######################################################
 ## Importing functions that we will use below        ##
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_shapes_functions import draw_a_triangle, draw_a_circle, draw_a_segment
-from zyxxy_shapes_colour_style import set_line_style, new_layer
+from zyxxy_shape_functions import draw_a_triangle, draw_a_circle, draw_a_segment
+from zyxxy_shape_style import set_line_style, new_layer
 
 #########################################################
 ## CREATING THE DRAWING!                               ##
@@ -10,8 +10,7 @@ from zyxxy_shapes_colour_style import set_line_style, new_layer
 # Creating the canvas!                               ##
 ax = create_canvas_and_axes(canvas_width = 12,
                             canvas_height = 10, 
-                            title = "Hello, I am Zyxxy!",
-                            tick_step = 1)
+                            title = "Hello, I am Zyxxy!")
 
 set_line_style(linewidth=2)
 #######################################################
@@ -24,8 +23,6 @@ draw_a_segment(ax, start_x=6, start_y=3, turn=3, length=2)
 draw_a_segment(ax, start_x=6, start_y=3, turn=4, length=2)
 draw_a_segment(ax, start_x=6, start_y=3, turn=9, length=2)
 draw_a_segment(ax, start_x=6, start_y=3, turn=8, length=2)
-
-new_layer()
 
 # let's draw the head of the mouse
 draw_a_triangle(ax=ax, tip_x=6, tip_y=1, height=6, width=6, colour='plum')

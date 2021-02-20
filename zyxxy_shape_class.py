@@ -159,20 +159,21 @@ class Shape:
     raise Exception("Unable to identify xy")
 
   def clip(self, clip_outline):
-    if self.patch is None:
-      return
-    if isinstance(clip_outline, Shape):
-      clip_xy = clip_outline.get_xy()
-    else:
-      clip_xy = _get_xy(clip_outline)
-    clip_patch = Polygon(clip_xy, 
+    for what in [self.patch, self.line, self.outline]:
+      if what is None:
+        continue
+      if isinstance(clip_outline, Shape):
+        clip_xy = clip_outline.get_xy()
+      else:
+        clip_xy = _get_xy(clip_outline)
+      clip_patch = Polygon(clip_xy, 
                                fc = 'none', 
                                ec = 'none',
                                zorder = self.patch.get_zorder())
-    self.patch.axes.add_patch(clip_patch)
-    self.patch.set_clip_path(clip_patch)
+      what.axes.add_patch(clip_patch)
+      what.set_clip_path(clip_patch)
 
-    self.clip_patches.append(clip_patch)
+      self.clip_patches.append(clip_patch)
     
     # TODO: investigate if lines are clippable
   

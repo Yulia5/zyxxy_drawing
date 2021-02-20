@@ -147,6 +147,7 @@ def new_layer():
   new_layer_nb = 1 + max([_default_arguments[fa]['zorder'] for fa in args_for_layer])
   for fa in args_for_layer: 
     _default_arguments[fa]['zorder'] = new_layer_nb
+  return new_layer_nb
 
 def set_line_style(**kwargs):
   _set_default_style(what='line', **kwargs)
