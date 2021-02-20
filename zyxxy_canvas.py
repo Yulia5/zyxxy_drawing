@@ -17,7 +17,7 @@
 import numpy as np
 from matplotlib import animation
 import matplotlib.pyplot as plt
-from zyxxy_shapes_colour_style import set_diamond_style
+from zyxxy_shape_style import set_diamond_style
 
 from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_background_settings
 

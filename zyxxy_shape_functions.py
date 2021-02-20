@@ -15,10 +15,10 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-from zyxxy_shapes_base import Shape
+from zyxxy_shape_class import Shape
 from functools import partial
 import zyxxy_coordinates
-from zyxxy_shapes_colour_style import raise_Exception_if_not_processed, extract_colour_etc_kwargs
+from zyxxy_shape_style import raise_Exception_if_not_processed, extract_colour_etc_kwargs
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'stretch_y' : 'stretch',

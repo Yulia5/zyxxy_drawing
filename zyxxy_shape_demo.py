@@ -16,9 +16,9 @@
 
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
-from zyxxy_shapes_base import Shape
+from zyxxy_shape_class import Shape
 from zyxxy_coordinates import zyxxy_line_shapes, shape_names_params_dicts_definition
-from zyxxy_shapes_functions import common_params_dict_definition, get_diamond_label
+from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
 from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size, my_default_demo_colours
 
 import matplotlib.pyplot as plt

@@ -18,7 +18,7 @@ import numpy as np
 from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-from zyxxy_shapes_colour_style import _set_style, raise_Exception_if_not_processed, get_diamond_size, _set_xy, _get_xy, format_arg_dict, get_default_arguments
+from zyxxy_shape_style import _set_style, raise_Exception_if_not_processed, get_diamond_size, _set_xy, _get_xy, format_arg_dict, get_default_arguments
 
 ##################################################################
 ## SHAPE                                                        ## 
