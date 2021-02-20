@@ -102,19 +102,22 @@ class Shape:
 
 
   def update_xy_by_shapename(self, shapename, **kwargs):
-    method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
-    contour = method_to_call(**kwargs)
+    if isinstance(shapename, str):
+      method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
+      contour = method_to_call(**kwargs)
+    else:
+      contour = shapename
 
     # updating the shapes
     if self.line is not None:
       if shapename not in zyxxy_coordinates.zyxxy_line_shapes: # the only open shapes
-        line_to_plot = np.append(contour, contour[0:2], axis=0)
+        line_to_plot = contour # np.append(contour, contour[0:2], axis=0)
       else:
         line_to_plot = contour
       _set_xy(self.line, line_to_plot)
     if self.outline is not None:
       if (np.array(contour)).shape[0] > 2:
-        contour_to_plot = np.append(contour, contour[0:2], axis=0)
+        contour_to_plot = contour # np.append(contour, contour[0:2], axis=0)
       else:
         contour_to_plot = contour
       _set_xy(self.outline, contour_to_plot)

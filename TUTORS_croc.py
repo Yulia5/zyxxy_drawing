@@ -4,8 +4,8 @@ import numpy as np
 
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_functions import draw_a_circle, draw_a_rectangle, draw_a_sector, draw_a_polygon, draw_an_eye, draw_a_broken_line
-from zyxxy_coordinates import build_an_arc, link_contours, build_an_eye
-from zyxxy_shape_style import new_layer
+from zyxxy_coordinates import build_an_arc, link_contours, build_an_eye, build_a_circle, build_a_zigzag
+from zyxxy_shape_style import new_layer, set_patch_style
 from zyxxy_shape_class import shift_layer, rotate_layer, get_all_shapes_in_layers
 
 
@@ -15,7 +15,7 @@ from zyxxy_shape_class import shift_layer, rotate_layer, get_all_shapes_in_layer
 # Creating the canvas!                               ##
 ax = create_canvas_and_axes(canvas_width = 190,
                             canvas_height = 100,
-                            background_colour = 'skyblue')
+                            background_colour = 'PastelBlue')
 
 #######################################################
 # Now let's draw the shapes!                         ##
@@ -52,46 +52,58 @@ jump_frames = 3
 size_jump = 20
 nb_wait_frames = 2
 
-# legs
-for shift, colour in [[0, 'green'], [-17, 'lime']]:
-  for x in [50, 100]:
-    x_coord = x + shift
-    # draw a leg
-    draw_a_rectangle(ax=ax, left=x_coord, top=bottom_body, height=leg_length, width=leg_width, colour=colour)
-    # draw a feet
-    draw_a_sector(ax=ax, centre_x=x_coord+feel_length/2, centre_y=bottom_body-leg_length, radius=feel_length/2, stretch_y=feet_height/(feel_length/2), angle_start=9, angle_end=3, colour=colour)
+set_patch_style(colour='BrightGreen')
 
-new_layer()
+# legs
+
+leg_layer_nb = new_layer()
+
+for shift, colour in [[0, 'green'], [-17, 'BrightGreen']]:
+  for x in [50, 100]:
+    # draw a leg
+    draw_a_rectangle(ax=ax, left=x+shift, top=bottom_body, height=leg_length, width=leg_width, colour=colour)
+    # draw a feet
+    draw_a_sector(ax=ax, centre_x=x+shift+feel_length/2, centre_y=bottom_body-leg_length, radius=feel_length/2, stretch_y=feet_height/(feel_length/2), angle_start=9, angle_end=15, colour=colour)
 
 # body
-draw_a_rectangle(ax=ax, left=left_body, bottom=bottom_body, height=top_body-bottom_body, width=right_body-left_body, colour='lime')
+
+body_layer_nb = new_layer()
+
+draw_a_rectangle(ax=ax, left=left_body, bottom=bottom_body, height=top_body-bottom_body, width=right_body-left_body)
 
 # backside
-draw_a_sector(ax=ax, centre_x=left_body, centre_y=centre_backside, radius=centre_backside-bottom_body,angle_start=6, angle_end=12, colour='lime')
+
+backside = draw_a_sector(ax=ax, centre_x=left_body, 
+centre_y=(2*centre_backside-bottom_body-tail_width+top_body)/2, 
+radius=(2*centre_backside-bottom_body-tail_width+top_body)/2-bottom_body, 
+radius_2=(2*centre_backside-bottom_body-tail_width-top_body)/2, 
+angle_start=6, angle_end=12)
+
+clip_contour = build_a_circle(radius=centre_backside-bottom_body) + [left_body, centre_backside]
+backside.clip(clip_outline = clip_contour)
 
 # tail
-draw_a_rectangle(ax=ax, left=left_body, top=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body, colour='lime')
+draw_a_rectangle(ax=ax, left=left_body, top=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body)
 
-draw_a_sector(ax=ax, centre_x=tail_right, centre_y=2*centre_backside-bottom_body, radius=tail_width,angle_start=3, angle_end=6, colour='lime')
-
-draw_a_circle(ax=ax, centre_x=left_body, centre_y=(2*centre_backside-bottom_body-tail_width+top_body)/2, radius=(2*centre_backside-bottom_body-tail_width-top_body)/2, colour='skyblue')
+draw_a_sector(ax=ax, centre_x=tail_right, centre_y=2*centre_backside-bottom_body, radius=tail_width,angle_start=3, angle_end=6)
 
 # lower teeth and jaw
-teeth_x = np.linspace(right_body-lip_r, right_head, 2*nb_teeth+1)
-upper_teeth = np.array([[teeth_x[t], lip_y - (t%2) * teeth_length] for t in range(2*nb_teeth+1)])
-lower_teeth = link_contours(upper_teeth[1:,:] + [0, teeth_length], [[teeth_x[-1], lip_y]])
+upper_teeth = build_a_zigzag(width=right_head - (right_body-lip_r), height=teeth_length, angle_start=3, nb_segments=2*nb_teeth) + [right_body-lip_r, lip_y]
+
+lower_teeth = upper_teeth[1:-1] + [0, teeth_length]
 draw_a_polygon(ax=ax, contour=lower_teeth, colour='white')
 
-draw_a_rectangle(ax=ax, left_x=right_body, bottom_y=bottom_body, height=lip_y-bottom_body, width=right_head-right_body, colour='lime')
-
-new_layer()
+draw_a_rectangle(ax=ax, left=right_body, bottom=bottom_body, height=lip_y-bottom_body, width=right_head-right_body)
 
 # upper jaw
-draw_a_rectangle(ax=ax, left_x=right_body, bottom_y=lip_y, height=top_head-lip_y, width=right_head-right_body, colour='lime')
+
+upper_jaw_layer_nb = new_layer()
+
+draw_a_rectangle(ax=ax, left=right_body, bottom=lip_y, height=top_head-lip_y, width=right_head-right_body)
 
 # ... and the eyes, white circles with black circles on top
 eye_y = top_body
-for radius, colour in [[8, 'lime'], [5, 'white'], [3, 'black']]:
+for radius, colour in [[8, 'BrightGreen'], [5, 'white'], [3, 'black']]:
   for eye_x in [right_body, right_body+12]:
     draw_a_circle(ax=ax, centre_x=eye_x, centre_y=eye_y, radius=radius, colour=colour)
 # ... and the eyelids. Saving them in array for future use   
@@ -106,16 +118,16 @@ for eye_x in [right_body, right_body+12]:
 # ... and the nostrils
 nostril_y = top_head
 for nostril_x in [right_head-r_nostrils, right_head-3*r_nostrils]:
-  draw_a_circle(ax=ax, centre_x=nostril_x, centre_y=nostril_y, radius=r_nostrils, colour='lime')
+  draw_a_circle(ax=ax, centre_x=nostril_x, centre_y=nostril_y, radius=r_nostrils)
   draw_a_circle(ax=ax, centre_x=nostril_x, centre_y=nostril_y, radius=1, colour='green')
 
 # ... and the teeth and the lip
 # teeth
 draw_a_polygon(ax=ax, contour=upper_teeth, colour='white')
 # upper lip
-_, lipline_top = build_an_arc(centre_x=right_body-lip_r, centre_y=lip_y+lip_r, radius_x=lip_r, radius_y=lip_r, angle_start=6, angle_end=9)
+lipline_top = build_an_arc(radius=lip_r, angle_start=6, angle_end=9) + [right_body-lip_r, lip_y+lip_r]
 lipline_top = link_contours([[right_head, lip_y]], lipline_top)
-draw_a_broken_line(ax=ax, points=lipline_top, colour='green', linewidth=2)
+draw_a_broken_line(ax=ax, contour=lipline_top, colour='green', linewidth=2)
 
 # now for the animation!
 scenarios = {}
@@ -125,9 +137,9 @@ for eyelid_shape_nb in range(blink_frames):
   eyelid_outlines = []
   for eye_x in [right_body, right_body+12]:
     for td in [-1, 1]:
-      _, eyelid_outline = build_an_eye(centre_x=eye_x, width=eyelid_width, corners_y=eye_y, 
-      mid1_y=eye_y + td * eyelid_width / 2, 
-      mid2_y=eye_y + td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1))
+      eyelid_outline = build_an_eye(width=eyelid_width,  
+      depth_1=eye_y + td * eyelid_width / 2, 
+      depth_2=eye_y + td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1)) + [eye_x, eye_y]
       eyelid_outlines.append(eyelid_outline)
   eyelid_outlines_all_scenarios.append(eyelid_outlines)
 
@@ -192,5 +204,5 @@ def animate(i):
   return get_all_shapes_in_layers(0, 1, 2)
 
 show_drawing_and_save_if_needed(filename="croc" 
-  , animation_func = animate,  animation_init = init, nb_of_frames = total_nb_of_frames
+ # , animation_func = animate,  animation_init = init, nb_of_frames = total_nb_of_frames
   )
