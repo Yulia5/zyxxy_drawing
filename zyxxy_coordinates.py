@@ -236,7 +236,7 @@ def build_a_coil(angle_start, nb_turns, speed_x, speed_out):
 
 # a smile ###########################################################
 # depth is middle_y_to_half_width
-def build_a_smile(width, depth): # assume that the width = 2
+def build_a_smile(width, depth):
   # if mid_point is almost at the same hor line, assume it's a straight line
   if is_the_same_point(depth/(width/2), 0.0): # this will be a segment
     result = np.empty([2, 2])
@@ -246,11 +246,11 @@ def build_a_smile(width, depth): # assume that the width = 2
     # reusing build_arc
     result = build_an_arc(angle_start=-angle, 
                           angle_end=+angle) * radius - [0, radius-abs(depth/(width/2))]
-    if depth < 0:
+    if depth > 0:
       result[:, 1] *= -1
   else: # a half-ellipse
     result = build_an_arc(angle_start=full_turn_angle/4, 
-                          angle_end=full_turn_angle*3/4) * [-1, -depth/(width/2)]
+                          angle_end=full_turn_angle*3/4) * [-1, depth/(width/2)]
   # adjusting start and end points to make sure they match the inputs exactly
   result[0] = [-1, 0]
   result[-1] = [1, 0]

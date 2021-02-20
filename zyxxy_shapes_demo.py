@@ -32,7 +32,7 @@ canvas_height = my_default_demo_canvas_size[1]
 half_min_size = min(canvas_width, canvas_height) * 0.5
 
 slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
-                'plus_minus_half_min_size' : [-half_min_size, half_min_size, -int(half_min_size/2), .1],
+                'plus_minus_half_min_size' : [-half_min_size, half_min_size, int(half_min_size/2), .1],
                 'half_min_size_34' : [0., half_min_size, int(half_min_size*3/4), 1],
                 'half_width'   : [0., canvas_width, int(canvas_width/2), 1],
                 'half_height'  : [0., canvas_height, int(canvas_height/2), 1],
@@ -196,12 +196,12 @@ def switch_demo(side, shapename, switch_on):
   _shape.set_visible(switch_on) # depends on the switch
 
   # widgets
-  _widgets['button'].ax.set_visible(switch_on is not None)
-  _widgets['flip_checkbox'].ax.set_visible(switch_on is not None)
+  _widgets['button'].ax.set_visible(switch_on)
+  _widgets['flip_checkbox'].ax.set_visible(switch_on)
   for _s in _widgets['sliders_specific'].values():
-    _s.ax.set_visible(switch_on is not None)
+    _s.ax.set_visible(switch_on)
   for _s in _widgets['sliders_common'].values():
-    _s.ax.set_visible(switch_on is not None)
+    _s.ax.set_visible(switch_on)
 
 for side in ['left', 'right']:
   count_shapes = 0
@@ -214,9 +214,8 @@ plt.show(block=False)
 
 def switch_demo_given_side(side):
   label = shape_switcher[side].value_selected
-  switch_demo(side=side, shapename=active_shapename[side], switch_on=None)
-  shape_type = label not in zyxxy_line_shapes
-  switch_demo(side=side, shapename=label, switch_on=shape_type)
+  switch_demo(side=side, shapename=active_shapename[side], switch_on=False)
+  switch_demo(side=side, shapename=label, switch_on=True)
   active_shapename[side] = label
   plt.draw()
 
@@ -228,7 +227,7 @@ def switch_demo_right(label):
 for side, func in [['left', switch_demo_left], ['right', switch_demo_right]]:
   for shapename in shape_names_params_dicts_definition.keys():
     update_given_shapename_and_side(side=side, shapename=shapename)
-    switch_demo(side=side, shapename=shapename, switch_on=None)
+    switch_demo(side=side, shapename=shapename, switch_on=False)
   switch_demo_given_side(side=side)
   shape_switcher[side].on_clicked(func)
 

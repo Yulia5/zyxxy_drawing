@@ -22,8 +22,21 @@
 # you can save your favourite colours here!
 # Try to give them names different from ...
 # ... the names of standard colours
-my_colour_palette = {'Bubble_blue'     : '#0099ff', 
-                     'Light_pink'      : '#ff8888'}
+my_colour_palette = {
+                     'DarkTeal'   : "#004949",
+                     'SeaWave'    : "#009292",
+                     'BubblePink' : "#ff6db6",
+                     'LightPink'  : "#ffb6db",
+                     'Purple'     : "#490092",
+                     'RoyalBlue'  : "#006ddb",
+                     'Hyacinth'   : "#b66dff",
+                     'PastelBlue' : "#6db6ff",
+                     'LightBlue'  : "#b6dbff",
+                     'Burgundy'   : "#920000",
+                     'MidBrown'   : "#924900",
+                     'LightBrown' : "#db6d00",
+                     'BrightGreen':"#24ff24",
+                     'Yellow'     : "#ffff6d"}
 
 # Colours, alphas and linewidths!
 my_default_colour_etc_settings = {
