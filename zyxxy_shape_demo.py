@@ -16,6 +16,7 @@
 
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
+from functools import partial
 from zyxxy_shape_class import Shape
 from zyxxy_coordinates import zyxxy_line_shapes, shape_names_params_dicts_definition
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
@@ -44,6 +45,7 @@ slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
                 'quarter_turn' : [0, full_turn_angle/4, 0, full_turn_angle/12],
                 'vertices'     : [1, 12, 5, 1],}
 
+widget_lefts = {'left': 0.15, 'right' : 0.65}
 #clip?
 
 # finding the max number of widgets
@@ -75,9 +77,6 @@ for side, rax_x_left in both_rax_x_left.items():
     switcher[side] = RadioButtons(rax, options, active=1)
     switcher[side].activecolor = my_default_demo_colours[side]["shape"]
     bottom_y += my_default_demo_widget_height * (len(options) + 0.2)
-
-def d_print():
-  pass
   
 # Creating the canvas!
 
@@ -93,9 +92,6 @@ create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
                             axes_label_font_size = my_default_demo_font_size,
                             axes_tick_font_size = my_default_demo_font_size,
                             ax=ax)
-plt.draw()
-plt.show(block=False)
-
 
 def update_given_shapename_and_side(side, shapename):
   global shapes_by_side_by_shapename
@@ -112,6 +108,20 @@ def update_given_shapename_and_side(side, shapename):
   _shape.move(**kwargs_common)
   plt.draw()
 
+def get_axes_for_widget(counter, widget_left):
+  return plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])
+
+def resize_1_checkbox(a_checkbox, left, bottom, width, height):
+  r = a_checkbox.rectangles[0]
+  r.set_x(left)
+  r.set_y(bottom)
+  r.set_width(width)
+  r.set_height(height)
+
+  l = a_checkbox.lines[0]
+  l[0].set_data([left, left+width], [bottom+height, bottom])
+  l[1].set_data([left, left+width], [bottom, bottom+height])
+
 def place_shapes_and_widgets(side, shapename, count_shapes):
   this_shape_params_definition = shape_names_params_dicts_definition[shapename]
   shape_params_dict = {}
@@ -124,11 +134,9 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
 
   common_params_dict = {key:np.copy(slider_range[value]) for key, value in common_params_dict_definition.items()}
 
-  if side == 'left':
-    widget_left = 0.15
-  else:
-    widget_left = 0.65
-  widget_left += count_shapes * 0.0001 # this tiny adjustment is needed to avoid a matplotlib glitch
+  _get_w_axes = partial(get_axes_for_widget, 
+                        widget_left = widget_lefts[side] + count_shapes * 0.0001)
+                           # this tiny adjustment is needed to avoid a matplotlib glitch
 
   shape_colour = my_default_demo_colours[side]["shape"]   
   diamond_colour = my_default_demo_colours[side]["diamond"]   
@@ -146,23 +154,15 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
         label = get_diamond_label(shapename=shapename, original_label=param_name)
       else:
         colour = shape_colour
-        label = param_name
-      rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])      
-      target[param_name] = Slider(ax=rax, label=label, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3], color=colour)
+        label = param_name      
+      target[param_name] = Slider(ax=_get_w_axes(counter), label=label, valmin=param_params[0], valmax=param_params[1], valinit=param_params[2], valstep=param_params[3], color=colour)
     if flip_checkbox is None:
       counter -= 1
-      rax = plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])
+      flip_checkbox = CheckButtons(_get_w_axes(counter), ('flip_upside_down', ), (False, ))
+      resize_1_checkbox(a_checkbox=flip_checkbox, left=0.05, bottom=0.15, width=0.05, height=0.7)
 
-      flip_checkbox = CheckButtons(rax, ('flip_upside_down', ), (False, ))
-      for r in flip_checkbox.rectangles:
-        r.set_width(0.05)
-        r.set_height(0.7)
-        r.set_y(0.15)
-      for l in flip_checkbox.lines:
-        l[0].set_data([0.05, 0.1], [0.85, 0.15])
-        l[1].set_data([0.05, 0.1], [0.15, 0.85])
   counter -= 1
-  button = Button(ax=plt.axes([widget_left, my_default_demo_plot_bottom_gap, 0.1, my_default_demo_widget_height]) , label='Reset')
+  button = Button(ax=_get_w_axes(counter), label='Reset')
 
   widgets_by_side_by_shapename[side][shapename] = {'sliders_specific': sliders_specific, 
                                                    'flip_checkbox' : flip_checkbox,
@@ -192,15 +192,12 @@ def switch_demo(side, shapename, switch_on):
   if shapename is None:
     return
   _shape = shapes_by_side_by_shapename[side][shapename]
-  _widgets = widgets_by_side_by_shapename[side][shapename]
-  _shape.set_visible(switch_on) # depends on the switch
+  _shape.set_visible(switch_on)
 
   # widgets
-  _widgets['button'].ax.set_visible(switch_on)
-  _widgets['flip_checkbox'].ax.set_visible(switch_on)
-  for _s in _widgets['sliders_specific'].values():
-    _s.ax.set_visible(switch_on)
-  for _s in _widgets['sliders_common'].values():
+  _widgets = widgets_by_side_by_shapename[side][shapename]
+  all_widgets = [_widgets['button'], _widgets['flip_checkbox']] + [v for v in _widgets['sliders_specific'].values()] + [v for v in _widgets['sliders_common'].values()]
+  for _s in all_widgets:
     _s.ax.set_visible(switch_on)
 
 for side in ['left', 'right']:
@@ -208,9 +205,6 @@ for side in ['left', 'right']:
   for shapename in shape_names_params_dicts_definition.keys():
     place_shapes_and_widgets(side=side, shapename=shapename, count_shapes=count_shapes)
     count_shapes += 1
-
-plt.draw()
-plt.show(block=False)
 
 def switch_demo_given_side(side):
   label = shape_switcher[side].value_selected
@@ -229,7 +223,7 @@ for side, func in [['left', switch_demo_left], ['right', switch_demo_right]]:
     update_given_shapename_and_side(side=side, shapename=shapename)
     switch_demo(side=side, shapename=shapename, switch_on=False)
   switch_demo_given_side(side=side)
-  shape_switcher[side].on_clicked(func)
+  shape_switcher[side].on_clicked( func )
 
 fig.set_dpi(my_default_demo_dpi) 
 fig.set_size_inches(my_default_demo_figsize)
