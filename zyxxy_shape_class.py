@@ -79,9 +79,11 @@ class Shape:
         set_patch_style(_attr, **defaults_to_use[attr_name])
 
     self.clip_patches = []
-    for s in [self.patch, self.line, self.outline]:
-      if s is not None:
-        add_to_layer_record(what_to_add=s)
+    self.move_history = []
+    self.shape_kwargs = None
+    self.shapename = None
+    self.is_patch_not_line = is_patch_not_line
+
 
   def set_visible(self, s):
     for attr_name in format_arg_dict.keys():
@@ -130,12 +132,6 @@ class Shape:
     
     # updating the diamond
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
-
-  def redraw_on_axes(self):
-    what_to_redraw = self.get_what_to_move() + [self.diamond]
-    for something in what_to_redraw:
-      if something is not None:
-        something.axes.draw_artist(something)
 
   def move(self, **kwargs_common):
     if 'flip' in kwargs_common and kwargs_common['flip']:

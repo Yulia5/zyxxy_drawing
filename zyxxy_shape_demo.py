@@ -91,7 +91,7 @@ create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
                             title_font_size = my_default_demo_font_size*1.5,
                             axes_label_font_size = my_default_demo_font_size,
                             axes_tick_font_size = my_default_demo_font_size,
-                            ax=ax)
+                            axes=ax)
 
 def update_given_shapename_and_side(side, shapename):
   global shapes_by_side_by_shapename

@@ -39,13 +39,13 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_title_font_size,
                            axes_label_font_size = my_default_axes_label_font_size,
                            axes_tick_font_size = my_default_axes_tick_font_size,
-                           ax = None):
+                           axes = None):
   global background_rectangle
 
-  if ax is None:
-    _, ax = plt.subplots()
+  if axes is None:
+    _, axes = plt.subplots()
 
-  ax.set_title(title, fontdict={'size': title_font_size})
+  axes.set_title(title, fontdict={'size': title_font_size})
 
   if make_symmetric:
     left_x, right_x = -canvas_width/2, canvas_width/2
@@ -56,30 +56,30 @@ def create_canvas_and_axes(canvas_width,
 
   # show diamond points and grid and axis if and only if tick_step is set
   set_diamond_style(show = (tick_step is not None))
-  ax.grid(tick_step is not None)
+  axes.grid(tick_step is not None)
   if tick_step is not None:
-    ax.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)
-    ax.set_ylabel("RULER FOR Y's", fontsize=axes_label_font_size)
-    ax.tick_params(axis='both', which='major', labelsize=axes_tick_font_size)
-    ax.set_xticks(ticks = np.arange(left_x, right_x, tick_step))
-    ax.set_yticks(ticks = np.arange(bottom_y, top_y, tick_step))
+    axes.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)
+    axes.set_ylabel("RULER FOR Y's", fontsize=axes_label_font_size)
+    axes.tick_params(axis='both', which='major', labelsize=axes_tick_font_size)
+    axes.set_xticks(ticks = np.arange(left_x, right_x, tick_step))
+    axes.set_yticks(ticks = np.arange(bottom_y, top_y, tick_step))
   else:
-    ax.set_xticks(ticks = [])
-    ax.set_yticks(ticks = [])
+    axes.set_xticks(ticks = [])
+    axes.set_yticks(ticks = [])
     background_rectangle = plt.Polygon([[left_x, bottom_y], 
                                        [left_x+canvas_width, bottom_y], 
                                        [left_x+canvas_width, bottom_y+canvas_height], 
                                        [left_x, bottom_y+canvas_height]], 
                                        **my_default_background_settings)
-    ax.add_patch(background_rectangle)
+    axes.add_patch(background_rectangle)
     set_background_colour(new_background_colour=background_colour)
 
   # set axis limits
-  ax.set_aspect('equal')
-  ax.set_xlim(left=left_x, right=right_x)
-  ax.set_ylim(bottom=bottom_y, top=top_y)
+  axes.set_aspect('equal')
+  axes.set_xlim(left=left_x, right=right_x)
+  axes.set_ylim(bottom=bottom_y, top=top_y)
 
-  return ax
+  return axes
 
 # this function creates two axes sets
 def create_model_and_result_axes(method1, method2):
