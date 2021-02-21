@@ -17,7 +17,7 @@
 import numpy as np
 from matplotlib import animation
 import matplotlib.pyplot as plt
-from zyxxy_shape_style import set_diamond_style, set_patch_style
+from zyxxy_shape_style import set_diamond_style, set_patch_style, show_outlines_only
 
 from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_background_settings
 
@@ -39,11 +39,26 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_title_font_size,
                            axes_label_font_size = my_default_axes_label_font_size,
                            axes_tick_font_size = my_default_axes_tick_font_size,
-                           axes = None):
+                           axes = None,
+                           model = None,
+                           show_outlines = False):
   global background_rectangle
+  global SHOW_OUTLINES_ONLY
 
   if axes is None:
-    _, axes = plt.subplots()
+    if model is None:
+      _, axes = plt.subplots()
+    else:
+     _, axs = plt.subplots(2)
+     plt.subplots_adjust(hspace=0.8)
+     axes = axs[0]
+     model(axes=axs[1]) 
+     axs[1].set_title("Completed Drawing", fontdict={'size': title_font_size})
+     if show_outlines:
+       show_outlines_only(True)
+       model(axes=axes)
+       axes.set_title("") # remove the title if needed
+       show_outlines_only(False)
 
   axes.set_title(title, fontdict={'size': title_font_size})
 
@@ -80,13 +95,6 @@ def create_canvas_and_axes(canvas_width,
   axes.set_ylim(bottom=bottom_y, top=top_y)
 
   return axes
-
-# this function creates two axes sets
-def create_model_and_result_axes(method1, method2):
-  _, axs = plt.subplots(2)
-  plt.subplots_adjust(hspace=0.8)
-  method1(ax=axs[0], title="Model To Start With", axes_tick_font_size=7, axes_label_font_size=10)
-  method2(ax=axs[1], title="Completed Drawing")  
 
 # this function shows the drawing 
 # and saves if as a file if requested

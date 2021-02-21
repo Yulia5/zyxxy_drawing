@@ -14,15 +14,13 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
-import numpy as np
-import matplotlib.lines, matplotlib.patches
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
 from MY_zyxxy_SETTINGS import my_colour_palette, my_default_demo_params, my_default_colour_etc_settings, my_default_diamond_size
 
 ########################################################################
 
-line_arg_types = ["colour", "linewidth", "joinstyle", "zorder"]
+line_arg_types = ["colour", "linewidth", "joinstyle", "zorder", "capstyle"]
 patch_arg_types = ["colour", "alpha", "zorder"]
 
 format_arg_dict = { "line"    : line_arg_types, 
@@ -78,6 +76,14 @@ def find_colour_code(colour_name):
 
 ########################################################################
 
+SHOW_OUTLINES_ONLY = False
+
+def show_outlines_only(val):
+  global SHOW_OUTLINES_ONLY
+  SHOW_OUTLINES_ONLY = val
+
+########################################################################
+
 def get_default_arguments(defaults_for_demo):
   if defaults_for_demo:
     defaults_to_use = my_default_demo_params
@@ -94,7 +100,10 @@ def extract_colour_etc_kwargs(kwargs):
 def set_line_style(something, **kwargs):
 
     something.set_fc('none')
-    something.set_linestyle('solid') # 'dotted'
+    if SHOW_OUTLINES_ONLY:
+      something.set_linestyle('dotted')
+    else:
+      something.set_linestyle('solid')
     if "colour" in kwargs:
       something.set_ec(find_colour_code( kwargs['colour'] ))
     if "zorder" in kwargs:
@@ -104,16 +113,29 @@ def set_line_style(something, **kwargs):
       something.set_lw(kwargs['linewidth'])
     if "joinstyle" in kwargs:
       something.set_joinstyle(kwargs['joinstyle'])
+    if 'capstyle' in kwargs:
+      something.set_capstyle(kwargs['capstyle'])
 
 def set_patch_style(something, **kwargs):
 
-    something.set_ec('none')
     if "colour" in kwargs:
-      something.set_fc(find_colour_code( kwargs['colour'] ))
+      this_colour = find_colour_code( kwargs['colour'] )
+      if not SHOW_OUTLINES_ONLY:
+        something.set_ec('none')
+        something.set_fc(this_colour)
+      else:
+        something.set_fc('none')
+        something.set_ec(this_colour)
+        something.set_linestyle('dotted')
+    
+    something.set_lw(_default_arguments['line']['linewidth'])
+
     if "zorder" in kwargs:
       something.set_zorder(kwargs['zorder'])
-    if "alpha" in kwargs:
-      something.set_alpha(kwargs['alpha'])
+
+    if not SHOW_OUTLINES_ONLY:
+      if "alpha" in kwargs:
+        something.set_alpha(kwargs['alpha'])
 
 
 ########################################################################

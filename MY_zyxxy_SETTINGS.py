@@ -43,14 +43,16 @@ my_default_colour_etc_settings = {
                      "line" : {'colour' : 'black', 
                                'linewidth' : 2, 
                                'joinstyle' : 'miter', 
-                               'zorder' : 1}, 
+                               'zorder' : 1,
+                               "capstyle" : 'round'}, 
                      "patch" : {'alpha' : 1.0, 
                                 'zorder' : 1, 
                                 'colour' : 'none'},
                      "outline" : {'colour' : 'black', 
                                              'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
-                                             'zorder' : 1},
+                                             'zorder' : 1,
+                                 "capstyle" : 'round'},
                      "diamond" : {'colour' : 'blue', #  None #
                                   'alpha' : 1.0,
                                   'zorder' : 1000}} 
@@ -65,7 +67,7 @@ my_default_diamond_size = 0.015
 # Font sizes and adjustment needed to fit them
 my_default_title_font_size = 18
 my_default_axes_label_font_size = 14
-my_default_axes_tick_font_size = 10
+my_default_axes_tick_font_size = 8
 my_default_margin_adjustments = {'top' : 0.85, 
                                  'bottom' : 0.20}
 
@@ -102,14 +104,16 @@ my_default_demo_plot_bottom_gap = 0.01
 my_default_demo_font_size = 10 / demo_screen_zoom
 
 my_default_demo_params = {"line" : {'colour' : 'black', 
-                                    'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1}, 
+                                    'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1,
+                               "capstyle" : 'round'}, 
                           "patch" : {'alpha' : 0.5, 
                                      'zorder' : 1, 
                                      'colour' : 'none'},
                           "outline" : {'colour' : 'black', 
-                                             'linewidth' : 2, 
-                                             'joinstyle' : 'miter', 
-                                             'zorder' : 1},
+                                       'linewidth' : 2, 
+                                       'joinstyle' : 'miter', 
+                                       'zorder' : 1,
+                                       "capstyle" : 'round'},
                          "diamond" : {
                                   'colour' : 'green', #  None #
                                   'alpha' : 1.0,

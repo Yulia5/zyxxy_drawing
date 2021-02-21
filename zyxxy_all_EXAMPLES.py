@@ -9,6 +9,20 @@ from zyxxy_coordinates import build_an_arc, link_contours, build_an_eye, build_a
 from zyxxy_shape_class import shift_layer, rotate_layer, get_all_shapes_in_layers
 
 #########################################################
+## THE FLAGS                                           ##
+#########################################################
+def example_japanese_flag(axes=None):
+  #####################################################
+  # Creating the canvas!
+  axes = create_canvas_and_axes(canvas_width = 30,
+                                canvas_height = 20,
+                                axes=axes)
+
+  #######################################################
+  # Now let's draw the shapes!                         ##
+  draw_a_circle(ax=axes, centre_x=15, centre_y=10, radius=6, colour='crimson')   
+
+#########################################################
 ## ZYXXY THE MOUSE                                     ##
 #########################################################
 def example_Zyxxy_the_mouse(axes=None):
