@@ -1,10 +1,11 @@
-# import  TUTORS_orange_cat #  zyxxy_shape_demo #  TUTORS_croc # TUTORS_zyxxy #     
+# import  zyxxy_shape_demo     
 
 
-
-from zyxxy_all_EXAMPLES import example_yellow_cat, example_Zyxxy_the_mouse
+from zyxxy_all_EXAMPLES import example_yellow_cat, example_Zyxxy_the_mouse, example_croc, example_animation_croc
 from zyxxy_canvas import show_drawing_and_save_if_needed
 
-example_yellow_cat()
+leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond = example_croc()
+example_animation_croc(leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond)
 
-show_drawing_and_save_if_needed()
+#show_drawing_and_save_if_needed()
+
