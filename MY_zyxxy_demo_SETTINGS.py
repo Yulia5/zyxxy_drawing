@@ -17,19 +17,19 @@
 demo_screen_zoom = 1/2
 
 figure_params = {'canvas_width' : 20, 
-                 'canvas_height' : 12,
+                 'canvas_height' : 16,
                  'figsize' : [14 / demo_screen_zoom, 8 / demo_screen_zoom],
                  'dpi' : 75,
                  'tick_step' : 1,
                  'font_size' : 10/demo_screen_zoom,
-                 'widget_lefts' : {'left': 0.10, 'right' : 0.60},
+                 'widget_lefts' : {'left': 0.21, 'right' : 0.56},
                  'plot_gap' : 0.05,
                  'plot_bottom_gap' : 0.01}
 
-widget_params = {'radio_width' : 0.125,
+widget_params = {'radio_width' : 0.128,
                  'radio_side_margin' : 0.01,
                  'height' : 0.0239,
-                 'width' : 0.35,
+                 'width' : 0.27,
                  'gap' : 0.01}
 
 style_params = {"line" : {'colour' : 'black', 
