@@ -20,17 +20,17 @@ from functools import partial
 from zyxxy_shape_class import Shape
 from zyxxy_coordinates import zyxxy_line_shapes, shape_names_params_dicts_definition
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
-from MY_zyxxy_SETTINGS import my_default_demo_canvas_size, my_default_demo_figsize, my_default_demo_dpi, my_default_demo_tick_step, my_default_demo_radio_width, my_default_demo_widget_height, my_default_demo_radio_side_margin, my_default_demo_widget_gap, my_default_demo_plot_gap, my_default_demo_plot_bottom_gap, my_default_demo_font_size, my_default_demo_colours
+from MY_zyxxy_demo_SETTINGS import figure_params, widget_params, my_default_demo_colours
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 import numpy as np
 
-plt.rcParams.update({'font.size': my_default_demo_font_size})
+plt.rcParams.update({'font.size': figure_params['font_size']})
 
-canvas_width = my_default_demo_canvas_size[0]
-canvas_height = my_default_demo_canvas_size[1]
-half_min_size = min(canvas_width, canvas_height) * 0.5
+canvas_width = figure_params['canvas_width']
+canvas_height =figure_params['canvas_height']
+half_min_size = min(canvas_width, canvas_height)/2
 
 slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
                 'plus_minus_half_min_size' : [-half_min_size, half_min_size, int(half_min_size/2), .1],
@@ -44,9 +44,6 @@ slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
                 'half_turn'    : [0, full_turn_angle/2, 0, full_turn_angle/12],
                 'quarter_turn' : [0, full_turn_angle/4, 0, full_turn_angle/12],
                 'vertices'     : [1, 12, 5, 1],}
-
-widget_lefts = {'left': 0.15, 'right' : 0.65}
-#clip?
 
 # finding the max number of widgets
 MAX_WIDGET_QTY = 0
@@ -63,34 +60,35 @@ widgets_by_side_by_shapename = {'left' : {key : {} for key in shape_names_params
                                 'right': {key : {} for key in shape_names_params_dicts_definition.keys()},}
 active_shapename = {'left' : None, 'right' : None}
 
-demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (my_default_demo_widget_height + my_default_demo_widget_gap) + my_default_demo_plot_bottom_gap
+demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
 # create the figure and the radio buttons
-both_rax_x_left = {'left' : my_default_demo_radio_side_margin, 'right' : (1 - my_default_demo_radio_side_margin - my_default_demo_radio_width)}
+both_rax_x_left = {'left'  : widget_params['radio_side_margin'], 
+                   'right' : 1 - widget_params['radio_side_margin'] - widget_params['radio_width']}
 shape_switcher = {}
 colour_switcher = {}
 fig = plt.figure()
 for side, rax_x_left in both_rax_x_left.items():
   bottom_y = demo_rax_bottom
   for options, switcher in [[shape_names_params_dicts_definition.keys(), shape_switcher]]:
-    rax = plt.axes([rax_x_left, bottom_y, my_default_demo_radio_width, my_default_demo_widget_height*len(options)])
+    rax = plt.axes([rax_x_left, bottom_y, widget_params['radio_width'], widget_params['height']*len(options)])
     fig.add_axes(rax)
     switcher[side] = RadioButtons(rax, options, active=1)
     switcher[side].activecolor = my_default_demo_colours[side]["shape"]
-    bottom_y += my_default_demo_widget_height * (len(options) + 0.2)
+    bottom_y += widget_params['height'] * (len(options) + widget_params['radio_gap'])
   
 # Creating the canvas!
-
-big_axes_width = 1-2*(my_default_demo_radio_width + my_default_demo_radio_side_margin+my_default_demo_plot_gap)
-ax = plt.axes([my_default_demo_radio_side_margin+my_default_demo_radio_width+my_default_demo_plot_gap, demo_rax_bottom+my_default_demo_plot_bottom_gap, big_axes_width, 1-demo_rax_bottom-my_default_demo_plot_bottom_gap])
+plot_ax_left  = widget_params['radio_side_margin'] + widget_params['radio_width'] + figure_params['plot_gap']
+plot_ax_bottom= demo_rax_bottom + figure_params['plot_bottom_gap']
+ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
 fig.add_axes(ax)
 
-create_canvas_and_axes(canvas_width=my_default_demo_canvas_size[0],
-                            canvas_height=my_default_demo_canvas_size[1], 
-                            tick_step=my_default_demo_tick_step,
+create_canvas_and_axes(canvas_width=canvas_width,
+                            canvas_height=canvas_height, 
+                            tick_step=figure_params['tick_step'],
                             title="Try Out Shapes",
-                            title_font_size = my_default_demo_font_size*1.5,
-                            axes_label_font_size = my_default_demo_font_size,
-                            axes_tick_font_size = my_default_demo_font_size,
+                            title_font_size=figure_params['font_size']*1.5,
+                            axes_label_font_size=figure_params['font_size'],
+                            axes_tick_font_size=figure_params['font_size'],
                             axes=ax)
 
 def update_given_shapename_and_side(side, shapename):
@@ -109,7 +107,10 @@ def update_given_shapename_and_side(side, shapename):
   plt.draw()
 
 def get_axes_for_widget(counter, widget_left):
-  return plt.axes([widget_left, (my_default_demo_widget_height + my_default_demo_widget_gap )*counter + my_default_demo_plot_bottom_gap, 0.3, my_default_demo_widget_height])
+  return plt.axes([widget_left, 
+                   (widget_params['height'] + widget_params['gap']) * counter + figure_params['plot_bottom_gap'], 
+                   widget_params['width'], 
+                   widget_params['height']])
 
 def resize_1_checkbox(a_checkbox, left, bottom, width, height):
   r = a_checkbox.rectangles[0]
@@ -135,7 +136,7 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
   common_params_dict = {key:np.copy(slider_range[value]) for key, value in common_params_dict_definition.items()}
 
   _get_w_axes = partial(get_axes_for_widget, 
-                        widget_left = widget_lefts[side] + count_shapes * 0.0001)
+                        widget_left = figure_params['widget_lefts'][side] + count_shapes * 0.0001)
                            # this tiny adjustment is needed to avoid a matplotlib glitch
 
   shape_colour = my_default_demo_colours[side]["shape"]   
@@ -225,6 +226,6 @@ for side, func in [['left', switch_demo_left], ['right', switch_demo_right]]:
   switch_demo_given_side(side=side)
   shape_switcher[side].on_clicked( func )
 
-fig.set_dpi(my_default_demo_dpi) 
-fig.set_size_inches(my_default_demo_figsize)
+fig.set_dpi(figure_params['dpi']) 
+fig.set_size_inches(figure_params['figsize'])
 plt.show()

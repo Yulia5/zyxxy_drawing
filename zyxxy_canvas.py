@@ -19,7 +19,7 @@ from matplotlib import animation
 import matplotlib.pyplot as plt
 from zyxxy_shape_style import set_diamond_style, set_patch_style, show_outlines_only
 
-from MY_zyxxy_SETTINGS import my_default_image_format,my_default_title_font_size,my_default_axes_label_font_size,my_default_axes_tick_font_size, my_default_figsize,my_default_dpi, my_default_image_file_figsize, my_default_image_file_dpi, my_default_margin_adjustments, my_default_animation_file_figsize, my_default_animation_file_dpi, my_default_animation_interval, my_default_animation_blit, my_default_animation_repeat, my_default_animation_FPS, my_default_background_settings
+from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_background_settings, my_default_display_params, my_default_image_params, my_default_animation_params
 
 background_rectangle = None
 
@@ -36,14 +36,13 @@ def create_canvas_and_axes(canvas_width,
                            tick_step = None,
                            background_colour = None,
                            title = None,
-                           title_font_size = my_default_title_font_size,
-                           axes_label_font_size = my_default_axes_label_font_size,
-                           axes_tick_font_size = my_default_axes_tick_font_size,
+                           title_font_size = my_default_font_sizes['title'],
+                           axes_label_font_size = my_default_font_sizes['axes_label'],
+                           axes_tick_font_size = my_default_font_sizes['tick'],
                            axes = None,
                            model = None,
                            show_outlines = False):
   global background_rectangle
-  global SHOW_OUTLINES_ONLY
 
   if axes is None:
     if model is None:
@@ -100,18 +99,23 @@ def create_canvas_and_axes(canvas_width,
 # and saves if as a file if requested
 # more information in the document below
 # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.savefig.html#matplotlib.pyplot.savefig 
+
+
 def show_drawing_and_save_if_needed(filename=None,
-                           figsize = my_default_figsize,
-                           dpi = my_default_dpi,
-                           figsize4saving = my_default_image_file_figsize,
-                           dpi4saving = my_default_image_file_dpi,
-                           margin_adjustments = my_default_margin_adjustments,
-                           animation_file_figsize = my_default_animation_file_figsize,
-                           animation_file_dpi = my_default_animation_file_dpi,
-                           animation_interval = my_default_animation_interval,
-                           animation_blit = my_default_animation_blit,
-                           animation_repeat = my_default_animation_repeat,
-                           animation_FPS = my_default_animation_FPS,
+                           figsize = my_default_display_params['figsize'],
+                           dpi = my_default_display_params['dpi'],
+                           figsize4saving = my_default_image_params['figsize'],
+                           dpi4saving = my_default_image_params['dpi'],
+                           margin_adjustments = my_default_display_params['margin_adjustments'],
+                           image_format = my_default_image_params['format'],
+                           animation_file_figsize = my_default_animation_params['figsize'],
+                           animation_file_dpi = my_default_animation_params['dpi'],
+                           animation_interval = my_default_animation_params['interval'],
+                           animation_blit = my_default_animation_params['blit'],
+                           animation_repeat = my_default_animation_params['repeat'],
+                           animation_FPS = my_default_animation_params['FPS'],
+                           animation_writer = my_default_animation_params['writer'],
+                           animation_format = my_default_animation_params['format'],
                            animation_func = None,
                            animation_init = None,
                            nb_of_frames = None):
@@ -122,25 +126,25 @@ def show_drawing_and_save_if_needed(filename=None,
     if animation_func is None:
       last_dot_position = filename.rfind(".")
       if last_dot_position < 0:
-        filename += '.' + my_default_image_format
+        filename += '.' + image_format
         last_dot_position = filename.rfind(".")
       figure.set_size_inches(figsize4saving)
       plt.savefig(fname="images_videos/"+filename, 
                   format = filename[last_dot_position+1:],
                   dpi = dpi4saving)
     else:
-      figure.set_dpi(my_default_animation_file_dpi) 
-      figure.set_size_inches(my_default_animation_file_figsize)
+      figure.set_dpi(animation_file_dpi) 
+      figure.set_size_inches(animation_file_figsize)
       anim = animation.FuncAnimation(
          fig=figure, 
          func=animation_func, 
-         init_func=animation_init, 
+         init_func=animation_init,  
          frames=nb_of_frames, 
          interval=animation_interval,
          blit=animation_blit, 
          repeat=animation_repeat)
-      writer = animation.writers['ffmpeg'](fps=animation_FPS)
-      anim.save("images_videos/"+filename+'.mp4', writer=writer)
+      writer = animation.writers[animation_writer](fps=animation_FPS)
+      anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
   figure.set_dpi(dpi) 
   figure.set_size_inches(figsize)
   plt.subplots_adjust(**margin_adjustments)

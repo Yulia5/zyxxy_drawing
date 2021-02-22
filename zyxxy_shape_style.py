@@ -16,7 +16,8 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
-from MY_zyxxy_SETTINGS import my_colour_palette, my_default_demo_params, my_default_colour_etc_settings, my_default_diamond_size
+from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings, my_default_diamond_size
+from MY_zyxxy_demo_SETTINGS import style_params as my_default_demo_params
 
 ########################################################################
 
