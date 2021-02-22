@@ -14,6 +14,8 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+screen_zoom = 1/2
+
 # There are 148 beautiful pre-defined colours!
 # You can find them here:
 # https://matplotlib.org/stable/gallery/color/named_colors.html
@@ -64,17 +66,18 @@ my_default_background_settings =  {'fc' : 'none',
 my_default_diamond_size = 0.015         
 
 # Font sizes and adjustment needed to fit them
-my_default_font_sizes = {'title' : 18,
-                         'axes_label' : 14,
-                         'tick' : 8,}
+my_default_font_sizes = {'title'      : 18/screen_zoom,
+                         'axes_label' : 14/screen_zoom,
+                         'tick'       :  8/screen_zoom}
 
 # Figure sizes (in inches) and DPIs  
 # Figure size in pixels is DPI * figure size in inches
 
-my_default_display_params = {'figsize' : [6, 4],
+my_default_display_params = {'figsize' : [6/screen_zoom, 4/screen_zoom],
                              'dpi' : 75,
                              'margin_adjustments' : {'top'    : 0.85, 
-                                                     'bottom' : 0.20}}
+                                                     'bottom' : 0.20,
+                                                     'hspace' : 0.3}}
 
 my_default_image_params = {'figsize' : [3.6, 2.4], 
                            'dpi'     : 200,

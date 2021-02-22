@@ -39,6 +39,9 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_font_sizes['title'],
                            axes_label_font_size = my_default_font_sizes['axes_label'],
                            axes_tick_font_size = my_default_font_sizes['tick'],
+                           figsize = my_default_display_params['figsize'],
+                           dpi = my_default_display_params['dpi'],
+                           margin_adjustments = my_default_display_params['margin_adjustments'],
                            axes = None,
                            model = None,
                            show_outlines = False):
@@ -49,9 +52,11 @@ def create_canvas_and_axes(canvas_width,
       _, axes = plt.subplots()
     else:
      _, axs = plt.subplots(2)
-     plt.subplots_adjust(hspace=0.8)
      axes = axs[0]
      model(axes=axs[1]) 
+     figsize[1] *= 2 # because we plot 2 images
+     margin_adjustments['bottom'] /= 2.
+     margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
      axs[1].set_title("Completed Drawing", fontdict={'size': title_font_size})
      if show_outlines:
        show_outlines_only(True)
@@ -93,6 +98,11 @@ def create_canvas_and_axes(canvas_width,
   axes.set_xlim(left=left_x, right=right_x)
   axes.set_ylim(bottom=bottom_y, top=top_y)
 
+  plt.subplots_adjust(**margin_adjustments)
+  figure = plt.gcf()
+  figure.set_dpi(dpi) 
+  figure.set_size_inches(figsize)
+
   return axes
 
 # this function shows the drawing 
@@ -102,11 +112,8 @@ def create_canvas_and_axes(canvas_width,
 
 
 def show_drawing_and_save_if_needed(filename=None,
-                           figsize = my_default_display_params['figsize'],
-                           dpi = my_default_display_params['dpi'],
                            figsize4saving = my_default_image_params['figsize'],
                            dpi4saving = my_default_image_params['dpi'],
-                           margin_adjustments = my_default_display_params['margin_adjustments'],
                            image_format = my_default_image_params['format'],
                            animation_file_figsize = my_default_animation_params['figsize'],
                            animation_file_dpi = my_default_animation_params['dpi'],
@@ -120,6 +127,10 @@ def show_drawing_and_save_if_needed(filename=None,
                            animation_init = None,
                            nb_of_frames = None):
   figure = plt.gcf()
+
+  current_dpi = figure.get_dpi() 
+  current_figsize = figure.get_size_inches()
+
   if (animation_func is None) != (nb_of_frames is None):
     raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
   if (filename is not None) and (filename != ""):
@@ -145,7 +156,6 @@ def show_drawing_and_save_if_needed(filename=None,
          repeat=animation_repeat)
       writer = animation.writers[animation_writer](fps=animation_FPS)
       anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
-  figure.set_dpi(dpi) 
-  figure.set_size_inches(figsize)
-  plt.subplots_adjust(**margin_adjustments)
+  figure.set_dpi(current_dpi) 
+  figure.set_size_inches(current_figsize)
   plt.show()
