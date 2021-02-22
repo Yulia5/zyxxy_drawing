@@ -20,9 +20,14 @@ from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings,
 from MY_zyxxy_demo_SETTINGS import style_params as my_default_demo_params
 
 ########################################################################
+# as defined by matplotlib
+capstyle_types = ['butt', 'round', 'projecting']
+joinstyle_types= ['miter', 'round', 'bevel']
 
-line_arg_types = ["colour", "linewidth", "joinstyle", "zorder", "capstyle"]
-patch_arg_types = ["colour", "alpha", "zorder"]
+########################################################################
+
+line_arg_types = ["colour", "zorder", "linewidth", "joinstyle", "capstyle"]
+patch_arg_types= ["colour", "zorder", "alpha"]
 
 format_arg_dict = { "line"    : line_arg_types, 
                     "patch"   : patch_arg_types, 

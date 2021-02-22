@@ -16,38 +16,40 @@
 
 demo_screen_zoom = 1/2
 
-figure_params = {'canvas_width' : 16, 
+figure_params = {'canvas_width' : 16*1.45, 
                  'canvas_height' : 10,
                  'figsize' : [10 / demo_screen_zoom, 7.5 / demo_screen_zoom],
                  'dpi' : 75,
                  'tick_step' : 1,
                  'font_size' : 10/demo_screen_zoom,
-                 'widget_lefts' : {'left': 0.15, 'right' : 0.65},
+                 'widget_lefts' : {'left': 0.10, 'right' : 0.60},
                  'plot_gap' : 0.05,
                  'plot_bottom_gap' : 0.01}
 
-widget_params = {'radio_width' : 0.2,
-                 'radio_side_margin' : 0.025,
+widget_params = {'radio_width' : 0.2/1.45,
+                 'radio_side_margin' : 0.025/1.45,
                  'radio_gap' : 0.2,
                  'height' : 0.0239,
-                 'width' : 0.3,
+                 'width' : 0.35,
                  'gap' : 0.01}
 
 style_params = {"line" : {'colour' : 'black', 
-                                    'linewidth' : 2, 'joinstyle' : 'miter', 'zorder' : 1,
-                               "capstyle" : 'round'}, 
-                          "patch" : {'alpha' : 0.5, 
-                                     'zorder' : 1, 
-                                     'colour' : 'none'},
-                          "outline" : {'colour' : 'black', 
-                                       'linewidth' : 2, 
-                                       'joinstyle' : 'miter', 
-                                       'zorder' : 1,
-                                       "capstyle" : 'round'},
-                          "diamond" : {
-                                  'colour' : 'green', #  None #
-                                  'alpha' : 1.0,
-                                  'zorder' : 1000}}
+                          'linewidth' : 2, 
+                          'joinstyle' : 'miter', 
+                          'zorder' : 1,
+                          'capstyle' : 'round'}, 
+                "patch" : {'alpha' : 0.5, 
+                           'zorder' : 1, 
+                           'colour' : 'none'},
+                "outline" : {'colour' : 'black', 
+                             'linewidth' : 2, 
+                             'joinstyle' : 'miter', 
+                             'zorder' : 1,
+                             'capstyle' : 'round'},
+                "diamond" : {'colour' : 'green', #  None #
+                             'alpha' : 1.0,
+                             'zorder' : 1000}
+               }
 
 my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'red'},
                            "right" : {"shape" : 'blue', 'diamond' : 'blue'}}

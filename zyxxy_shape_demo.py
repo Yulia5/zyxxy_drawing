@@ -18,6 +18,7 @@ from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from functools import partial
 from zyxxy_shape_class import Shape
+from zyxxy_shape_style import joinstyle_types, capstyle_types
 from zyxxy_coordinates import zyxxy_line_shapes, shape_names_params_dicts_definition
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
 from MY_zyxxy_demo_SETTINGS import figure_params, widget_params, my_default_demo_colours
@@ -28,8 +29,8 @@ import numpy as np
 
 plt.rcParams.update({'font.size': figure_params['font_size']})
 
-canvas_width = figure_params['canvas_width']
-canvas_height =figure_params['canvas_height']
+canvas_width  = figure_params['canvas_width']
+canvas_height = figure_params['canvas_height']
 half_min_size = min(canvas_width, canvas_height)/2
 
 slider_range = {'half_min_size' : [0., half_min_size, int(half_min_size/2), 1],
@@ -53,31 +54,62 @@ for spec_param_dict in shape_names_params_dicts_definition.values():
 MAX_WIDGET_QTY += len(common_params_dict_definition) + 1
 
 # variables that will be populated later
+sides = ['left', 'right']
+all_shapenames = shape_names_params_dicts_definition.keys()
 
-shapes_by_side_by_shapename = {'left' : {key : None for key in shape_names_params_dicts_definition.keys()},
-                               'right': {key : None for key in shape_names_params_dicts_definition.keys()},}
-widgets_by_side_by_shapename = {'left' : {key : {} for key in shape_names_params_dicts_definition.keys()},
-                                'right': {key : {} for key in shape_names_params_dicts_definition.keys()},}
-active_shapename = {'left' : None, 'right' : None}
+shapes_by_side_by_shapename = {side : {key : None for key in all_shapenames} for side in sides}
+widgets_by_side_by_shapename = {side : {key : {} for key in all_shapenames} for side in sides}
+active_shapename = {side : None for side in sides}
 
-demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
-# create the figure and the radio buttons
-both_rax_x_left = {'left'  : widget_params['radio_side_margin'], 
-                   'right' : 1 - widget_params['radio_side_margin'] - widget_params['radio_width']}
 shape_switcher = {}
-colour_switcher = {}
+style_switcher = {}
+
+# create the figure
 fig = plt.figure()
-for side, rax_x_left in both_rax_x_left.items():
-  bottom_y = demo_rax_bottom
-  for options, switcher in [[shape_names_params_dicts_definition.keys(), shape_switcher]]:
-    rax = plt.axes([rax_x_left, bottom_y, widget_params['radio_width'], widget_params['height']*len(options)])
-    fig.add_axes(rax)
-    switcher[side] = RadioButtons(rax, options, active=1)
-    switcher[side].activecolor = my_default_demo_colours[side]["shape"]
-    bottom_y += widget_params['height'] * (len(options) + widget_params['radio_gap'])
+
+def add_radio_buttons(rb_options, rb_left, rb_bottom, rb_caption):
+  rb_height = widget_params['height']*len(rb_options)
+  rax = plt.axes([rb_left, rb_bottom, widget_params['radio_width'], rb_height])
+  fig.add_axes(rax)
+  result = RadioButtons(rax, rb_options, active=1)
+  new_bottom = rb_bottom + rb_height + widget_params['radio_side_margin']
+
+  fig.text(rb_left, new_bottom, rb_caption)
+  new_bottom += rb_height + widget_params['radio_side_margin']
+
+  return new_bottom, result
+
+# create shapename radio buttons
+demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
+for side in sides:
+  rax_left = widget_params['radio_side_margin'] * 2 + widget_params['radio_width']
+  if side == 'left':
+    rax_left = 1 - widget_params['radio_width'] - rax_left
+  _, shape_switcher[side] = add_radio_buttons(rb_options=all_shapenames, rb_left=rax_left, rb_bottom=demo_rax_bottom, rb_caption="shapenames")
+  # shape_switcher[side].activecolor = my_default_demo_colours[side]["shape"]
+
+# create shapestyle widgets
+for side in sides:
+  rax_left = widget_params['radio_side_margin']
+  if side != 'left':
+    rax_left = 1 - widget_params['radio_width'] - rax_left
+  style_switcher[side] = {"patch" : {}, "line" : {}}
+  left_adj = {"patch" : 0, "line" : 0.00001}
+  bottoms = {st : demo_rax_bottom for st in style_switcher[side].keys()} 
+  for st in style_switcher[side].keys():
+    bottoms[st], style_switcher[side][st]['joinstyle'] = add_radio_buttons(rb_options=joinstyle_types, 
+                                                                           rb_left=rax_left+left_adj[st], 
+                                                                           rb_bottom=bottoms[st], 
+                                                                           rb_caption="joinstyle")
+  bottoms["line"], style_switcher[side]["line"]['capstyle'] = add_radio_buttons(rb_options=capstyle_types, 
+                                                                           rb_left=rax_left+left_adj["line"], 
+                                                                           rb_bottom=bottoms["line"], 
+                                                                           rb_caption="capstyle")
+
+
   
 # Creating the canvas!
-plot_ax_left  = widget_params['radio_side_margin'] + widget_params['radio_width'] + figure_params['plot_gap']
+plot_ax_left  = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
 plot_ax_bottom= demo_rax_bottom + figure_params['plot_bottom_gap']
 ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
 fig.add_axes(ax)

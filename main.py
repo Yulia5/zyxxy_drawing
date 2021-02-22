@@ -1,4 +1,4 @@
-#import  zyxxy_shape_demo     
+import  zyxxy_shape_demo     
 
 
 from zyxxy_all_EXAMPLES import example_yellow_cat, example_Zyxxy_the_mouse, example_croc, example_animation_croc
@@ -12,5 +12,4 @@ from zyxxy_canvas import create_canvas_and_axes
 
 #show_drawing_and_save_if_needed()
 
-
-import draw_Japanese_flag
+#import draw_Japanese_flag
