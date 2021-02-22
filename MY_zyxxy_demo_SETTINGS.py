@@ -16,9 +16,9 @@
 
 demo_screen_zoom = 1/2
 
-figure_params = {'canvas_width' : 16*1.45, 
-                 'canvas_height' : 10,
-                 'figsize' : [10 / demo_screen_zoom, 7.5 / demo_screen_zoom],
+figure_params = {'canvas_width' : 20, 
+                 'canvas_height' : 12,
+                 'figsize' : [14 / demo_screen_zoom, 8 / demo_screen_zoom],
                  'dpi' : 75,
                  'tick_step' : 1,
                  'font_size' : 10/demo_screen_zoom,
@@ -26,9 +26,8 @@ figure_params = {'canvas_width' : 16*1.45,
                  'plot_gap' : 0.05,
                  'plot_bottom_gap' : 0.01}
 
-widget_params = {'radio_width' : 0.2/1.45,
-                 'radio_side_margin' : 0.025/1.45,
-                 'radio_gap' : 0.2,
+widget_params = {'radio_width' : 0.125,
+                 'radio_side_margin' : 0.01,
                  'height' : 0.0239,
                  'width' : 0.35,
                  'gap' : 0.01}

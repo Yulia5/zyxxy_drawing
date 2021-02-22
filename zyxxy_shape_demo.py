@@ -72,10 +72,10 @@ def add_radio_buttons(rb_options, rb_left, rb_bottom, rb_caption):
   rax = plt.axes([rb_left, rb_bottom, widget_params['radio_width'], rb_height])
   fig.add_axes(rax)
   result = RadioButtons(rax, rb_options, active=1)
-  new_bottom = rb_bottom + rb_height + widget_params['radio_side_margin']
+  new_bottom = rb_bottom + rb_height + widget_params['gap']
 
   fig.text(rb_left, new_bottom, rb_caption)
-  new_bottom += rb_height + widget_params['radio_side_margin']
+  new_bottom += widget_params['height'] + widget_params['gap']
 
   return new_bottom, result
 
@@ -83,7 +83,7 @@ def add_radio_buttons(rb_options, rb_left, rb_bottom, rb_caption):
 demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
 for side in sides:
   rax_left = widget_params['radio_side_margin'] * 2 + widget_params['radio_width']
-  if side == 'left':
+  if side != 'left':
     rax_left = 1 - widget_params['radio_width'] - rax_left
   _, shape_switcher[side] = add_radio_buttons(rb_options=all_shapenames, rb_left=rax_left, rb_bottom=demo_rax_bottom, rb_caption="shapenames")
   # shape_switcher[side].activecolor = my_default_demo_colours[side]["shape"]

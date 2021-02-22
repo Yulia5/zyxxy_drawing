@@ -22,7 +22,7 @@ from MY_zyxxy_demo_SETTINGS import style_params as my_default_demo_params
 ########################################################################
 # as defined by matplotlib
 capstyle_types = ['butt', 'round', 'projecting']
-joinstyle_types= ['miter', 'round', 'bevel']
+joinstyle_types= ['round', 'miter', 'bevel']
 
 ########################################################################
 
