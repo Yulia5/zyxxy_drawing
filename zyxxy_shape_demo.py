@@ -55,16 +55,15 @@ MAX_WIDGET_QTY += len(common_params_dict_definition) + 1
 
 # variables that will be populated later
 sides = ['left', 'right']
+shape_types = ["patch", "line"]
 all_shapenames = shape_names_params_dicts_definition.keys()
 
-shapes_by_side_by_shapename = {side : {key : None for key in all_shapenames} for side in sides}
+shapes_by_side_by_shapename = {side : {st : None for st in shape_types} for side in sides}
 widgets_by_side_by_shapename = {side : {key : {} for key in all_shapenames} for side in sides}
 active_shapename = {side : None for side in sides}
 
-
 shape_switcher = {}
-style_widgets = {side : {"patch" : {'text' : []}, "line" : {'text' : []}} for side in sides}
-
+style_widgets = {side : {st : {'text' : []} for st in shape_types} for side in sides}
 
 # create the figure
 fig = plt.figure()
@@ -157,10 +156,26 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes_tick_font_size=figure_params['font_size'],
                             axes=ax)
 
+# placing the shapes_by_side_by_shapename
+
+for side in sides:
+  shape_colour = my_default_demo_colours[side]["shape"]   
+  diamond_colour = my_default_demo_colours[side]["diamond"] 
+  for st in shape_types:                                          
+    _shape = Shape(ax=ax, is_patch_not_line=(st == "patch"), defaults_for_demo=True)
+    _shape.set_style(colour=shape_colour, diamond_colour=diamond_colour)
+    shapes_by_side_by_shapename[side][st] = _shape
+
+def get_type_given_shapename(shapename):
+  if shapename in zyxxy_line_shapes:
+    return 'line'
+  else:
+    return 'patch'
+
 def update_given_shapename_and_side(side, shapename):
   global shapes_by_side_by_shapename
   global widgets_by_side_by_shapename
-  _shape = shapes_by_side_by_shapename[side][shapename]
+  _shape = shapes_by_side_by_shapename[side][get_type_given_shapename(shapename)]
   _widgets = widgets_by_side_by_shapename[side][shapename]
   _sliders_specific = _widgets['sliders_specific']
   _sliders_common = _widgets['sliders_common']
@@ -239,10 +254,6 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
                                                    'flip_checkbox' : flip_checkbox,
                                                    'sliders_common': sliders_common, 
                                                    'button': button}
-                                            
-  _shape = Shape(ax=ax, is_patch_not_line=(shapename not in zyxxy_line_shapes), defaults_for_demo=True)
-  _shape.set_style(colour=shape_colour, diamond_colour=diamond_colour)
-  shapes_by_side_by_shapename[side][shapename] = _shape
     
   def update(val):
     update_given_shapename_and_side(side=side, shapename=shapename)
@@ -262,15 +273,17 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
 def switch_demo(side, shapename, switch_on):
   if shapename is None:
     return
-  _shape = shapes_by_side_by_shapename[side][shapename]
+  _shape = shapes_by_side_by_shapename[side][get_type_given_shapename(shapename)]
   _shape.set_visible(switch_on)
+  update_given_shapename_and_side(side=side, shapename=shapename)
 
-  # widgets
+  # form widgets visibility
   _widgets = widgets_by_side_by_shapename[side][shapename]
   all_widgets = [_widgets['button'], _widgets['flip_checkbox']] + [v for v in _widgets['sliders_specific'].values()] + [v for v in _widgets['sliders_common'].values()]
   for _s in all_widgets:
     _s.ax.set_visible(switch_on)
 
+  # style widgets visibility
   patch_or_line = "line" if (shapename in zyxxy_line_shapes) else "patch"
   for key, sw_or_all_texts in style_widgets[side][patch_or_line].items():
     if key == "text":
@@ -280,7 +293,7 @@ def switch_demo(side, shapename, switch_on):
       sw_or_all_texts.ax.set_visible(switch_on)
 
 
-for side in ['left', 'right']:
+for side in sides:
   count_shapes = 0
   for shapename in shape_names_params_dicts_definition.keys():
     place_shapes_and_widgets(side=side, shapename=shapename, count_shapes=count_shapes)
