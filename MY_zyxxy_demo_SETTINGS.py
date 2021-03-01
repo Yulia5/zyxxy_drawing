@@ -35,20 +35,23 @@ widget_params = {'radio_width' : 0.128,
 style_params = {"line" : {'colour' : 'black', 
                           'linewidth' : 2, 
                           'joinstyle' : 'miter', 
-                          'zorder' : 1,
+                          'layer_nb' : 1,
                           'capstyle' : 'round'}, 
-                "patch" : {'alpha' : 0.5, 
-                           'zorder' : 1, 
+                "patch" : {'opacity' : 0.5, 
+                           'layer_nb' : 1, 
                            'colour' : 'none'},
                 "outline" : {'colour' : 'black', 
                              'linewidth' : 2, 
                              'joinstyle' : 'miter', 
-                             'zorder' : 1,
+                             'layer_nb' : 1,
                              'capstyle' : 'round'},
                 "diamond" : {'colour' : 'green', #  None #
-                             'alpha' : 1.0,
-                             'zorder' : 1000}
+                             'opacity' : 1.0,
+                             'layer_nb' : 1000}
                }
 
 my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'red'},
                            "right" : {"shape" : 'blue', 'diamond' : 'blue'}}
+
+patch_colours = {'yellow', 'blue', 'red', 'green', 'black', 'none'} 
+line_colours = {'yellow', 'blue', 'red', 'green', 'black', 'none'}

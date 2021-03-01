@@ -26,8 +26,8 @@ joinstyle_types= ['round', 'miter', 'bevel']
 
 ########################################################################
 
-line_arg_types = ["colour", "zorder", "linewidth", "joinstyle", "capstyle"]
-patch_arg_types= ["colour", "zorder", "alpha"]
+line_arg_types = ["colour", "layer_nb", "linewidth", "joinstyle", "capstyle"]
+patch_arg_types= ["colour", "layer_nb", "opacity"]
 
 format_arg_dict = { "line"    : line_arg_types, 
                     "patch"   : patch_arg_types, 
@@ -112,8 +112,8 @@ def set_line_style(something, **kwargs):
       something.set_linestyle('solid')
     if "colour" in kwargs:
       something.set_ec(find_colour_code( kwargs['colour'] ))
-    if "zorder" in kwargs:
-      something.set_zorder(kwargs['zorder'])
+    if "layer_nb" in kwargs:
+      something.set_zorder(kwargs['layer_nb'])
 
     if "linewidth" in kwargs:
       something.set_lw(kwargs['linewidth'])
@@ -136,21 +136,21 @@ def set_patch_style(something, **kwargs):
     
     something.set_lw(_default_arguments['line']['linewidth'])
 
-    if "zorder" in kwargs:
-      something.set_zorder(kwargs['zorder'])
+    if "layer_nb" in kwargs:
+      something.set_zorder(kwargs['layer_nb'])
 
     if not SHOW_OUTLINES_ONLY:
-      if "alpha" in kwargs:
-        something.set_alpha(kwargs['alpha'])
+      if "opacity" in kwargs:
+        something.set_alpha(kwargs['opacity'])
 
 
 ########################################################################
 
 def new_layer():
   args_for_layer = ["line", "patch", "outline"]
-  new_layer_nb = 1 + max([_default_arguments[fa]['zorder'] for fa in args_for_layer])
+  new_layer_nb = 1 + max([_default_arguments[fa]['layer_nb'] for fa in args_for_layer])
   for fa in args_for_layer: 
-    _default_arguments[fa]['zorder'] = new_layer_nb
+    _default_arguments[fa]['layer_nb'] = new_layer_nb
   return new_layer_nb
 
 def set_default_line_style(**kwargs):

@@ -44,23 +44,23 @@ my_default_colour_etc_settings = {
                      "line" : {'colour' : 'black', 
                                'linewidth' : 2, 
                                'joinstyle' : 'miter', 
-                               'zorder' : 1,
+                               'layer_nb' : 1,
                                "capstyle" : 'round'}, 
                      "patch" : {'alpha' : 1.0, 
-                                'zorder' : 1, 
+                                'layer_nb' : 1, 
                                 'colour' : 'none'},
                      "outline" : {'colour' : 'black', 
                                              'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
-                                             'zorder' : 1,
+                                             'layer_nb' : 1,
                                  "capstyle" : 'round'},
                      "diamond" : {'colour' : 'blue', #  None #
                                   'alpha' : 1.0,
-                                  'zorder' : 1000}} 
+                                  'layer_nb' : 1000}} 
 
 my_default_background_settings =  {'fc' : 'none', 
                                    'ec' : 'none',
-                                   'zorder' : -1000,
+                                   'layer_nb' : -1000,
                                    'alpha' : 1}   
 
 my_default_diamond_size = 0.015         

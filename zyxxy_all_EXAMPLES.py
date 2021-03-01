@@ -283,7 +283,9 @@ def example_croc(axes=None):
   return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond
 
 
-def example_animation_croc(leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond):
+def example_animated_croc(axes=None):
+
+  leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond = example_croc(axes=axes)
 
   nb_blinks = 2
   blink_frames = 3
