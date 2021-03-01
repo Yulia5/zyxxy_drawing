@@ -59,8 +59,6 @@ style_widgets_side_by_shapetype = {side : {st : {'text' : []} for st in shape_ty
 ##########################################################################################
 # create the figure
 fig = plt.figure()
-fig.set_dpi(figure_params['dpi']) 
-fig.set_size_inches(figure_params['figsize'])
 
 ##########################################################################################
 # widget-creating functions
@@ -192,9 +190,9 @@ def switch_active_shapename_given_side(label, side):
 
 ##########################################################################################
 def reset(event, side):
-  for w in specific_widgets_by_side_by_shapename[active_shapename[side]].values():
+  for w in specific_widgets_by_side_by_shapename[side][active_shapename[side]].values():
     w.reset()
-  for w in common_widgets_by_side.values():
+  for w in common_widgets_by_side[side].values():
     if isinstance(w, Slider):
       w.reset()
     elif isinstance(w, CheckButtons):
@@ -306,24 +304,24 @@ for side in sides:
   for sh_counter, shapename in enumerate(shape_names_params_dicts_definition.keys()):
     specific_widgets_by_side_by_shapename[side][shapename] = {}
     w_left = figure_params['widget_lefts'][side] + sh_counter * 0.0001
-    param_counter = -1
+    w_bottom = start_bottom_for_specific
     for param_name, param_name_range in shape_names_params_dicts_definition[shapename].items():
-      param_counter += 1
+      
       if isinstance(param_name_range, str):
         param_params = np.copy(slider_range[param_name_range])
       else:
         param_params = np.copy(slider_range[param_name_range[0]]) 
         param_params[2] = param_name_range[1] 
    
-      w_bottom = (widget_params['height']+widget_params['gap'])*param_counter+ figure_params['plot_bottom_gap']
       _, s_slider, _ = add_a_slider(w_left=w_left,
                                               w_bottom=w_bottom,
                                               w_caption=param_name, 
                                               s_vals=param_params, 
                                               color=my_default_demo_colours[side]["shape"])
       s_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
-
       specific_widgets_by_side_by_shapename[side][shapename][param_name] = s_slider
+
+      w_bottom += widget_params['height']+widget_params['gap']
 
   # ... and update the visibility !
   for shapename in shape_names_params_dicts_definition.keys():
@@ -333,5 +331,6 @@ for side in sides:
   
 
 ##########################################################################################
-
+fig.set_dpi(figure_params['dpi']) 
+fig.set_size_inches(figure_params['figsize'])
 plt.show()
