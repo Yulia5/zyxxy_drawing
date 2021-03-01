@@ -14,6 +14,11 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
+import numpy as np
+import functools
+
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shape_class import Shape
@@ -21,11 +26,6 @@ from zyxxy_shape_style import joinstyle_types, capstyle_types
 from zyxxy_coordinates import shape_names_params_dicts_definition, get_type_given_shapename
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
 from MY_zyxxy_demo_SETTINGS import figure_params, widget_params, patch_colours, line_colours, my_default_demo_colours
-
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
-import numpy as np
-import functools
 
 plt.rcParams.update({'font.size': figure_params['font_size']})
 
@@ -86,7 +86,7 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options):
   return new_bottom, result, added_text
 
 def add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
-  new_bottom = sax.get_position().get_y()
+  new_bottom = sax.get_position().ymin
 
   label = w_caption if caption_in_the_same_line else ""
   result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], **slider_qwargs)
@@ -287,7 +287,7 @@ for side in sides:
   button = Button(ax=b_axes, label='Reset')
   button.on_clicked(functools.partial(reset, side=side))
 
-  for param_name, slider_range_name in common_params_dict_definition.items()[::-1]:
+  for param_name, slider_range_name in common_params_dict_definition.items():
     new_bottom, w_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
     _, c_slider, _ = add_a_slider2(w_axes,
                                    w_caption=param_name, 
