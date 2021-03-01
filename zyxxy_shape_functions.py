@@ -68,14 +68,21 @@ def get_common_kwargs(kwargs, shapename):
       used_keys.append(value)
   return used_keys, common_kwargs
 
-def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
+def draw_a_shape(ax, shapename, **kwargs):
+  param_names_used = []
   # create a shape
+  if isinstance(shapename, str):
+    is_patch_not_line = (zyxxy_coordinates.get_type_given_shapename(shapename=shapename) == "patch")
+  else:
+    is_patch_not_line = kwargs['is_patch_not_line']
+    param_names_used += ['is_patch_not_line']
+
   _shape = Shape(ax=ax, is_patch_not_line=is_patch_not_line, defaults_for_demo=False)
 
   # get colour params
   colour_etc_kwargs = extract_colour_etc_kwargs(kwargs)
   _shape.set_style(**colour_etc_kwargs)
-  param_names_used = [k for k in colour_etc_kwargs.keys()]
+  param_names_used += [k for k in colour_etc_kwargs.keys()]
 
   kwargs_common = {}
   if isinstance(shapename, str):
@@ -100,7 +107,7 @@ def draw_a_shape(ax, is_patch_not_line, shapename, **kwargs):
 def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None, ax=None, **kwargs):
   contour = zyxxy_coordinates.build_a_rectangle(width=width, height=height, 
     left_x=left, centre_x=centre_x, right_x=right, bottom_y=bottom, centre_y=centre_y, top_y=top)
-  result = draw_a_shape(ax=ax, shapename=contour, is_patch_not_line=True, **kwargs)
+  result = draw_a_shape(ax=ax, shapename=contour, **kwargs)
   return result
 
 def draw_a_broken_line(contour, ax=None, **kwargs):
@@ -113,11 +120,5 @@ def draw_a_polygon(contour, ax=None, **kwargs):
 
 # autogenerate all other draw_* functions
 for shapename in zyxxy_coordinates.shape_names_params_dicts_definition.keys():
-  if shapename == "a_rectangle":
-    pass
-  is_patch_not_line = not (shapename in zyxxy_coordinates.zyxxy_line_shapes)
-  globals()["draw_" + shapename] = partial(
-      draw_a_shape,
-      shapename=shapename,
-      is_patch_not_line=is_patch_not_line,
-    )
+  if shapename != "a_rectangle":
+    globals()["draw_" + shapename] = partial(draw_a_shape, shapename=shapename)

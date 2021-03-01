@@ -22,6 +22,14 @@ from math import sqrt, ceil, floor
 
 zyxxy_line_shapes = ['a_segment', 'a_smile', 'a_coil', 'an_arc', 'a_zigzag', 'a_wave']
 
+def get_type_given_shapename(shapename):
+  if shapename in zyxxy_line_shapes:
+    return 'line'
+  elif shapename in shape_names_params_dicts_definition.keys():
+    return 'patch'
+  else:
+    raise Exception(shapename, " is not a recognized shapename")
+
 shape_names_params_dicts_definition = {
                             'a_segment' : {'length': 'half_min_size'},               
                             'a_triangle': {'width' : 'half_min_size', 'height' : 'half_min_size'}, 
