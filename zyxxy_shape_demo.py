@@ -52,7 +52,7 @@ shape_types = ["patch", "line"]
 
 active_shapename = {side : None for side in sides}
 shapes_by_side_by_shapetype = {side : {st : None for st in shape_types} for side in sides}
-common_widgets_by_side_by_shapetype = {side : {st : {} for st in shape_types} for side in sides}
+common_widgets_by_side = {side : {} for side in sides}
 specific_widgets_by_side_by_shapename = {side : {} for side in sides}
 style_widgets_side_by_shapetype = {side : {st : {'text' : []} for st in shape_types} for side in sides}
 
@@ -125,13 +125,13 @@ def get_value(a_widget):
   raise Exception(type(a_widget), "is not handled")
 
 ##########################################################################################
-def get_active_shapetype():
+def get_active_shapetype(side):
   shapetype = get_type_given_shapename(shapename=active_shapename[side])
   return shapetype
 
 ##########################################################################################
 def update_shape_style_given_side(_, side):
-  shapetype = get_active_shapetype()
+  shapetype = get_active_shapetype(side=side)
   style_widgets = style_widgets_side_by_shapetype[side][shapetype]
   kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.key() if key != 'text'}
   _shape.set_style(**kwargs_style)
@@ -148,8 +148,8 @@ def update_shape_form_given_side(_, side):
   kwargs_shape = {key : _sliders_specific[key].val for key in _sliders_specific.keys()}
   _shape.update_xy_by_shapename(shapename, **kwargs_shape)
 
-  _widgets_common = common_widgets_by_side_by_shapetype[side][shapetype]
-  kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.key()}
+  _widgets_common = common_widgets_by_side[side]
+  kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
   _shape.move(**kwargs_common)
 
   plt.draw()
@@ -159,7 +159,7 @@ def update_visibility(side, switch_on):
   shapename = active_shapename[side]
 
   #shape visibility
-  _shape = shapes_by_side_by_shapetype[side][get_active_shapetype()]
+  _shape = shapes_by_side_by_shapetype[side][get_active_shapetype(side=side)]
   _shape.set_visible(switch_on)  
 
   # shape-specific form widgets visibility
@@ -167,7 +167,7 @@ def update_visibility(side, switch_on):
     _s.ax.set_visible(switch_on)
 
   # style widgets visibility
-  patch_or_line = get_active_shapetype()
+  patch_or_line = get_active_shapetype(side=side)
   for key, sw_or_all_texts in style_widgets_side_by_shapetype[side][patch_or_line].items():
     if key == "text":
       for t in sw_or_all_texts:
@@ -185,16 +185,16 @@ def switch_active_shapename_given_side(label, side):
   # update diamond labels
   for diam_name in ["diamond_x", "diamond_y"]:
     shape_specific_label = get_diamond_label(shapename=active_shapename[side], original_label=diam_name)
-    common_widgets_by_side_by_shapetype[side][active_shapename[side]][diam_name].set_caption(shape_specific_label)
+    common_widgets_by_side[side][diam_name].label = shape_specific_label
 
-  update_shape_form_given_side(side=side)
+  update_shape_form_given_side(_, side=side)
   plt.draw()
 
 ##########################################################################################
 def reset(event, side):
   for w in specific_widgets_by_side_by_shapename[active_shapename[side]].values():
     w.reset()
-  for w in common_widgets_by_side_by_shapetype.values():
+  for w in common_widgets_by_side.values():
     if isinstance(w, Slider):
       w.reset()
     elif isinstance(w, CheckButtons):
@@ -294,13 +294,13 @@ for side in sides:
                                    s_vals=np.copy(slider_range[slider_range_name]), 
                                    color=my_default_demo_colours[side]["shape"])
     c_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
-    common_widgets_by_side_by_shapetype[param_name] = c_slider  
+    common_widgets_by_side[side][param_name] = c_slider  
 
   start_bottom_for_specific, w_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
   flip_checkbox = CheckButtons(w_axes, ('flip_upside_down', ), (False, ))
   resize_1_checkbox(a_checkbox=flip_checkbox, left=0.05, bottom=0.15, width=0.05, height=0.7)
   flip_checkbox.on_clicked(functools.partial(update_shape_form_given_side, side=side))
-  common_widgets_by_side_by_shapetype['flip'] = flip_checkbox
+  common_widgets_by_side[side]['flip'] = flip_checkbox
 
   # ... and specific sliders
   for sh_counter, shapename in enumerate(shape_names_params_dicts_definition.keys()):
