@@ -63,7 +63,7 @@ active_shapename = {side : None for side in sides}
 
 
 shape_switcher = {}
-style_widgets = {side : {"patch" : {}, "line" : {}} for side in sides}
+style_widgets = {side : {"patch" : {'text' : []}, "line" : {'text' : []}} for side in sides}
 
 
 # create the figure
@@ -82,10 +82,10 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options):
                                         w_height=widget_params['height']*len(rb_options))
   result = RadioButtons(rax, rb_options, active=1)
 
-  fig.text(w_left, new_bottom, w_caption)
+  added_text = fig.text(w_left, new_bottom, w_caption)
   new_bottom += widget_params['height'] + widget_params['gap']
 
-  return new_bottom, result
+  return new_bottom, result, added_text
 
 def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
   new_bottom, sax = get_axes_for_widget(w_left=w_left, 
@@ -93,11 +93,13 @@ def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=T
   label = w_caption if caption_in_the_same_line else ""
   result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], **slider_qwargs)
 
-  if not caption_in_the_same_line:
-    fig.text(w_left, new_bottom, w_caption)
+  if caption_in_the_same_line:
+    added_text = None
+  else:
+    added_text = fig.text(w_left, new_bottom, w_caption)
     new_bottom += widget_params['height'] + widget_params['gap']
 
-  return new_bottom, result
+  return new_bottom, result, added_text
 
 # create shapename radio buttons
 demo_rax_bottom = (MAX_WIDGET_QTY + 1) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
@@ -108,7 +110,7 @@ for side in sides:
   rax_left = widget_params['radio_side_margin'] * 2 + widget_params['radio_width']
   if side != 'left':
     rax_left = 1 - widget_params['radio_width'] - rax_left
-  _, shape_switcher[side] = add_radio_buttons(rb_options=all_shapenames, w_left=rax_left, w_bottom=demo_rax_bottom, w_caption="shapenames")
+  _, shape_switcher[side], _ = add_radio_buttons(rb_options=all_shapenames, w_left=rax_left, w_bottom=demo_rax_bottom, w_caption="shapenames")
   # shape_switcher[side].activecolor = my_default_demo_colours[side]["shape"]
 
 # create shapestyle widgets
@@ -119,11 +121,13 @@ lefts = {'left' : {'line' : widget_params['radio_side_margin'] + 0.00001,
                     'patch' : 1 - widget_params['radio_width'] - widget_params['radio_side_margin']}}
 
 def add_style_widget(side, patch_or_line, caption, func_name, **other_kwargs):
-  bottoms[side][patch_or_line], style_widgets[side][patch_or_line][caption] = func_name(
+  bottoms[side][patch_or_line], style_widgets[side][patch_or_line][caption], added_text = func_name(
                                                                            w_left=lefts[side][patch_or_line], 
                                                                            w_bottom=bottoms[side][patch_or_line], 
                                                                            w_caption=caption,
                                                                            **other_kwargs)
+  if added_text is not None:
+    style_widgets[side][patch_or_line]['text'].append(added_text)
 
 default_widget_width = widget_params['radio_width']
                                                                 
@@ -135,8 +139,8 @@ for side in sides:
   add_style_widget(side=side, patch_or_line="line", caption="colour", func_name=add_radio_buttons, rb_options=line_colours)
   add_style_widget(side=side, patch_or_line="patch", caption="outline_colour", func_name=add_radio_buttons, rb_options=line_colours)
   for patch_or_line, caption in {"line" : "linewidth", "patch" : "outline_linewidth"}.items():
-    add_style_widget(side=side, patch_or_line=patch_or_line, caption=caption, func_name=add_a_slider, s_vals=[0, 10, 1, 1])
-  add_style_widget(side=side, patch_or_line="patch", caption="opacity", func_name=add_a_slider, s_vals=[0, 1, 1, 0.1])
+    add_style_widget(side=side, patch_or_line=patch_or_line, caption=caption, func_name=add_a_slider, s_vals=[0, 10, 1, 1], caption_in_the_same_line=False)
+  add_style_widget(side=side, patch_or_line="patch", caption="opacity", func_name=add_a_slider, s_vals=[0, 1, 1, 0.1], caption_in_the_same_line=False)
   
 # Creating the canvas!
 plot_ax_left  = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
@@ -219,10 +223,10 @@ def place_shapes_and_widgets(side, shapename, count_shapes):
       else:
         colour = shape_colour
         label = param_name      
-      _, target[param_name] = add_a_slider(**get_left_bottom(counter),
-                                           w_caption=label, 
-                                           s_vals=param_params, 
-                                           color=colour)
+      _, target[param_name], _ = add_a_slider(**get_left_bottom(counter),
+                                              w_caption=label, 
+                                              s_vals=param_params, 
+                                              color=colour)
     if flip_checkbox is None:
       counter -= 1
       flip_checkbox = CheckButtons(get_axes_for_widget(**get_left_bottom(counter))[1], ('flip_upside_down', ), (False, ))
@@ -266,6 +270,15 @@ def switch_demo(side, shapename, switch_on):
   all_widgets = [_widgets['button'], _widgets['flip_checkbox']] + [v for v in _widgets['sliders_specific'].values()] + [v for v in _widgets['sliders_common'].values()]
   for _s in all_widgets:
     _s.ax.set_visible(switch_on)
+
+  patch_or_line = "line" if (shapename in zyxxy_line_shapes) else "patch"
+  for key, sw_or_all_texts in style_widgets[side][patch_or_line].items():
+    if key == "text":
+      for t in sw_or_all_texts:
+        t.set_visible(switch_on)
+    else:
+      sw_or_all_texts.ax.set_visible(switch_on)
+
 
 for side in ['left', 'right']:
   count_shapes = 0
