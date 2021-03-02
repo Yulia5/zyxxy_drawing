@@ -17,7 +17,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons, CheckButtons
 import numpy as np
-import functools
+import functools, inspect
 
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
@@ -84,15 +84,15 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options):
   return new_bottom, result, added_text
 
 def add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
-  new_bottom = sax.get_position().ymin
-
+  
   label = w_caption if caption_in_the_same_line else ""
   result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], **slider_qwargs)
 
+  new_bottom = sax.get_position().ymax + widget_params['gap']
   if caption_in_the_same_line:
     added_text = None
   else:
-    added_text = fig.text(w_left, new_bottom, w_caption)
+    added_text = fig.text(sax.get_position().xmin, new_bottom, w_caption)
     new_bottom += widget_params['height'] + widget_params['gap']
 
   return new_bottom, result, added_text
@@ -100,7 +100,7 @@ def add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=True, **slide
 def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
   new_bottom, sax = get_axes_for_widget(w_left=w_left, 
                                         w_bottom=w_bottom)
-  return add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs)
+  return add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=caption_in_the_same_line, **slider_qwargs)
 
 def resize_1_checkbox(a_checkbox, left, bottom, width, height):
   r = a_checkbox.rectangles[0]
@@ -131,7 +131,7 @@ def get_active_shapetype(side):
 def update_shape_style_given_side(_, side):
   shapetype = get_active_shapetype(side=side)
   style_widgets = style_widgets_side_by_shapetype[side][shapetype]
-  kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.key() if key != 'text'}
+  kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
   _shape.set_style(**kwargs_style)
 
 ##########################################################################################
@@ -182,8 +182,9 @@ def switch_active_shapename_given_side(label, side):
 
   # update diamond labels
   for diam_name in ["diamond_x", "diamond_y"]:
+    #print(inspect.getmethods(common_widgets_by_side[side][diam_name]))
     shape_specific_label = get_diamond_label(shapename=active_shapename[side], original_label=diam_name)
-    common_widgets_by_side[side][diam_name].label = shape_specific_label
+    common_widgets_by_side[side][diam_name].label.set_text(shape_specific_label)
 
   update_shape_form_given_side(_, side=side)
   plt.draw()
@@ -266,6 +267,15 @@ for side in sides:
     add_style_widget(side=side, patch_or_line=patch_or_line, caption=caption, func_name=add_a_slider, s_vals=[0, 10, 1, 1], caption_in_the_same_line=False)
   add_style_widget(side=side, patch_or_line="patch", caption="opacity", func_name=add_a_slider, s_vals=[0, 1, 1, 0.1], caption_in_the_same_line=False)
 
+  for st in shape_types:
+    for sw in style_widgets_side_by_shapetype[side][st].values():
+      if isinstance(sw, list):
+        continue
+      elif isinstance(sw, RadioButtons):
+        sw.on_clicked(functools.partial(update_shape_style_given_side, side=side))
+      else:
+        sw.on_changed(functools.partial(update_shape_style_given_side, side=side))
+
   # adding shapename switchers
   default_widget_width = widget_params['radio_width']
   rax_left = widget_params['radio_side_margin'] * 2 + widget_params['radio_width']
@@ -284,8 +294,9 @@ for side in sides:
   new_bottom, b_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
   button = Button(ax=b_axes, label='Reset')
   button.on_clicked(functools.partial(reset, side=side))
-
-  for param_name, slider_range_name in common_params_dict_definition.items():
+   
+  _cpdd = [[key, value] for key, value in common_params_dict_definition.items()]
+  for param_name, slider_range_name in _cpdd[::-1]:
     new_bottom, w_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
     _, c_slider, _ = add_a_slider2(w_axes,
                                    w_caption=param_name, 
