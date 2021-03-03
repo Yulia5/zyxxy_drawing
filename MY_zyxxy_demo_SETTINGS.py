@@ -34,11 +34,11 @@ widget_params = {'radio_width' : 0.128,
 
 my_default_demo_shapes = {"left" : "a_square", "right" : "a_triangle"}
 
-my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'diamond_colour' : 'red', 'linewidth' : 5}, 
-                                   "patch"  : {"colour" : 'red', 'diamond_colour' : 'red', 'opacity' : 1.0}, 
+my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'linewidth' : 5}, 
+                                   "patch"  : {"colour" : 'red', 'opacity' : 1.0}, 
                                    'outline': {'linewidth' : 5}},
-                         "right": {"line" : {"colour" : 'blue', 'diamond_colour' : 'blue'}, 
-                                   "patch" : {"colour" : 'blue', 'diamond_colour' : 'blue', 'opacity' : 0.5}, 
+                         "right": {"line" : {"colour" : 'blue'}, 
+                                   "patch" : {"colour" : 'blue', 'opacity' : 0.5}, 
                                    'outline': {}}}
 
 demo_style_widgets_value_ranges = {"colour"    : ['yellow', 'blue', 'red', 'green', 'black'],

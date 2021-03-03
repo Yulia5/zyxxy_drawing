@@ -262,7 +262,7 @@ def place_style_widgets(side, arg_category, w_left, w_bottom):
   result = {'text' : []}
   for argname, init_value in captions_init_values.items():
     w_options = demo_style_widgets_value_ranges[argname]
-    print(w_options)
+    
     if not isinstance(w_options[0], str): 
       func_name = add_a_slider
       other_kwargs = {'s_vals' : w_options, 'caption_in_the_same_line' : False}
@@ -275,7 +275,11 @@ def place_style_widgets(side, arg_category, w_left, w_bottom):
     set_widget_value(result[prefixed_caption], init_value)
 
     shapetype = arg_category if arg_category != "outline" else "patch"
-    result[prefixed_caption].on_change(functools.partial(update_shape_style, side=side, shapetype=shapetype, argname=argname))
+    on_click_or_change = functools.partial(update_shape_style, side=side, shapetype=shapetype, argname=argname)
+    if isinstance(result[prefixed_caption], RadioButtons):
+      result[prefixed_caption].on_clicked(on_click_or_change)
+    elif isinstance(result[prefixed_caption], Slider):
+      result[prefixed_caption].on_changed(on_click_or_change)
 
     if added_text is not None:
       result['text'].append(added_text)
@@ -320,9 +324,8 @@ def place_shapes_and_widgets(side):
   _, more_patch_style_widgets = place_style_widgets(                     side=side, arg_category='patch', 
                                                                          w_left=w_left, 
                                                                          w_bottom=new_bottom)
-  style_widgets_side_by_shapetype[side]["patch"] += more_patch_style_widgets
-
-
+  for key, value in more_patch_style_widgets.items():
+    style_widgets_side_by_shapetype[side]["patch"][key] = value
 
   for st in shape_types:
     for sw in style_widgets_side_by_shapetype[side][st].values():

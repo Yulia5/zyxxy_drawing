@@ -46,7 +46,7 @@ my_default_colour_etc_settings = {
                                'joinstyle' : 'miter', 
                                'layer_nb' : 1,
                                "capstyle" : 'round'}, 
-                     "patch" : {'alpha' : 1.0, 
+                     "patch" : {'opacity' : 1.0, 
                                 'layer_nb' : 1, 
                                 'colour' : 'none'},
                      "outline" : {'colour' : 'black', 
@@ -54,7 +54,7 @@ my_default_colour_etc_settings = {
                                              'joinstyle' : 'miter', 
                                              'layer_nb' : 1},
                      "diamond" : {'colour' : 'blue', #  None #
-                                  'alpha' : 1.0,
+                                  'opacity' : 1.0,
                                   'layer_nb' : 1000}} 
 
 my_default_background_settings =  {'fc' : 'none', 
