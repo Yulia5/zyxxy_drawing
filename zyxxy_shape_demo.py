@@ -22,10 +22,14 @@ import functools, inspect
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes
 from zyxxy_shape_class import Shape
-from zyxxy_shape_style import joinstyle_types, capstyle_types
 from zyxxy_coordinates import shape_names_params_dicts_definition, get_type_given_shapename
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
-from MY_zyxxy_demo_SETTINGS import figure_params, widget_params, patch_colours, line_colours, my_default_demo_colours
+from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
+from MY_zyxxy_demo_SETTINGS import figure_params, widget_params, demo_style_widgets_value_ranges, my_default_demo_shapes, my_default_demo_style
+
+from zyxxy_shape_style import joinstyle_types, capstyle_types
+demo_style_widgets_value_ranges["joinstyle"] = joinstyle_types
+demo_style_widgets_value_ranges["capstyle"] = capstyle_types
 
 plt.rcParams.update({'font.size': figure_params['font_size']})
 
@@ -72,11 +76,13 @@ def get_axes_for_widget(w_left, w_bottom, w_height=widget_params['height']):
   new_bottom = w_height + w_bottom + widget_params['gap']
   return new_bottom, wax
 
-def add_radio_buttons(w_left, w_bottom, w_caption, rb_options):
+def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option=None):
   new_bottom, rax = get_axes_for_widget(w_left=w_left, 
                                         w_bottom=w_bottom, 
                                         w_height=widget_params['height']*len(rb_options))
-  result = RadioButtons(rax, rb_options, active=1)
+
+  active = 1 if active_option is None else rb_options.index(active_option)
+  result = RadioButtons(rax, rb_options, active=active)
 
   added_text = fig.text(w_left, new_bottom, w_caption)
   new_bottom += widget_params['height'] + widget_params['gap']
@@ -127,20 +133,24 @@ def get_active_shapetype(side):
   shapetype = get_type_given_shapename(shapename=active_shapename[side])
   return shapetype
 
+def get_active_shape(side):
+  _shape = shapes_by_side_by_shapetype[side][get_active_shapetype(side=side)]
+  return _shape
+
 ##########################################################################################
 def update_shape_style_given_side(_, side):
   shapetype = get_active_shapetype(side=side)
   style_widgets = style_widgets_side_by_shapetype[side][shapetype]
   kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
+
+  _shape = get_active_shape(side=side)
   _shape.set_style(**kwargs_style)
 
 ##########################################################################################
 def update_shape_form_given_side(_, side):
 
   shapename = active_shapename[side]
-  shapetype = get_type_given_shapename(shapename)
-
-  _shape = shapes_by_side_by_shapetype[side][shapetype]
+  _shape = get_active_shape(side=side)
 
   _sliders_specific = specific_widgets_by_side_by_shapename[side][shapename]
   kwargs_shape = {key : _sliders_specific[key].val for key in _sliders_specific.keys()}
@@ -186,11 +196,11 @@ def switch_active_shapename_given_side(label, side):
     shape_specific_label = get_diamond_label(shapename=active_shapename[side], original_label=diam_name)
     common_widgets_by_side[side][diam_name].label.set_text(shape_specific_label)
 
-  update_shape_form_given_side(_, side=side)
+  update_shape_form_given_side(None, side=side)
   plt.draw()
 
 ##########################################################################################
-def reset(event, side):
+def reset(_, side):
   for w in specific_widgets_by_side_by_shapename[side][active_shapename[side]].values():
     w.reset()
   for w in common_widgets_by_side[side].values():
@@ -202,70 +212,117 @@ def reset(event, side):
     else:
       raise Exception(type(w), "type not recognized")
 
+def get_widget_value(a_widget):
+  if isinstance(a_widget, Slider):
+    return a_widget.val
+  elif isinstance(a_widget, RadioButtons):
+    return a_widget.value_selected
+  else:
+    raise Exception(type(a_widget), "type not recognized")
+
+def set_widget_value(a_widget, new_value):
+  if isinstance(a_widget, Slider):
+    a_widget.val = new_value
+  elif isinstance(a_widget, RadioButtons):
+    a_widget.value_selected = new_value
+  else:
+    raise Exception(type(a_widget), "type not recognized")
+  
+def set_widget_colour(a_widget, new_colour):
+  if isinstance(a_widget, Slider):
+    a_widget.color = new_colour
+  elif isinstance(a_widget, CheckButtons):
+    for a_line in a_widget.lines[0]: 
+      a_line.set_color(new_colour)
+  elif isinstance(a_widget, RadioButtons):
+    a_widget.activecolor = new_colour
+    a_widget.value_selected = a_widget.value_selected # to activate new colour
+  else:
+    raise Exception(type(a_widget), "type not recognized")
+
 ##########################################################################################
 
-# create shapename radio buttons
-# finding the max number of widgets
-max_widget_qty = 0
-for spec_param_dict in shape_names_params_dicts_definition.values():
-  max_widget_qty = max(max_widget_qty, len(spec_param_dict))
-demo_rax_bottom = (max_widget_qty + len(common_params_dict_definition) + 2) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
+def get_demo_rax_bottom():
+  max_widget_qty = 0
+  for spec_param_dict in shape_names_params_dicts_definition.values():
+    max_widget_qty = max(max_widget_qty, len(spec_param_dict))
+  demo_rax_bottom = (max_widget_qty + len(common_params_dict_definition) + 2) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
+  return demo_rax_bottom
+
+##################################################################################
+# create shapestyle widgets  
+
+def place_style_widgets(side, arg_category, w_left, w_bottom):
+
+  captions_init_values = my_default_demo_style[side][arg_category]
+  for key, value in my_default_colour_etc_settings[arg_category].items():
+    if key not in captions_init_values:
+      captions_init_values[key] = value
+
+  result = {'text' : []}
+  for argname, init_value in captions_init_values.items():
+    w_options = demo_style_widgets_value_ranges[argname]
+    print(w_options)
+    if not isinstance(w_options[0], str): 
+      func_name = add_a_slider
+      other_kwargs = {'s_vals' : w_options, 'caption_in_the_same_line' : False}
+    else:
+      func_name = add_radio_buttons
+      other_kwargs = {'rb_options' : w_options}
+
+    prefixed_caption = argname if arg_category != "outline" else "outline_"+argname
+    w_bottom, result[prefixed_caption], added_text = func_name(w_left=w_left, w_bottom=w_bottom, w_caption=prefixed_caption, **other_kwargs)
+    set_widget_value(result[prefixed_caption], init_value)
+
+    shapetype = arg_category if arg_category != "outline" else "patch"
+    result[prefixed_caption].on_change(functools.partial(update_shape_style, side=side, shapetype=shapetype, argname=argname))
+
+    if added_text is not None:
+      result['text'].append(added_text)
+
+  return w_bottom, result
+
+def update_shape_style(_, side, shapetype, argname):
+  argvalue = get_widget_value(style_widgets_side_by_shapetype[side][shapetype][argname])
+  style_kwargs = {argname : argvalue}
+  shapes_by_side_by_shapetype[side][shapetype].set_style(**style_kwargs)
+  if argname == "colour":
+    shapes_by_side_by_shapetype[side][shapetype].set_style(diamond_colour=argvalue)
+    all_widgets_on_this_side = [w for w in common_widgets_by_side[side].values()]
+    all_widgets_on_this_side+= [w for w in style_widgets_side_by_shapetype[side][shapetype].values()]
+    for shapewidgets in specific_widgets_by_side_by_shapename[side].values():
+      all_widgets_on_this_side += [w for w in shapewidgets.values()]
+    for a_widget in all_widgets_on_this_side:
+      set_widget_colour(a_widget=a_widget, colour=argvalue)
 
 
-# create shapestyle widgets
-bottoms = {side : {st : figure_params['plot_bottom_gap'] for st in style_widgets_side_by_shapetype[side].keys()} for side in sides}
-lefts = {'left' : {'line' : widget_params['radio_side_margin'] + 0.00001, 
-                   'patch' : widget_params['radio_side_margin']},
-         'right' : {'line' : 1 - widget_params['radio_width'] - widget_params['radio_side_margin'] + 0.00001, 
-                    'patch' : 1 - widget_params['radio_width'] - widget_params['radio_side_margin']}}
-
-def add_style_widget(side, patch_or_line, caption, func_name, **other_kwargs):
-  bottoms[side][patch_or_line], style_widgets_side_by_shapetype[side][patch_or_line][caption], added_text = func_name(
-                                                                           w_left=lefts[side][patch_or_line], 
-                                                                           w_bottom=bottoms[side][patch_or_line], 
-                                                                           w_caption=caption,
-                                                                           **other_kwargs)
-  if added_text is not None:
-    style_widgets_side_by_shapetype[side][patch_or_line]['text'].append(added_text)
-
-  
-# Creating the canvas!
-plot_ax_left  = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
-plot_ax_bottom= demo_rax_bottom + figure_params['plot_bottom_gap']
-ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
-fig.add_axes(ax)
-
-create_canvas_and_axes(canvas_width=canvas_width,
-                            canvas_height=canvas_height, 
-                            tick_step=figure_params['tick_step'],
-                            title="Try Out Shapes",
-                            title_font_size=figure_params['font_size']*1.5,
-                            axes_label_font_size=figure_params['font_size'],
-                            axes_tick_font_size=figure_params['font_size'],
-                            axes=ax)
-
-for side in sides:
-
+##################################################################################
+def place_shapes_and_widgets(side):
   # placing the shapes_by_side_by_shapetype
-  shape_colour = my_default_demo_colours[side]["shape"]   
-  diamond_colour = my_default_demo_colours[side]["diamond"] 
-  for st in shape_types:                                          
-    _shape = Shape(ax=ax, is_patch_not_line=(st == "patch"), defaults_for_demo=True)
-    _shape.set_style(colour=shape_colour, diamond_colour=diamond_colour)
-    shapes_by_side_by_shapetype[side][st] = _shape
+  shapes_by_side_by_shapetype[side] = {shapetype : Shape(ax=ax, shapetype=shapetype) for shapetype in shape_types}
 
   # adding style widgets
-  default_widget_width = widget_params['radio_width']
-  for st in style_widgets_side_by_shapetype[side].keys():
-    add_style_widget(side=side, patch_or_line=st, caption="layer_nb", func_name=add_a_slider, s_vals=[0, 3, 1, 1], caption_in_the_same_line=False)
-    add_style_widget(side=side, patch_or_line=st, caption="joinstyle", func_name=add_radio_buttons, rb_options=joinstyle_types)
-  add_style_widget(side=side, patch_or_line="line", caption="capstyle", func_name=add_radio_buttons, rb_options=capstyle_types)
-  add_style_widget(side=side, patch_or_line="patch", caption="colour", func_name=add_radio_buttons, rb_options=patch_colours) 
-  add_style_widget(side=side, patch_or_line="line", caption="colour", func_name=add_radio_buttons, rb_options=line_colours)
-  add_style_widget(side=side, patch_or_line="patch", caption="outline_colour", func_name=add_radio_buttons, rb_options=line_colours)
-  for patch_or_line, caption in {"line" : "linewidth", "patch" : "outline_linewidth"}.items():
-    add_style_widget(side=side, patch_or_line=patch_or_line, caption=caption, func_name=add_a_slider, s_vals=[0, 10, 1, 1], caption_in_the_same_line=False)
-  add_style_widget(side=side, patch_or_line="patch", caption="opacity", func_name=add_a_slider, s_vals=[0, 1, 1, 0.1], caption_in_the_same_line=False)
+  global default_widget_width
+  default_widget_width = widget_params['radio_width'] 
+  w_left =  widget_params['radio_side_margin']
+  if side == "right":
+    w_left = 1 - widget_params['radio_width'] - widget_params['radio_side_margin']
+
+  _, style_widgets_side_by_shapetype[side]["line"] = place_style_widgets(side=side, arg_category='line', 
+                                                                         w_left=w_left+0.00001, 
+                                                                         w_bottom=figure_params['plot_bottom_gap'])
+
+  new_bottom, style_widgets_side_by_shapetype[side]["patch"]= place_style_widgets(
+                                                                         side=side, arg_category='outline', 
+                                                                         w_left=w_left, 
+                                                                         w_bottom=figure_params['plot_bottom_gap'])
+
+  _, more_patch_style_widgets = place_style_widgets(                     side=side, arg_category='patch', 
+                                                                         w_left=w_left, 
+                                                                         w_bottom=new_bottom)
+  style_widgets_side_by_shapetype[side]["patch"] += more_patch_style_widgets
+
+
 
   for st in shape_types:
     for sw in style_widgets_side_by_shapetype[side][st].values():
@@ -281,8 +338,9 @@ for side in sides:
   rax_left = widget_params['radio_side_margin'] * 2 + widget_params['radio_width']
   if side != 'left':
     rax_left = 1 - widget_params['radio_width'] - rax_left
-  _, shape_switcher_side, _ = add_radio_buttons(rb_options=shape_names_params_dicts_definition.keys(), w_left=rax_left, w_bottom=demo_rax_bottom, w_caption="shapenames")
-  # shape_switcher_side.activecolor = my_default_demo_colours[side]["shape"]
+  _, shape_switcher_side, _ = add_radio_buttons(rb_options=[k for k in shape_names_params_dicts_definition.keys()], w_left=rax_left, w_bottom=get_demo_rax_bottom(), w_caption="shapenames", active_option=my_default_demo_shapes[side])
+  shape_switcher_side.activecolor = 'black'
+  
   shape_switcher_side.on_clicked(functools.partial(switch_active_shapename_given_side, side=side) )
 
   # adding common form parameters sliders 
@@ -300,8 +358,7 @@ for side in sides:
     new_bottom, w_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
     _, c_slider, _ = add_a_slider2(w_axes,
                                    w_caption=param_name, 
-                                   s_vals=np.copy(slider_range[slider_range_name]), 
-                                   color=my_default_demo_colours[side]["shape"])
+                                   s_vals=np.copy(slider_range[slider_range_name]))
     c_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
     common_widgets_by_side[side][param_name] = c_slider  
 
@@ -327,8 +384,7 @@ for side in sides:
       _, s_slider, _ = add_a_slider(w_left=w_left,
                                               w_bottom=w_bottom,
                                               w_caption=param_name, 
-                                              s_vals=param_params, 
-                                              color=my_default_demo_colours[side]["shape"])
+                                              s_vals=param_params)
       s_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
       specific_widgets_by_side_by_shapename[side][shapename][param_name] = s_slider
 
@@ -338,10 +394,29 @@ for side in sides:
   for shapename in shape_names_params_dicts_definition.keys():
     active_shapename[side] = shapename
     update_visibility(side=side, switch_on=False)
-  switch_active_shapename_given_side(label="a_circle", side=side)
+  switch_active_shapename_given_side(label=my_default_demo_shapes[side], side=side)
   
 
 ##########################################################################################
+# Creating the canvas!
+plot_ax_left   = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
+plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap']
+ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
+fig.add_axes(ax)
+
+create_canvas_and_axes(canvas_width=canvas_width,
+                            canvas_height=canvas_height, 
+                            tick_step=figure_params['tick_step'],
+                            title="Try Out Shapes",
+                            title_font_size=figure_params['font_size']*1.5,
+                            axes_label_font_size=figure_params['font_size'],
+                            axes_tick_font_size=figure_params['font_size'],
+                            axes=ax)
+
+# placing the shapes and widgets
+for side in sides:
+  place_shapes_and_widgets(side=side)
+
 fig.set_dpi(figure_params['dpi']) 
 fig.set_size_inches(figure_params['figsize'])
 plt.show()

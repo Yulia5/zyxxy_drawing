@@ -18,7 +18,8 @@ import numpy as np
 from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-from zyxxy_shape_style import set_patch_style, set_line_style, raise_Exception_if_not_processed, get_diamond_size, format_arg_dict, get_default_arguments
+from zyxxy_shape_style import set_patch_style, set_line_style, raise_Exception_if_not_processed, get_diamond_size, format_arg_dict
+from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
 
 
 ##################################################################
@@ -43,21 +44,23 @@ def _set_xy(something, xy):
 ##################################################################
 
 class Shape:
-  def __init__(self, ax, is_patch_not_line, defaults_for_demo):
+  def __init__(self, ax, shapetype):
 
     self.diamond_coords = np.array([0, 0])
 
-    if is_patch_not_line:  
+    if shapetype == "patch":  
       self.patch = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=True, closed=True)
       ax.add_patch(self.patch)
       self.outline = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=False, closed=True) 
       ax.add_patch(self.outline)
       self.line = None
-    else:
+    elif shapetype == "line":
       self.patch = None
       self.outline = None
       self.line = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=False, closed=False) 
       ax.add_patch(self.line)
+    else:
+      raise Exception(shapetype, "not a recognized shapetype")
 
     diamond_size = get_diamond_size(ax)
     if diamond_size is not None:
@@ -68,22 +71,19 @@ class Shape:
       self.diamond_contour = None
       self.diamond = None
 
-    defaults_to_use = get_default_arguments(defaults_for_demo = defaults_for_demo)
     for attr_name in format_arg_dict.keys():
       _attr = getattr(self, attr_name)
       if _attr is None:
         continue
       if "line" in attr_name:
-        set_line_style(_attr, **defaults_to_use[attr_name])
+        set_line_style(_attr, **my_default_colour_etc_settings[attr_name])
       else:
-        set_patch_style(_attr, **defaults_to_use[attr_name])
+        set_patch_style(_attr, **my_default_colour_etc_settings[attr_name])
 
     self.clip_patches = []
     self.move_history = []
     self.shape_kwargs = None
     self.shapename = None
-    self.is_patch_not_line = is_patch_not_line
-
 
   def set_visible(self, s):
     for attr_name in format_arg_dict.keys():

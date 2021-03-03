@@ -36,7 +36,7 @@ my_colour_palette = {'DarkTeal'   : "#004949",
                      'Burgundy'   : "#920000",
                      'MidBrown'   : "#924900",
                      'LightBrown' : "#db6d00",
-                     'BrightGreen':"#24ff24",
+                     'BrightGreen': "#24ff24",
                      'Yellow'     : "#ffff6d"}
 
 # Colours, alphas and linewidths!
@@ -52,8 +52,7 @@ my_default_colour_etc_settings = {
                      "outline" : {'colour' : 'black', 
                                              'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
-                                             'layer_nb' : 1,
-                                 "capstyle" : 'round'},
+                                             'layer_nb' : 1},
                      "diamond" : {'colour' : 'blue', #  None #
                                   'alpha' : 1.0,
                                   'layer_nb' : 1000}} 

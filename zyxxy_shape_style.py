@@ -17,7 +17,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
 from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings, my_default_diamond_size
-from MY_zyxxy_demo_SETTINGS import style_params as my_default_demo_params
 
 ########################################################################
 # as defined by matplotlib
@@ -89,13 +88,6 @@ def show_outlines_only(val):
   SHOW_OUTLINES_ONLY = val
 
 ########################################################################
-
-def get_default_arguments(defaults_for_demo):
-  if defaults_for_demo:
-    defaults_to_use = my_default_demo_params
-  else:
-    defaults_to_use = _default_arguments
-  return defaults_to_use
 
 def extract_colour_etc_kwargs(kwargs):
   possible_keys = line_arg_types + patch_arg_types + ["outline_" + a for a in line_arg_types] + ["diamond_" + a for a in patch_arg_types]

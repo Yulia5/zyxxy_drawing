@@ -32,26 +32,16 @@ widget_params = {'radio_width' : 0.128,
                  'width' : 0.27,
                  'gap' : 0.01}
 
-style_params = {"line" : {'colour' : 'black', 
-                          'linewidth' : 2, 
-                          'joinstyle' : 'miter', 
-                          'layer_nb' : 1,
-                          'capstyle' : 'round'}, 
-                "patch" : {'opacity' : 0.5, 
-                           'layer_nb' : 1, 
-                           'colour' : 'none'},
-                "outline" : {'colour' : 'black', 
-                             'linewidth' : 2, 
-                             'joinstyle' : 'miter', 
-                             'layer_nb' : 1,
-                             'capstyle' : 'round'},
-                "diamond" : {'colour' : 'green', #  None #
-                             'opacity' : 1.0,
-                             'layer_nb' : 1000}
-               }
+my_default_demo_shapes = {"left" : "a_square", "right" : "a_triangle"}
 
-my_default_demo_colours = {"left" : {"shape" : 'red', 'diamond' : 'red'},
-                           "right" : {"shape" : 'blue', 'diamond' : 'blue'}}
+my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'diamond_colour' : 'red', 'linewidth' : 5}, 
+                                   "patch"  : {"colour" : 'red', 'diamond_colour' : 'red', 'opacity' : 1.0}, 
+                                   'outline': {'linewidth' : 5}},
+                         "right": {"line" : {"colour" : 'blue', 'diamond_colour' : 'blue'}, 
+                                   "patch" : {"colour" : 'blue', 'diamond_colour' : 'blue', 'opacity' : 0.5}, 
+                                   'outline': {}}}
 
-patch_colours = {'yellow', 'blue', 'red', 'green', 'black', 'none'} 
-line_colours = {'yellow', 'blue', 'red', 'green', 'black', 'none'}
+demo_style_widgets_value_ranges = {"colour"    : ['yellow', 'blue', 'red', 'green', 'black'],
+                                   "layer_nb"  : [0, 3, 1, 1],
+                                   "linewidth" : [0, 10, 1, 1], 
+                                   "opacity"  : [0, 1, 1, 0.1]}
