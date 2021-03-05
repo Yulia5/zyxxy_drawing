@@ -76,7 +76,7 @@ def get_axes_for_widget(w_left, w_bottom, w_height=widget_params['height']):
   new_bottom = w_height + w_bottom + widget_params['gap']
   return new_bottom, wax
 
-def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option=None):
+def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option):
   new_bottom, rax = get_axes_for_widget(w_left=w_left, 
                                         w_bottom=w_bottom, 
                                         w_height=widget_params['height']*len(rb_options))
@@ -138,14 +138,6 @@ def get_active_shape(side):
   return _shape
 
 ##########################################################################################
-def update_shape_style_given_side(_, side):
-  shapetype = get_active_shapetype(side=side)
-  style_widgets = style_widgets_side_by_shapetype[side][shapetype]
-  kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
-
-  _shape = get_active_shape(side=side)
-  _shape.set_style(**kwargs_style)
-
 ##########################################################################################
 def update_shape_form_given_side(_, side):
 
@@ -155,7 +147,7 @@ def update_shape_form_given_side(_, side):
   _sliders_specific = specific_widgets_by_side_by_shapename[side][shapename]
   kwargs_shape = {key : _sliders_specific[key].val for key in _sliders_specific.keys()}
   _shape.update_xy_by_shapename(shapename, **kwargs_shape)
-
+  
   _widgets_common = common_widgets_by_side[side]
   kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
   _shape.move(**kwargs_common)
@@ -185,14 +177,13 @@ def update_visibility(side, switch_on):
 
 ##########################################################################################
 def switch_active_shapename_given_side(label, side):
-
+  
   update_visibility(side=side, switch_on=False)
   active_shapename[side] = label
   update_visibility(side=side, switch_on=True)
 
   # update diamond labels
   for diam_name in ["diamond_x", "diamond_y"]:
-    #print(inspect.getmethods(common_widgets_by_side[side][diam_name]))
     shape_specific_label = get_diamond_label(shapename=active_shapename[side], original_label=diam_name)
     common_widgets_by_side[side][diam_name].label.set_text(shape_specific_label)
 
@@ -212,21 +203,6 @@ def reset(_, side):
     else:
       raise Exception(type(w), "type not recognized")
 
-def get_widget_value(a_widget):
-  if isinstance(a_widget, Slider):
-    return a_widget.val
-  elif isinstance(a_widget, RadioButtons):
-    return a_widget.value_selected
-  else:
-    raise Exception(type(a_widget), "type not recognized")
-
-def set_widget_value(a_widget, new_value):
-  if isinstance(a_widget, Slider):
-    a_widget.val = new_value
-  elif isinstance(a_widget, RadioButtons):
-    a_widget.value_selected = new_value
-  else:
-    raise Exception(type(a_widget), "type not recognized")
   
 def set_widget_colour(a_widget, new_colour):
   if isinstance(a_widget, Slider):
@@ -264,18 +240,16 @@ def place_style_widgets(side, arg_category, w_left, w_bottom):
     w_options = demo_style_widgets_value_ranges[argname]
     
     if not isinstance(w_options[0], str): 
-      func_name = add_a_slider
-      other_kwargs = {'s_vals' : w_options, 'caption_in_the_same_line' : False}
+      w_options[2] = init_value
+      func_name = functools.partial(add_a_slider, s_vals=w_options, caption_in_the_same_line=False)
     else:
-      func_name = add_radio_buttons
-      other_kwargs = {'rb_options' : w_options}
+      func_name = functools.partial(add_radio_buttons, rb_options=w_options, active_option=init_value)
 
     prefixed_caption = argname if arg_category != "outline" else "outline_"+argname
-    w_bottom, result[prefixed_caption], added_text = func_name(w_left=w_left, w_bottom=w_bottom, w_caption=prefixed_caption, **other_kwargs)
-    set_widget_value(result[prefixed_caption], init_value)
+    w_bottom, result[prefixed_caption], added_text = func_name(w_left=w_left, w_bottom=w_bottom, w_caption=prefixed_caption)
 
     shapetype = arg_category if arg_category != "outline" else "patch"
-    on_click_or_change = functools.partial(update_shape_style, side=side, shapetype=shapetype, argname=argname)
+    on_click_or_change = functools.partial(update_shape_style, side=side, shapetype=shapetype, argname=prefixed_caption)
     if isinstance(result[prefixed_caption], RadioButtons):
       result[prefixed_caption].on_clicked(on_click_or_change)
     elif isinstance(result[prefixed_caption], Slider):
@@ -287,18 +261,18 @@ def place_style_widgets(side, arg_category, w_left, w_bottom):
   return w_bottom, result
 
 def update_shape_style(_, side, shapetype, argname):
-  argvalue = get_widget_value(style_widgets_side_by_shapetype[side][shapetype][argname])
+  argvalue = get_value(style_widgets_side_by_shapetype[side][shapetype][argname])
   style_kwargs = {argname : argvalue}
   shapes_by_side_by_shapetype[side][shapetype].set_style(**style_kwargs)
   if argname == "colour":
     shapes_by_side_by_shapetype[side][shapetype].set_style(diamond_colour=argvalue)
     all_widgets_on_this_side = [w for w in common_widgets_by_side[side].values()]
-    all_widgets_on_this_side+= [w for w in style_widgets_side_by_shapetype[side][shapetype].values()]
+    all_widgets_on_this_side+= [w for k, w in style_widgets_side_by_shapetype[side][shapetype].items() if k != "text"]
     for shapewidgets in specific_widgets_by_side_by_shapename[side].values():
       all_widgets_on_this_side += [w for w in shapewidgets.values()]
     for a_widget in all_widgets_on_this_side:
-      set_widget_colour(a_widget=a_widget, colour=argvalue)
-
+      set_widget_colour(a_widget=a_widget, new_colour=argvalue)
+  plt.draw()
 
 ##################################################################################
 def place_shapes_and_widgets(side):
@@ -326,15 +300,6 @@ def place_shapes_and_widgets(side):
                                                                          w_bottom=new_bottom)
   for key, value in more_patch_style_widgets.items():
     style_widgets_side_by_shapetype[side]["patch"][key] = value
-
-  for st in shape_types:
-    for sw in style_widgets_side_by_shapetype[side][st].values():
-      if isinstance(sw, list):
-        continue
-      elif isinstance(sw, RadioButtons):
-        sw.on_clicked(functools.partial(update_shape_style_given_side, side=side))
-      else:
-        sw.on_changed(functools.partial(update_shape_style_given_side, side=side))
 
   # adding shapename switchers
   default_widget_width = widget_params['radio_width']
@@ -393,10 +358,16 @@ def place_shapes_and_widgets(side):
 
       w_bottom += widget_params['height']+widget_params['gap']
 
-  # ... and update the visibility !
+  # ... and update the visibility and style!
   for shapename in shape_names_params_dicts_definition.keys():
     active_shapename[side] = shapename
     update_visibility(side=side, switch_on=False)
+
+    style_widgets = style_widgets_side_by_shapetype[side][get_active_shapetype(side)]
+    kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
+
+    get_active_shape(side=side).set_style(**kwargs_style)
+
   switch_active_shapename_given_side(label=my_default_demo_shapes[side], side=side)
   
 
