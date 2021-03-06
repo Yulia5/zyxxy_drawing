@@ -32,7 +32,7 @@ widget_params = {'radio_width' : 0.128,
                  'width' : 0.27,
                  'gap' : 0.01}
 
-my_default_demo_shapes = {"left" : "a_square", "right" : "a_triangle"}
+my_default_demo_shapes = {"left" : "a_triangle", "right" : "a_square"}
 
 my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'linewidth' : 5}, 
                                    "patch"  : {"colour" : 'red', 'opacity' : 1.0}, 

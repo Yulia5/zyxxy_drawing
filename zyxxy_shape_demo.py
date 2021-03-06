@@ -65,6 +65,30 @@ buttons = {side : None for side in sides}
 ##########################################################################################
 # create the figure
 fig = plt.figure()
+##########################################################################################
+# Creating the canvas!
+##########################################################################################
+
+def get_demo_rax_bottom():
+  max_widget_qty = 0
+  for spec_param_dict in shape_names_params_dicts_definition.values():
+    max_widget_qty = max(max_widget_qty, len(spec_param_dict))
+  demo_rax_bottom = (max_widget_qty + len(common_params_dict_definition) + 2) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
+  return demo_rax_bottom
+
+plot_ax_left   = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
+plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap']
+ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
+fig.add_axes(ax)
+
+create_canvas_and_axes(canvas_width=canvas_width,
+                            canvas_height=canvas_height, 
+                            tick_step=figure_params['tick_step'],
+                            title="Try Out Shapes",
+                            title_font_size=figure_params['font_size']*1.5,
+                            axes_label_font_size=figure_params['font_size'],
+                            axes_tick_font_size=figure_params['font_size'],
+                            axes=ax)
 
 ##########################################################################################
 # widget-creating functions
@@ -74,7 +98,7 @@ default_widget_width = None
 
 def get_axes_for_widget(w_left, w_bottom, w_height=widget_params['height']):
   wax = plt.axes([w_left, w_bottom, default_widget_width, w_height]) 
-  fig.add_axes(wax)
+  #fig.add_axes(wax)
   new_bottom = w_height + w_bottom + widget_params['gap']
   return new_bottom, wax
 
@@ -149,7 +173,7 @@ def update_shape_form_given_side(_, side):
   kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
   _shape.move(**kwargs_common)
 
-  plt.draw()
+  fig.canvas.draw_idle()
 
 ##########################################################################################
 def update_visibility(side, switch_on):
@@ -174,7 +198,7 @@ def update_visibility(side, switch_on):
 
 ##########################################################################################
 def switch_active_shapename_given_side(label, side):
-  print(label)
+
   update_visibility(side=side, switch_on=False)
   active_shapename[side] = label
   update_visibility(side=side, switch_on=True)
@@ -185,7 +209,7 @@ def switch_active_shapename_given_side(label, side):
     common_widgets_by_side[side][diam_name].label.set_text(shape_specific_label)
 
   update_shape_form_given_side(None, side=side)
-  plt.draw()
+  fig.canvas.draw_idle()
 
 ##########################################################################################
 def reset(_, side):
@@ -199,15 +223,6 @@ def reset(_, side):
         w.set_active(index=0)
     else:
       raise Exception(type(w), "type not recognized")
-
-##########################################################################################
-
-def get_demo_rax_bottom():
-  max_widget_qty = 0
-  for spec_param_dict in shape_names_params_dicts_definition.values():
-    max_widget_qty = max(max_widget_qty, len(spec_param_dict))
-  demo_rax_bottom = (max_widget_qty + len(common_params_dict_definition) + 2) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
-  return demo_rax_bottom
 
 ##################################################################################
 # create shapestyle widgets  
@@ -250,7 +265,7 @@ def update_shape_style(_, side, shapetype, argname):
   argvalue = get_value(style_widgets_side_by_shapetype[side][shapetype][argname])
   style_kwargs = {argname : argvalue}
   shapes_by_side_by_shapetype[side][shapetype].set_style(**style_kwargs)
-  plt.draw()
+  fig.canvas.draw_idle()
 
 ##################################################################################
 def place_shapes_and_widgets(side):
@@ -351,22 +366,6 @@ def place_shapes_and_widgets(side):
 
   switch_active_shapename_given_side(label=my_default_demo_shapes[side], side=side)
   
-
-##########################################################################################
-# Creating the canvas!
-plot_ax_left   = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
-plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap']
-ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
-fig.add_axes(ax)
-
-create_canvas_and_axes(canvas_width=canvas_width,
-                            canvas_height=canvas_height, 
-                            tick_step=figure_params['tick_step'],
-                            title="Try Out Shapes",
-                            title_font_size=figure_params['font_size']*1.5,
-                            axes_label_font_size=figure_params['font_size'],
-                            axes_tick_font_size=figure_params['font_size'],
-                            axes=ax)
 
 # placing the shapes and widgets
 for side in sides:
