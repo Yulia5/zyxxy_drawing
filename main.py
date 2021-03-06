@@ -1,4 +1,4 @@
-import  zyxxy_shape_demo     
+import zyxxy_shape_demo     
 
 
 from zyxxy_all_EXAMPLES import *

@@ -59,6 +59,8 @@ shapes_by_side_by_shapetype = {side : {st : None for st in shape_types} for side
 common_widgets_by_side = {side : {} for side in sides}
 specific_widgets_by_side_by_shapename = {side : {} for side in sides}
 style_widgets_side_by_shapetype = {side : {st : {'text' : []} for st in shape_types} for side in sides}
+shape_switchers = {side : None for side in sides}
+buttons = {side : None for side in sides}
 
 ##########################################################################################
 # create the figure
@@ -289,9 +291,9 @@ def place_shapes_and_widgets(side):
   rax_left = widget_params['radio_side_margin'] * 2 + widget_params['radio_width']
   if side != 'left':
     rax_left = 1 - widget_params['radio_width'] - rax_left
-  _, shape_switcher_side, _ = add_radio_buttons(rb_options=[k for k in shape_names_params_dicts_definition.keys()], w_left=rax_left, w_bottom=get_demo_rax_bottom(), w_caption="shapenames", active_option=my_default_demo_shapes[side])
+  _, shape_switchers[side], _ = add_radio_buttons(rb_options=[k for k in shape_names_params_dicts_definition.keys()], w_left=rax_left, w_bottom=get_demo_rax_bottom(), w_caption="shapenames", active_option=my_default_demo_shapes[side])
 
-  shape_switcher_side.on_clicked(functools.partial(switch_active_shapename_given_side, side=side) )
+  shape_switchers[side].on_clicked(functools.partial(switch_active_shapename_given_side, side=side) )
 
   # adding common form parameters sliders 
   default_widget_width = widget_params['width']
@@ -300,8 +302,8 @@ def place_shapes_and_widgets(side):
   w_left =  figure_params['widget_lefts'][side]
 
   new_bottom, b_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
-  button = Button(ax=b_axes, label='Reset')
-  button.on_clicked(functools.partial(reset, side=side))
+  buttons[side] = Button(ax=b_axes, label='Reset')
+  buttons[side].on_clicked(functools.partial(reset, side=side))
    
   _cpdd = [[key, value] for key, value in common_params_dict_definition.items()]
   for param_name, slider_range_name in _cpdd[::-1]:

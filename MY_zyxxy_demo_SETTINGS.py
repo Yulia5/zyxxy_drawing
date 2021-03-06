@@ -41,7 +41,7 @@ my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'linewidth' : 5
                          "right": {"line" : {"colour" : 'blue'}, 
                                    "patch" : {"colour" : 'blue', 'opacity' : 0.5}, 
                                    'outline': {},
-                                   'diamond': {"colour" : 'red'}}}
+                                   'diamond': {"colour" : 'blue'}}}
 
 demo_style_widgets_value_ranges = {"colour"    : ['yellow', 'blue', 'red', 'green', 'black'],
                                    "layer_nb"  : [0, 3, 1, 1],
