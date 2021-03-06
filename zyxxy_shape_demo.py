@@ -82,17 +82,18 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option):
                                         w_height=widget_params['height']*len(rb_options))
 
   active = 1 if active_option is None else rb_options.index(active_option)
-  result = RadioButtons(rax, rb_options, active=active)
+  result = RadioButtons(rax, rb_options, active=active, activecolor='black')
 
   added_text = fig.text(w_left, new_bottom, w_caption)
   new_bottom += widget_params['height'] + widget_params['gap']
 
   return new_bottom, result, added_text
 
-def add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
-  
+def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
+  _, sax = get_axes_for_widget(w_left=w_left, 
+                                        w_bottom=w_bottom)
   label = w_caption if caption_in_the_same_line else ""
-  result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], **slider_qwargs)
+  result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], color='black', **slider_qwargs)
 
   new_bottom = sax.get_position().ymax + widget_params['gap']
   if caption_in_the_same_line:
@@ -102,11 +103,6 @@ def add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=True, **slide
     new_bottom += widget_params['height'] + widget_params['gap']
 
   return new_bottom, result, added_text
-
-def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
-  new_bottom, sax = get_axes_for_widget(w_left=w_left, 
-                                        w_bottom=w_bottom)
-  return add_a_slider2(sax, w_caption, s_vals, caption_in_the_same_line=caption_in_the_same_line, **slider_qwargs)
 
 def resize_1_checkbox(a_checkbox, left, bottom, width, height):
   r = a_checkbox.rectangles[0]
@@ -137,7 +133,6 @@ def get_active_shape(side):
   _shape = shapes_by_side_by_shapetype[side][get_active_shapetype(side=side)]
   return _shape
 
-##########################################################################################
 ##########################################################################################
 def update_shape_form_given_side(_, side):
 
@@ -177,7 +172,7 @@ def update_visibility(side, switch_on):
 
 ##########################################################################################
 def switch_active_shapename_given_side(label, side):
-  
+  print(label)
   update_visibility(side=side, switch_on=False)
   active_shapename[side] = label
   update_visibility(side=side, switch_on=True)
@@ -203,19 +198,6 @@ def reset(_, side):
     else:
       raise Exception(type(w), "type not recognized")
 
-  
-def set_widget_colour(a_widget, new_colour):
-  if isinstance(a_widget, Slider):
-    a_widget.color = new_colour
-  elif isinstance(a_widget, CheckButtons):
-    for a_line in a_widget.lines[0]: 
-      a_line.set_color(new_colour)
-  elif isinstance(a_widget, RadioButtons):
-    a_widget.activecolor = new_colour
-    a_widget.value_selected = a_widget.value_selected # to activate new colour
-  else:
-    raise Exception(type(a_widget), "type not recognized")
-
 ##########################################################################################
 
 def get_demo_rax_bottom():
@@ -228,14 +210,15 @@ def get_demo_rax_bottom():
 ##################################################################################
 # create shapestyle widgets  
 
-def place_style_widgets(side, arg_category, w_left, w_bottom):
+def place_style_widgets(side, shapetype, arg_category, w_left, w_bottom):
 
   captions_init_values = my_default_demo_style[side][arg_category]
-  for key, value in my_default_colour_etc_settings[arg_category].items():
-    if key not in captions_init_values:
-      captions_init_values[key] = value
+  if arg_category != 'diamond':
+    for key, value in my_default_colour_etc_settings[arg_category].items():
+      if key not in captions_init_values:
+        captions_init_values[key] = value
 
-  result = {'text' : []}
+  where_to_add =  style_widgets_side_by_shapetype[side][shapetype] # a shortcut
   for argname, init_value in captions_init_values.items():
     w_options = demo_style_widgets_value_ranges[argname]
     
@@ -245,33 +228,26 @@ def place_style_widgets(side, arg_category, w_left, w_bottom):
     else:
       func_name = functools.partial(add_radio_buttons, rb_options=w_options, active_option=init_value)
 
-    prefixed_caption = argname if arg_category != "outline" else "outline_"+argname
-    w_bottom, result[prefixed_caption], added_text = func_name(w_left=w_left, w_bottom=w_bottom, w_caption=prefixed_caption)
+    prefixed_caption = argname if arg_category not in ["diamond", "outline"] else arg_category+"_"+argname
+    w_bottom, where_to_add[prefixed_caption], added_text = func_name(w_left=w_left, w_bottom=w_bottom, w_caption=prefixed_caption)
 
-    shapetype = arg_category if arg_category != "outline" else "patch"
     on_click_or_change = functools.partial(update_shape_style, side=side, shapetype=shapetype, argname=prefixed_caption)
-    if isinstance(result[prefixed_caption], RadioButtons):
-      result[prefixed_caption].on_clicked(on_click_or_change)
-    elif isinstance(result[prefixed_caption], Slider):
-      result[prefixed_caption].on_changed(on_click_or_change)
+    if isinstance(where_to_add[prefixed_caption], RadioButtons):
+      where_to_add[prefixed_caption].on_clicked(on_click_or_change)
+    elif isinstance(where_to_add[prefixed_caption], Slider):
+      where_to_add[prefixed_caption].on_changed(on_click_or_change)
 
     if added_text is not None:
-      result['text'].append(added_text)
+      where_to_add['text'].append(added_text)
 
-  return w_bottom, result
+  return w_bottom
+
+##########################################################################################
 
 def update_shape_style(_, side, shapetype, argname):
   argvalue = get_value(style_widgets_side_by_shapetype[side][shapetype][argname])
   style_kwargs = {argname : argvalue}
   shapes_by_side_by_shapetype[side][shapetype].set_style(**style_kwargs)
-  if argname == "colour":
-    shapes_by_side_by_shapetype[side][shapetype].set_style(diamond_colour=argvalue)
-    all_widgets_on_this_side = [w for w in common_widgets_by_side[side].values()]
-    all_widgets_on_this_side+= [w for k, w in style_widgets_side_by_shapetype[side][shapetype].items() if k != "text"]
-    for shapewidgets in specific_widgets_by_side_by_shapename[side].values():
-      all_widgets_on_this_side += [w for w in shapewidgets.values()]
-    for a_widget in all_widgets_on_this_side:
-      set_widget_colour(a_widget=a_widget, new_colour=argvalue)
   plt.draw()
 
 ##################################################################################
@@ -281,25 +257,32 @@ def place_shapes_and_widgets(side):
 
   # adding style widgets
   global default_widget_width
-  default_widget_width = widget_params['radio_width'] 
+  default_widget_width = widget_params['radio_width'] * .9
   w_left =  widget_params['radio_side_margin']
   if side == "right":
     w_left = 1 - widget_params['radio_width'] - widget_params['radio_side_margin']
 
-  _, style_widgets_side_by_shapetype[side]["line"] = place_style_widgets(side=side, arg_category='line', 
-                                                                         w_left=w_left+0.00001, 
-                                                                         w_bottom=figure_params['plot_bottom_gap'])
+  new_bottom = place_style_widgets( side=side, shapetype='line', arg_category='diamond', 
+                                    w_left=w_left, 
+                                    w_bottom=figure_params['plot_bottom_gap']+0.00001)
 
-  new_bottom, style_widgets_side_by_shapetype[side]["patch"]= place_style_widgets(
-                                                                         side=side, arg_category='outline', 
-                                                                         w_left=w_left, 
-                                                                         w_bottom=figure_params['plot_bottom_gap'])
+  _ = place_style_widgets(          side=side, shapetype='line', arg_category='line', 
+                                    w_left=w_left, 
+                                    w_bottom=new_bottom)
+  
 
-  _, more_patch_style_widgets = place_style_widgets(                     side=side, arg_category='patch', 
-                                                                         w_left=w_left, 
-                                                                         w_bottom=new_bottom)
-  for key, value in more_patch_style_widgets.items():
-    style_widgets_side_by_shapetype[side]["patch"][key] = value
+  new_bottom = place_style_widgets( side=side, shapetype='patch', arg_category='diamond', 
+                                    w_left=w_left, 
+                                    w_bottom=figure_params['plot_bottom_gap'])
+
+  new_bottom = place_style_widgets( side=side, shapetype='patch', arg_category='outline', 
+                                    w_left=w_left, 
+                                    w_bottom=new_bottom)
+
+  _          = place_style_widgets( side=side, shapetype='patch', arg_category='patch', 
+                                    w_left=w_left, 
+                                    w_bottom=new_bottom)
+
 
   # adding shapename switchers
   default_widget_width = widget_params['radio_width']
@@ -307,8 +290,7 @@ def place_shapes_and_widgets(side):
   if side != 'left':
     rax_left = 1 - widget_params['radio_width'] - rax_left
   _, shape_switcher_side, _ = add_radio_buttons(rb_options=[k for k in shape_names_params_dicts_definition.keys()], w_left=rax_left, w_bottom=get_demo_rax_bottom(), w_caption="shapenames", active_option=my_default_demo_shapes[side])
-  shape_switcher_side.activecolor = 'black'
-  
+
   shape_switcher_side.on_clicked(functools.partial(switch_active_shapename_given_side, side=side) )
 
   # adding common form parameters sliders 
@@ -323,8 +305,7 @@ def place_shapes_and_widgets(side):
    
   _cpdd = [[key, value] for key, value in common_params_dict_definition.items()]
   for param_name, slider_range_name in _cpdd[::-1]:
-    new_bottom, w_axes = get_axes_for_widget(w_bottom=new_bottom, w_left=w_left)
-    _, c_slider, _ = add_a_slider2(w_axes,
+    new_bottom, c_slider, _ = add_a_slider( w_bottom=new_bottom, w_left=w_left,
                                    w_caption=param_name, 
                                    s_vals=np.copy(slider_range[slider_range_name]))
     c_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
@@ -349,14 +330,12 @@ def place_shapes_and_widgets(side):
         param_params = np.copy(slider_range[param_name_range[0]]) 
         param_params[2] = param_name_range[1] 
    
-      _, s_slider, _ = add_a_slider(w_left=w_left,
+      w_bottom, s_slider, _ = add_a_slider(w_left=w_left,
                                               w_bottom=w_bottom,
                                               w_caption=param_name, 
                                               s_vals=param_params)
       s_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
       specific_widgets_by_side_by_shapename[side][shapename][param_name] = s_slider
-
-      w_bottom += widget_params['height']+widget_params['gap']
 
   # ... and update the visibility and style!
   for shapename in shape_names_params_dicts_definition.keys():

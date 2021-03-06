@@ -36,10 +36,12 @@ my_default_demo_shapes = {"left" : "a_square", "right" : "a_triangle"}
 
 my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'linewidth' : 5}, 
                                    "patch"  : {"colour" : 'red', 'opacity' : 1.0}, 
-                                   'outline': {'linewidth' : 5}},
+                                   'outline': {'linewidth' : 5},
+                                   'diamond': {"colour" : 'red'}},
                          "right": {"line" : {"colour" : 'blue'}, 
                                    "patch" : {"colour" : 'blue', 'opacity' : 0.5}, 
-                                   'outline': {}}}
+                                   'outline': {},
+                                   'diamond': {"colour" : 'red'}}}
 
 demo_style_widgets_value_ranges = {"colour"    : ['yellow', 'blue', 'red', 'green', 'black'],
                                    "layer_nb"  : [0, 3, 1, 1],
