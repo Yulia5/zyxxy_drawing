@@ -23,9 +23,14 @@ tolerance = 0.0001
 full_turn_angle = 12 # 12 for hours
 
 ##################################################################
+
+def is_number(val):
+  return isinstance(val, (int, float, np.float64))
+
+##################################################################
 def is_the_same_point(p1, p2):
   diff = p1 - p2
-  if isinstance(diff, (int, float)):
+  if is_number(diff):
     sqr_dist = diff**2
   else:
     sqr_dist = np.sum(diff**2) 
@@ -45,10 +50,21 @@ def rotate_point(point, diamond, turn):
   return [diamond[0] + diff_0 * cos_turn + diff_1 * sin_turn,
           diamond[1] - diff_0 * sin_turn + diff_1 * cos_turn] 
 
-def stretch_something(what_to_stretch, diamond, stretch_coeff):
+def _stretch_something(what_to_stretch, diamond, stretch_coeff):
   if is_the_same_point(stretch_coeff, 1.):
     return what_to_stretch
   result = diamond + (what_to_stretch - diamond) * stretch_coeff
+  return result
+
+def stretch_something(what_to_stretch, diamond, stretch_coeff):
+  if is_number(what_to_stretch[0]):
+    result = np.array([_stretch_something(what_to_stretch=what_to_stretch[i], 
+                                          diamond=diamond[i], 
+                                          stretch_coeff=stretch_coeff[i]) for i in [0, 1]]) 
+  else:
+    result = np.array([[_stretch_something(what_to_stretch=point[i], 
+                                           diamond=diamond[i], 
+                                           stretch_coeff=stretch_coeff[i]) for i in [0, 1]] for point in what_to_stretch]) 
   return result
 
 ##################################################################
@@ -82,3 +98,10 @@ def acos_hours(cos_value):
   return math.acos(cos_value) / (2 * math.pi) * full_turn_angle
 def atan_hours(tan_value):
   return math.atan(tan_value) / (2 * math.pi) * full_turn_angle
+
+########################################################################
+
+def raise_Exception_if_not_processed(kwarg_keys, allowed_keys):
+  not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in allowed_keys]
+  if len(not_processed) > 0:
+    raise Exception("Arguments", ', '.join(not_processed), " are not recognised")

@@ -18,9 +18,9 @@ import numpy as np
 from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
 from zyxxy_utils import rotate_point, stretch_something
-from zyxxy_shape_style import set_patch_style, set_line_style, raise_Exception_if_not_processed, get_diamond_size, format_arg_dict
+from zyxxy_shape_style import set_patch_style, set_line_style, get_diamond_size, format_arg_dict
 from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
-
+from zyxxy_shape_style import raise_Exception_if_not_processed
 
 ##################################################################
 def _get_xy(something):
@@ -81,15 +81,19 @@ class Shape:
         set_patch_style(_attr, **my_default_colour_etc_settings[attr_name])
 
     self.clip_patches = []
-    self.move_history = []
-    self.shape_kwargs = None
+    self.move_history = {'flip' : False, 'stretch_x' : 1., 'stretch_y' : 1., 'turn' : 0}
+    self.shape_kwargs = {}
     self.shapename = None
+
+##################################################################
 
   def set_visible(self, s):
     for attr_name in format_arg_dict.keys():
       _attr = getattr(self, attr_name)
       if _attr is not None:
         _attr.set_visible(s)   
+
+##################################################################
 
   def set_style(self, **kwargs):
 
@@ -115,15 +119,18 @@ class Shape:
 
       used_args += [prefix + k for k in _kwargs.keys()]
 
-    raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=used_args)
+    raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), allowed_keys=used_args)
 
+##################################################################
 
   def update_xy_by_shapename(self, shapename, **kwargs):
     if isinstance(shapename, str):
       method_to_call = getattr(zyxxy_coordinates, 'build_'+shapename)
       contour = method_to_call(**kwargs)
+      self.shapename = shapename
+      self.shape_kwargs = kwargs
     else:
-      contour = shapename
+      contour = shapename # assume that it's an array of coordinates
 
     # updating the elements
     for what in [self.line, self.outline, self.patch]:
@@ -133,21 +140,48 @@ class Shape:
     # updating the diamond
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
 
+##################################################################
+
+  def update_shape_parameters(self, **kwargs):
+    for key, value in kwargs.items():
+      self.shape_kwargs[key] = value
+
+    method_to_call = getattr(zyxxy_coordinates, 'build_'+self.shapename)
+    contour = method_to_call(**kwargs)
+    for what in [self.line, self.outline, self.patch]:
+      if what is not None:
+        _set_xy(what, contour)
+
+    self.move(**self.move_history) # correct for clipping contours
+
+    shift = self.diamond_coords # self.shift will restore the value of self.diamond_coords
+    self.update_diamond(new_diamond_coords = [0., 0.])
+    self.shift(shift=shift)
+
+##################################################################
+
   def move(self, **kwargs_common):
     if 'flip' in kwargs_common and kwargs_common['flip']:
       self.flip()
-    diamond = [0., 0.]
-    if 'diamond_x' in kwargs_common:
-      diamond[0] = kwargs_common['diamond_x']
-    if 'diamond_y' in kwargs_common:
-      diamond[1] = kwargs_common['diamond_y']
-    self.set_new_diamond_and_shift(new_diamond_coords=diamond)
+
+    stretch = [1., 1.]
     if 'stretch_x' in kwargs_common:
-      self.stretch(stretch_x=kwargs_common['stretch_x'], stretch_y=1)
+      stretch[0] = kwargs_common['stretch_x']
     if 'stretch_y' in kwargs_common:
-      self.stretch(stretch_x=1, stretch_y=kwargs_common['stretch_y'])
+      stretch[1] = kwargs_common['stretch_y']
+    self.stretch(stretch_x=stretch[0], stretch_y=stretch[1])
+
     if 'turn' in kwargs_common:
       self.rotate(turn=kwargs_common['turn'])
+
+    shift = [0., 0.]
+    if 'diamond_x' in kwargs_common:
+      shift[0] = kwargs_common['diamond_x']
+    if 'diamond_y' in kwargs_common:
+      shift[1] = kwargs_common['diamond_y']
+    self.shift(shift=shift)
+
+##################################################################
 
   def get_xy(self):
     if self.patch is not None:
@@ -155,6 +189,8 @@ class Shape:
     if self.line is not None:
       return _get_xy(self.line)
     raise Exception("Unable to identify xy")
+
+##################################################################
 
   def clip(self, clip_outline):
     for what in [self.patch, self.line, self.outline]:
@@ -172,6 +208,8 @@ class Shape:
       what.set_clip_path(clip_patch)
 
       self.clip_patches.append(clip_patch)
+
+##################################################################
   
   def update_diamond(self, new_diamond_coords):
     self.diamond_coords = np.array(new_diamond_coords)
@@ -179,8 +217,12 @@ class Shape:
       _set_xy(something=self.diamond, 
               xy=self.diamond_coords+self.diamond_contour)
 
+##################################################################
+
   def get_what_to_move(self):
     return [self.line, self.patch, self.outline] + self.clip_patches
+
+##################################################################
 
   def flip(self):
     what_to_move = self.get_what_to_move()
@@ -191,9 +233,12 @@ class Shape:
       xy[:, 1] = 2 * self.diamond_coords[1] - xy[:, 1]
       _set_xy(something=something, xy=xy)
 
+    self.move_history['flip'] = not self.move_history['flip']
+    self.move_history['turn'] =   - self.move_history['turn']
+
+##################################################################
+
   def shift(self, shift):
-    if shift is None:
-      return
     what_to_move = self.get_what_to_move()
     for something in what_to_move:
       if something is None:
@@ -203,60 +248,46 @@ class Shape:
       _set_xy(something=something, xy=xy)
     self.update_diamond(new_diamond_coords = self.diamond_coords + shift)
 
-  def set_new_diamond_and_shift(self, new_diamond_coords):
-    if new_diamond_coords is None:
-      return
-    shift = -self.diamond_coords + new_diamond_coords
-    what_to_move = self.get_what_to_move()
-    for something in what_to_move:
-      if something is None:
-        continue
-      xy = _get_xy(something=something)
-      xy += shift
-      _set_xy(something=something, xy=xy)
-    self.update_diamond(new_diamond_coords = new_diamond_coords)
+##################################################################
 
   def rotate(self, turn, diamond_override = None):
-    if (turn is None) or (turn == 0):
+    if turn == 0:
       return
-    if diamond_override is not None:
-      diamond_to_use = diamond_override
-      rotate_point(point=self.diamond_coords, diamond=diamond_override, turn=turn)
-    else:
-      diamond_to_use = self.diamond_coords
-      
+
     what_to_move = self.get_what_to_move()
     for something in what_to_move:
       if something is None:
         continue
       xy = _get_xy(something=something)
-      xy = np.array([rotate_point(point=point, diamond=diamond_to_use, turn=turn) for point in xy])
+      xy = np.array([rotate_point(point=point, diamond=self.diamond_coords, turn=turn) for point in xy])
       _set_xy(something=something, xy=xy)
+
+    if diamond_override is not None:
+      shift = - self.diamond_coords + rotate_point(
+                                point=self.diamond_coords, diamond=diamond_override, turn=turn)
+      self.shift(shift=shift)
+
+    self.move_history['turn'] += turn
+
+##################################################################
 
   def stretch(self, stretch_x, stretch_y, diamond_override = None):
-    if diamond_override is not None:
-      diamond_to_use = diamond_override
-      self.diamond_coords[0] = stretch_something(what_to_stretch=self.diamond_coords[0], 
-                                                 diamond=diamond_to_use[0], 
-                                                 stretch_coeff=stretch_x)
-      self.diamond_coords[1] = stretch_something(what_to_stretch=self.diamond_coords[1], 
-                                                 diamond=diamond_to_use[1], 
-                                                 stretch_coeff=stretch_y)
-    else:
-      diamond_to_use = self.diamond_coords
 
     what_to_move = self.get_what_to_move()
     for something in what_to_move:
       if something is None:
         continue
       xy = _get_xy(something=something)
-      xy[:, 0] = stretch_something(what_to_stretch=xy[:, 0], 
-                                                 diamond=diamond_to_use[0], 
-                                                 stretch_coeff=stretch_x)
-      xy[:, 1] = stretch_something(what_to_stretch=xy[:, 1], 
-                                                 diamond=diamond_to_use[1], 
-                                                 stretch_coeff=stretch_y)
+      xy = stretch_something(what_to_stretch=xy, 
+                             diamond=self.diamond_coords, 
+                             stretch_coeff=[stretch_x, stretch_y])
       _set_xy(something=something, xy=xy)
+
+    if diamond_override is not None:
+      shift = - self.diamond_coords + stretch_something(what_to_stretch=self.diamond_coords, 
+                                                 diamond=diamond_override, 
+                                                 stretch_coeff=[stretch_x, stretch_y])
+      self.shift(shift=shift)                                                 
   
 ########################################################################
 # handling shapes per layers

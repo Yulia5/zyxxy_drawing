@@ -17,6 +17,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
 from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings, my_default_diamond_size
+from zyxxy_utils import raise_Exception_if_not_processed
 
 ########################################################################
 # as defined by matplotlib
@@ -31,7 +32,7 @@ patch_arg_types= ["colour", "layer_nb", "opacity"]
 format_arg_dict = { "line"    : line_arg_types, 
                     "patch"   : patch_arg_types, 
                     "outline" : line_arg_types,
-                    "diamond" : patch_arg_types}
+                    "diamond" : patch_arg_types }
 
 _default_arguments = my_default_colour_etc_settings
 _show_diamond = True
@@ -157,13 +158,7 @@ def set_default_outline_style(**kwargs):
 def _set_default_style(what, **kwargs):
   global _default_arguments
   raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), 
-                                   processed_keys=_default_arguments[what].keys())
+                                   allowed_keys=_default_arguments[what].keys())
   for ua in kwargs.keys():
     _default_arguments[what][ua] = kwargs[ua]
 
-########################################################################
-
-def raise_Exception_if_not_processed(kwarg_keys, processed_keys):
-  not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in processed_keys]
-  if len(not_processed) > 0:
-    raise Exception("Arguments", ', '.join(not_processed), " are not recognised")
