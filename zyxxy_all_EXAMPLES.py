@@ -72,14 +72,14 @@ def example_animation_for_Zyxxy_the_mouse(left_eye_white, right_eye_white, left_
 #########################################################
 ## YELLOW CAT                                          ##
 #########################################################
-def example_yellow_cat(axes=None):
+def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'SeaWave'):
   #######################################################
   ## CREATING THE DRAWING!                             ##
   #######################################################
   ## Creating the canvas!                              ##  
   axes = create_canvas_and_axes(canvas_width = 120,
                                 canvas_height = 120,
-                                background_colour = 'SeaWave', 
+                                background_colour = background_colour, 
                                 axes = axes)
   #######################################################
   # Now let's draw the shapes!                         ##
@@ -87,7 +87,7 @@ def example_yellow_cat(axes=None):
    # settings
   set_default_outline_style(linewidth=2)
   set_default_line_style(linewidth=2)
-  set_default_patch_style(colour='Yellow')#darkorange
+  set_default_patch_style(colour=cat_colour)#darkorange
 
   # the tail
   tail_length = [30, 22, 20, 12, 10]

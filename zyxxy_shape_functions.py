@@ -77,7 +77,7 @@ def draw_a_shape(ax, shapename, **kwargs):
     shapetype = kwargs['shapetype']
     param_names_used += ['shapetype']
 
-  _shape = Shape(ax=ax, shapetype=shapetype, defaults_for_demo=False)
+  _shape = Shape(ax=ax, shapetype=shapetype)
 
   # get colour params
   colour_etc_kwargs = extract_colour_etc_kwargs(kwargs)
@@ -99,7 +99,7 @@ def draw_a_shape(ax, shapename, **kwargs):
   _shape.move(**kwargs_common)
   param_names_used += used_common_keys
 
-  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), processed_keys=param_names_used)
+  raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), allowed_keys=param_names_used)
   
   return _shape
 

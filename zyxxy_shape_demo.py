@@ -108,7 +108,7 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option):
                                         w_bottom=w_bottom, 
                                         w_height=widget_params['height']*len(rb_options))
 
-  rax.set_aspect('auto')
+  #rax.set_aspect('auto')
 
   active = 1 if active_option is None else rb_options.index(active_option)
   result = RadioButtons(rax, rb_options, active=active, activecolor='black')
@@ -117,7 +117,7 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option):
   new_bottom += widget_params['height'] + widget_params['gap']
 
   for circle in result.circles: # adjust radius here. The default is 0.05
-    circle.set_radius(widget_params['height']/2.)
+    pass # circle.set_radius(widget_params['height']/2.)
 
   return new_bottom, result, added_text
 

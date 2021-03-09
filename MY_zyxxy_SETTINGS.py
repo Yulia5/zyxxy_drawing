@@ -59,7 +59,7 @@ my_default_colour_etc_settings = {
 
 my_default_background_settings =  {'fc' : 'none', 
                                    'ec' : 'none',
-                                   'layer_nb' : -1000,
+                                   'zorder' : -1000,
                                    'alpha' : 1}   
 
 my_default_diamond_size = 0.015         
