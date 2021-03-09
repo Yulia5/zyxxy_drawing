@@ -104,11 +104,6 @@ def build_a_rectangle(width, height, left=None, centre_x=None, right=None, botto
   if len(errorMsg) != 0:
     raise Exception('; '.join(errorMsg))
 
-  diamond_best_guess = [0, 0]
-  if centre_x is not None:
-    diamond_best_guess[0] = centre_x
-  if centre_y is not None:
-    diamond_best_guess[1] = centre_y
   # defining coordinates that are undefined - x
   if left is not None:
     centre_x = left + width / 2
@@ -136,7 +131,6 @@ def build_a_rectangle(width, height, left=None, centre_x=None, right=None, botto
     bottom, top = - height / 2, height / 2
  
   contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]])
-  contour_array -= diamond_best_guess
   return contour_array
 
 # a segment ######################################################

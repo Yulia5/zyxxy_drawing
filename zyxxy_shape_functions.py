@@ -106,8 +106,8 @@ def draw_a_shape(ax, shapename, **kwargs):
 # code for three special draw_* functions
 def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None, ax=None, **kwargs):
   contour = zyxxy_coordinates.build_a_rectangle(width=width, height=height, 
-    left_x=left, centre_x=centre_x, right_x=right, bottom_y=bottom, centre_y=centre_y, top_y=top)
-  result = draw_a_shape(ax=ax, shapename=contour, **kwargs)
+    left=left, centre_x=centre_x, right=right, bottom=bottom, centre_y=centre_y, top=top)
+  result = draw_a_shape(ax=ax, shapename=contour, shapetype="patch", **kwargs)
   return result
 
 def draw_a_broken_line(contour, ax=None, **kwargs):

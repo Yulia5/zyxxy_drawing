@@ -66,11 +66,16 @@ def create_canvas_and_axes(canvas_width,
 
   axes.set_title(title, fontdict={'size': title_font_size})
 
-  if make_symmetric:
+  assert make_symmetric in ['x', 'y', True, False]
+
+  if make_symmetric in ['x', True]:
     left_x, right_x = -canvas_width/2, canvas_width/2
-    bottom_y, top_y = -canvas_height/2, canvas_height/2
   else:
     left_x, right_x = 0, canvas_width
+
+  if make_symmetric in ['y', True]: 
+    bottom_y, top_y = -canvas_height/2, canvas_height/2
+  else:
     bottom_y, top_y = 0, canvas_height
 
   # show diamond points and grid and axis if and only if tick_step is set
