@@ -188,10 +188,10 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
     
     # eye narrowing
     k = i - 4 * nb_head_tilts
-    if 0 <= k <= 2 * nb_eye_narrowing:
-      new_depth = 8 - (nb_eye_narrowing - abs(k-nb_eye_narrowing)) * depth_diff
+    if 0 <= k < 2 * nb_eye_narrowing:
+      depth_shift = (1 if k < nb_eye_narrowing else -1) * depth_diff
       for eye in eyes:
-        eye.update_shape_parameters(depth_1=-new_depth, depth_2=new_depth)
+        eye.shift_shape_parameters(depth_1=-depth_shift, depth_2=depth_shift)
 
     # smile
     s = k - 2 * nb_eye_narrowing - 1
@@ -313,7 +313,7 @@ def example_croc(axes=None):
   eyelid_width = 12
   for eye_x in [right_body, right_body+12]:
     for td in [-1, 1]:
-      mid_y = eye_y + td * eyelid_width / 2
+      mid_y = td * eyelid_width / 2
       eyelid = draw_an_eye(ax=axes, centre_x=eye_x, centre_y=eye_y, width=eyelid_width, depth_1=mid_y, depth_2=mid_y, colour='green')
       eyelids.append(eyelid)
 
@@ -330,14 +330,15 @@ def example_croc(axes=None):
   lipline_arc = build_an_arc(radius=lip_r, angle_start=6, angle_end=9) + [right_body-lip_r, lip_y+lip_r]
   lipline = link_contours([[right_head, lip_y]], lipline_arc)
   draw_a_broken_line(ax=axes, contour=lipline, colour='green', linewidth=2)
+
   upper_jaw_diamond = [right_body-lip_r, lip_y+lip_r]
 
-  return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond
+  return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond
 
 
 def example_animated_croc(axes=None):
 
-  leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, eyelid_width, upper_jaw_diamond = example_croc(axes=axes)
+  leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond = example_croc(axes=axes)
 
   nb_blinks = 2
   blink_frames = 3
@@ -352,12 +353,7 @@ def example_animated_croc(axes=None):
   size_jump = 20
   nb_wait_frames = 2
 
-  
-  for td in [-1, 1]:
-        depth_1=td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1) 
-
-
-  one_eyelid_blick = [i for i in range(blink_frames)] + [(blink_frames-1-i) for i in range(blink_frames)]
+  one_eyelid_blick = [-1.] * blink_frames + [1] * blink_frames
 
   one_jaw_turn = [-1.] * jaw_frames + [1] * jaw_frames
 
@@ -383,9 +379,8 @@ def example_animated_croc(axes=None):
     # eyelid blink  
     if i < (2 * blink_frames) * nb_blinks:
       i2 = i % (2 * blink_frames)
-      new_depth = 8 - (nb_eye_narrowing - abs(i2-nb_eye_narrowing)) * depth_diff
       for eyelid in eyelids:
-        eyelid.update_shape_parameters(depth_1=-new_depth, depth_2=new_depth)
+        eyelid.shift_shape_parameters(depth_1=-one_eyelid_blick[i2])
 
     t = i - (2 * blink_frames) * nb_blinks
     if 0 <= t < 2 * jaw_frames * nb_jaw_openings:
