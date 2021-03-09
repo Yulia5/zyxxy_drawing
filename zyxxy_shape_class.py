@@ -44,6 +44,43 @@ def _set_xy(something, xy):
 ##################################################################
 
 class Shape:
+
+########################################################################
+# handling shapes per layers
+########################################################################
+  all_shapes = []
+
+  def get_all_shapes_in_layers(*args_layer_nb):
+    if len(args_layer_nb) == 0:
+      _shapes = Shape.all_shapes
+    else:
+      _shapes = [sh for sh in Shape.all_shapes if sh.get_layer_nb() in args_layer_nb]
+    return _shapes
+
+  def get_all_polygons_in_layers(*args_layer_nb):
+    _shapes = Shape.get_all_shapes_in_layers(*args_layer_nb)
+    result = []
+    for _sh in _shapes:
+      result += _sh.get_what_to_move()
+    return result
+
+  def shift_layer(shift, layer_nbs):
+    _shapes = Shape.get_all_shapes_in_layers(*layer_nbs)
+    for shape in _shapes:
+      shape.shift(shift=shift)
+
+  def rotate_layer(turn, diamond, layer_nbs):
+    _shapes = Shape.get_all_shapes_in_layers(*layer_nbs)
+    for shape in _shapes:
+      shape.rotate(turn=turn, diamond_override=diamond)
+
+  def stretch_layer(diamond, stretch_x=1., stretch_y=1., layer_nbs=[]):
+    _shapes = Shape.get_all_shapes_in_layers(*layer_nbs)
+    for shape in _shapes:
+      shape.stretch(diamond_override=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
+
+ ################################################################## 
+
   def __init__(self, ax, shapetype):
 
     self.diamond_coords = np.array([0, 0])
@@ -84,6 +121,7 @@ class Shape:
     self.move_history = {'flip' : False, 'stretch_x' : 1., 'stretch_y' : 1., 'turn' : 0}
     self.shape_kwargs = {}
     self.shapename = None
+    Shape.all_shapes.append(self)
 
 ##################################################################
 
@@ -143,11 +181,12 @@ class Shape:
 ##################################################################
 
   def update_shape_parameters(self, **kwargs):
+    
     for key, value in kwargs.items():
       self.shape_kwargs[key] = value
-
+    
     method_to_call = getattr(zyxxy_coordinates, 'build_'+self.shapename)
-    contour = method_to_call(**kwargs)
+    contour = method_to_call(**self.shape_kwargs)
     for what in [self.line, self.outline, self.patch]:
       if what is not None:
         _set_xy(what, contour)
@@ -192,6 +231,15 @@ class Shape:
 
 ##################################################################
 
+  def get_layer_nb(self):
+    if self.patch is not None:
+      return self.patch.zorder
+    if self.line is not None:
+      return self.line.zorder
+    raise Exception("Unable to identify xy")
+
+##################################################################
+
   def clip(self, clip_outline):
     for what in [self.patch, self.line, self.outline]:
       if what is None:
@@ -220,7 +268,9 @@ class Shape:
 ##################################################################
 
   def get_what_to_move(self):
-    return [self.line, self.patch, self.outline] + self.clip_patches
+    all_candidates = [self.line, self.patch, self.outline] + self.clip_patches
+    result = [r for r in all_candidates if r is not None]
+    return result
 
 ##################################################################
 
@@ -289,45 +339,3 @@ class Shape:
                                                  stretch_coeff=[stretch_x, stretch_y])
       self.shift(shift=shift)                                                 
   
-########################################################################
-# handling shapes per layers
-########################################################################
-
-_all_shapes_per_zorder = {}
-
-def add_to_layer_record(what_to_add):
-  if what_to_add is not None:
-    zorder = what_to_add.get_zorder()
-    if zorder not in _all_shapes_per_zorder:
-      _all_shapes_per_zorder[zorder] = [what_to_add]
-    else:
-      _all_shapes_per_zorder[zorder] += [what_to_add]
-
-def get_all_shapes_in_layers(*args):
-  result = []
-  if len(args) == 0:
-    args = [k for k in _all_shapes_per_zorder.keys() if k>=0]
-  for zorder in args:
-    result += _all_shapes_per_zorder[zorder]
-  return result
-
-def shift_layer(layer_nb, shift):
-  if layer_nb not in _all_shapes_per_zorder:
-    return []
-  for shape in _all_shapes_per_zorder[layer_nb]:
-    shape.rotate(shift=shift)
-  return _all_shapes_per_zorder[layer_nb]
-
-def rotate_layer(layer_nb, turn, diamond):
-  if layer_nb not in _all_shapes_per_zorder:
-    return []
-  for shape in _all_shapes_per_zorder[layer_nb]:
-    shape.rotate(turn=turn, diamond=diamond)
-  return _all_shapes_per_zorder[layer_nb]
-
-def stretch_layer(layer_nb, diamond, stretch_x, stretch_y):
-  if layer_nb not in _all_shapes_per_zorder:
-    return []
-  for shape in _all_shapes_per_zorder[layer_nb]:
-    shape.rotate(diamond=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
-  return _all_shapes_per_zorder[layer_nb]

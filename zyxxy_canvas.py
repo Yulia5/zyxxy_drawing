@@ -138,8 +138,8 @@ def show_drawing_and_save_if_needed(filename=None,
 
   if (animation_func is None) != (nb_of_frames is None):
     raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
-  if (filename is not None) and (filename != ""):
-    if animation_func is None:
+  if animation_func is None:
+    if (filename is not None) and (filename != ""):
       last_dot_position = filename.rfind(".")
       if last_dot_position < 0:
         filename += '.' + image_format
@@ -148,18 +148,20 @@ def show_drawing_and_save_if_needed(filename=None,
       plt.savefig(fname="images_videos/"+filename, 
                   format = filename[last_dot_position+1:],
                   dpi = dpi4saving)
-    else:
-      figure.set_dpi(animation_file_dpi) 
-      figure.set_size_inches(animation_file_figsize)
-      anim = animation.FuncAnimation(
-         fig=figure, 
-         func=animation_func, 
-         init_func=animation_init,  
-         frames=nb_of_frames, 
-         interval=animation_interval,
-         blit=animation_blit, 
-         repeat=animation_repeat)
-      writer = animation.writers[animation_writer](fps=animation_FPS)
+  else:
+    figure.set_dpi(animation_file_dpi) 
+    figure.set_size_inches(animation_file_figsize)
+
+    anim = animation.FuncAnimation( fig=figure, 
+                                    func=animation_func, 
+                                    init_func=animation_init,  
+                                    frames=nb_of_frames, 
+                                    interval=animation_interval,
+                                    blit=animation_blit, 
+                                    repeat=animation_repeat)
+
+    writer = animation.writers[animation_writer](fps=animation_FPS)
+    if (filename is not None) and (filename != ""):
       anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
   figure.set_dpi(current_dpi) 
   figure.set_size_inches(current_figsize)

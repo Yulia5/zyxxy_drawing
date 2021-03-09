@@ -6,7 +6,7 @@ from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer
 from zyxxy_shape_functions import draw_a_circle, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_an_eye
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_circle, build_a_zigzag
-from zyxxy_shape_class import shift_layer, rotate_layer, get_all_shapes_in_layers
+from zyxxy_shape_class import Shape
 
 #########################################################
 ## THE FLAGS                                           ##
@@ -114,9 +114,9 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
   # the ears
   et = 4.5
   draw_a_triangle(ax=axes, tip_x=-30, tip_y=114, height=50, width=30, turn=et)
-  draw_a_triangle(ax=axes, tip_x=-28, tip_y=106, height=40, width=24, colour='black', turn=et)
+  draw_a_triangle(ax=axes, tip_x=-22, tip_y=106, height=40, width=24, colour='black', turn=et)
   draw_a_triangle(ax=axes, tip_x= 30, tip_y=114, height=50, width=30, turn=-et)
-  draw_a_triangle(ax=axes, tip_x= 28, tip_y=106, height=40, width=24, colour='black', turn=-et)
+  draw_a_triangle(ax=axes, tip_x= 22, tip_y=106, height=40, width=24, colour='black', turn=-et)
 
   #head
   head_circle = draw_a_circle(ax=axes, centre_x=0, centre_y=85, radius=25)
@@ -126,24 +126,22 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
 
   # neck
   draw_a_circle(ax=axes, centre_x=0, centre_y=60, radius=1)
+  neck_coords = [0, 60]
 
   # stripes on the face
 
-  stripes = []
   # vertical stripes
   for c, b in [[-10, 101], [-5, 100], [0, 101]]:
     stripe = draw_a_rectangle(ax=axes, centre_x=c, bottom=b, width=3, height=20)
-    stripes += [stripe]
+    stripe.clip(clip_outline = head_circle)
 
   # horizontal stripes
   for c, x in [[70, 16], [75, 15], [80, 18]]:
     stripe_l = draw_a_rectangle(ax=axes, right=-x, centre_y=c, width=20, height=3)
     stripe_r = draw_a_rectangle(ax=axes, left=+x, centre_y=c, width=20, height=3)
-    stripes += [stripe_l, stripe_r]
-
-  for stripe in stripes:
-    stripe.clip(clip_outline = head_circle)
-
+    stripe_l.clip(clip_outline = head_circle)
+    stripe_r.clip(clip_outline = head_circle)
+    
   # eyes
   eyes = []
   for centre_x in [-12, 12]:
@@ -160,9 +158,60 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
 
   # smile
   draw_a_segment(ax=axes, start_x=0, start_y=72, length=7, turn=6)
-  smile = draw_a_smile(ax=axes, centre_x=0, centre_y=72, depth=7, width=20)
+  smile = draw_a_smile(ax=axes, centre_x=0, centre_y=69, depth=4, width=20)
 
-  return head_layer, eyes, smile
+  return head_layer, neck_coords, eyes, smile
+
+
+def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_colour = 'SeaWave'):
+  head_layer, neck_coords, eyes, smile = example_yellow_cat(axes=axes, cat_colour=cat_colour, background_colour=background_colour)
+
+  nb_head_tilts = 3
+  angle_one_head_move = 1/3
+  nb_eye_narrowing = 3
+  depth_diff = 2
+  nb_smile = 6
+  smile_diff = 1/2
+  nb_zoom = 3
+  zoom_factor = 1.1
+
+  # return the list of the shapes that are moved by animation
+  def init():
+    return Shape.get_all_polygons_in_layers()
+
+  def animate(i):
+
+    # head nods
+    if i < 4 * nb_head_tilts:
+      turn = angle_one_head_move if (nb_head_tilts <= i < 3*nb_head_tilts) else -angle_one_head_move
+      Shape.rotate_layer(turn=turn, diamond=neck_coords, layer_nbs=[head_layer])
+    
+    # eye narrowing
+    k = i - 4 * nb_head_tilts
+    if 0 <= k <= 2 * nb_eye_narrowing:
+      new_depth = 8 - (nb_eye_narrowing - abs(k-nb_eye_narrowing)) * depth_diff
+      for eye in eyes:
+        eye.update_shape_parameters(depth_1=-new_depth, depth_2=new_depth)
+
+    # smile
+    s = k - 2 * nb_eye_narrowing - 1
+    if 0 < s <= nb_smile:
+      smile.update_shape_parameters(depth=4+s*smile_diff)
+      smile.shift(shift=[0, smile_diff])
+
+    # zoom
+    z = s - nb_smile - 1
+    if 0 < z <= nb_zoom:
+      Shape.stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90], layer_nbs=[])
+
+    return Shape.get_all_polygons_in_layers()
+
+
+  show_drawing_and_save_if_needed( # filename="croc" , 
+   animation_func = animate,  animation_init = init, nb_of_frames = 4 * nb_head_tilts + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1)
+
+
+    
 
 
 #########################################################
