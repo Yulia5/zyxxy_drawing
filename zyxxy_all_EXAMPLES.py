@@ -177,7 +177,7 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
 
   # return the list of the shapes that are moved by animation
   def init():
-    return Shape.get_all_polygons_in_layers()
+    return Shape.get_all_polygons_in_layers(axes)
 
   def animate(i):
 
@@ -352,72 +352,54 @@ def example_animated_croc(axes=None):
   size_jump = 20
   nb_wait_frames = 2
 
-  # now for the animation!
-  scenarios = {}
-
-  eyelids_all_scenarios = []
-  for eyelid_shape_nb in range(blink_frames):
-    eyelid_depths=[]
-    for eye_x in eyelids:
-      for td in [-1, 1]:
+  
+  for td in [-1, 1]:
         depth_1=td * eyelid_width / 2 * eyelid_shape_nb / (blink_frames-1) 
-        eyelid_depths.append(depth_1)
-    eyelids_all_scenarios.append(eyelid_depths)
+
 
   one_eyelid_blick = [i for i in range(blink_frames)] + [(blink_frames-1-i) for i in range(blink_frames)]
-  all_eyelid_blick_scenarios = np.tile(one_eyelid_blick, nb_blinks)
 
   one_jaw_turn = [-1.] * jaw_frames + [1] * jaw_frames
-  scenarios['jaw_turn'] = np.hstack((
-    [0] * (all_eyelid_blick_scenarios.size),
-    np.tile(one_jaw_turn, nb_jaw_openings)))
 
   one_jump = ([-1.] * prep_jump_frames + 
               [1] * (prep_jump_frames + jump_frames) + 
               [-1] * (prep_jump_frames + jump_frames) + 
               [1] * prep_jump_frames + 
               [0] * nb_wait_frames)
-  scenarios['body_lift'] = np.hstack((
-    [0] * scenarios['jaw_turn'].size, 
-    np.tile(one_jump, nb_jumps)))
 
   one_leg_lift = ([0.] * 2 * prep_jump_frames + 
                 [1] * jump_frames + 
                 [-1] * jump_frames + 
                 [0] * (2*prep_jump_frames + nb_wait_frames))
-  scenarios['leg_lift'] = np.hstack(([0] * scenarios['jaw_turn'].size,
-                                     np.tile(one_leg_lift, nb_jumps)))
 
-  total_nb_of_frames = len(scenarios['leg_lift'])
+  size_shift = size_jump / (prep_jump_frames+jump_frames)
+  size_turn =  max_jaw_opening_angle / jaw_frames
 
-  for key in scenarios.keys():
-    scenarios[key] = np.hstack((scenarios[key], [0] * (total_nb_of_frames - scenarios[key].size)))
-
-  #pad_with_zeros(scenarios['jaw_turn'], total_size=total_nb_of_frames)
-  scenarios['jaw_turn'] *= max_jaw_opening_angle / jaw_frames
-  scenarios['body_lift']*= size_jump / (prep_jump_frames+jump_frames)
-  scenarios['leg_lift'] *= size_jump / (prep_jump_frames+jump_frames)
-
+  # return the list of the shapes that are moved by animation
   def init():
-    # return the list of the shapes that are moved by animation
-    return get_all_shapes_in_layers(0, 1, 2)
+    return Shape.get_all_polygons_in_layers(axes)
 
   def animate(i):
     # eyelid blink  
-    if i < len(all_eyelid_blick_scenarios):
-      for eyelid_nb, eyelid_shape in enumerate(eyelids):
-        eyelid_shape.change_parameter(depth_1=eyelids_all_scenarios[i][eyelid_nb])
+    if i < (2 * blink_frames) * nb_blinks:
+      i2 = i % (2 * blink_frames)
+      new_depth = 8 - (nb_eye_narrowing - abs(i2-nb_eye_narrowing)) * depth_diff
+      for eyelid in eyelids:
+        eyelid.update_shape_parameters(depth_1=-new_depth, depth_2=new_depth)
 
-    # lift legs
-    shift_layer(layer_nb=leg_layer_nb, shift=[0, scenarios['leg_lift'][i]])
-    # lift body, head & upper jaw
-    shift_layer(layer_nb=body_layer_nb, shift=[0, scenarios['body_lift'][i]])
-    shift_layer(layer_nb=upper_jaw_layer_nb, shift=[0, scenarios['body_lift'][i]])
-    # upper jaw
-    rotate_layer(layer_nb=upper_jaw_layer_nb, turn=scenarios['jaw_turn'][i], diamond=upper_jaw_diamond)
-    # return the list of the shapes that are moved by animation
-    return get_all_shapes_in_layers(0, 1, 2)
+    t = i - (2 * blink_frames) * nb_blinks
+    if 0 <= t < 2 * jaw_frames * nb_jaw_openings:
+      t1 = t % (2 * jaw_frames)
+      Shape.rotate_layer(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
+
+    j = t - 2 * jaw_frames * nb_jaw_openings
+    if 0 <= j < (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames) * nb_jumps:
+      j1 = j % (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames)
+      Shape.shift_layer(shift=one_leg_lift[j1]*size_shift, layer_nbs=[leg_layer_nb])
+      Shape.shift_layer(shift=    one_jump[j1]*size_shift, layer_nbs=[body_layer_nb])
+
+    return Shape.get_all_polygons_in_layers(axes)
 
   show_drawing_and_save_if_needed( # filename="croc" , 
-   animation_func = animate,  animation_init = init, nb_of_frames = total_nb_of_frames
+   animation_func = animate,  animation_init = init, nb_of_frames = ((2 * eyelid_shape_moves + 1) * blink_nb + 2 * jaw_frames * nb_jaw_openings + (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames) * nb_jumps)
     )
