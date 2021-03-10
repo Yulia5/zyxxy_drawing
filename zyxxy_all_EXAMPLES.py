@@ -194,21 +194,18 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
   return head_layer, neck_coords, eyes, smile
 
 
-def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_colour = 'SeaWave'):
+def example_yellow_cat_animation(axes=None, cat_colour='Yellow', background_colour='SeaWave', filename=None):
+  
   head_layer, neck_coords, eyes, smile = example_yellow_cat(axes=axes, cat_colour=cat_colour, background_colour=background_colour)
 
-  nb_head_tilts = 6
-  angle_one_head_move = 1/12
+  #nb_head_tilts = 6
+  #angle_one_head_move = 1/12
   nb_eye_narrowing = 6
   depth_diff = 0.5
   nb_smile = 12
   smile_diff = 1/4
   nb_zoom = 4
   zoom_factor = 1.025
-
-  # return the list of the shapes that are moved by animation
-  def init():
-    return get_all_polygons_in_layers()
 
   def animate(k):
 
@@ -219,10 +216,10 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
     
     # eye narrowing
     #k = i - 4 * nb_head_tilts
+    depth_shifts = [-depth_diff] * nb_eye_narrowing + [depth_diff] * nb_eye_narrowing
     if 0 <= k < 2 * nb_eye_narrowing:
-      depth_shift = (-1 if k < nb_eye_narrowing else 1) * depth_diff
       for eye in eyes:
-        eye.shift_shape_parameters(depth_1=-depth_shift, depth_2=depth_shift)
+        eye.shift_shape_parameters(depth_1=-depth_shifts[k], depth_2=depth_shifts[k])
 
     # smile
     s = k - 2 * nb_eye_narrowing - 1
@@ -233,13 +230,10 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
     # zoom
     z = s - nb_smile - 1
     if 0 < z <= nb_zoom:
-      stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90], layer_nbs=[])
+      stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90])
 
-    return get_all_polygons_in_layers()
-
-  show_drawing_and_save_if_needed(filename="yellow_cat" , 
-   animation_func = animate,  animation_init = init, nb_of_frames = # 4 * nb_head_tilts 
-   + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1, animation_interval=100)
+  show_drawing_and_save_if_needed(filename=filename, animation_func = animate,
+    nb_of_frames = 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1, animation_interval=100)
 
 
 #########################################################
@@ -360,7 +354,7 @@ def example_croc(axes=None):
   return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond
 
 
-def example_animated_croc(axes=None):
+def example_animated_croc(axes=None, filename=None):
 
   leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond = example_croc(axes=axes)
 
@@ -378,23 +372,15 @@ def example_animated_croc(axes=None):
   nb_wait_frames = 2
 
   one_eyelid_blick = [-1.] * blink_frames + [1] * blink_frames
-  one_jaw_turn = [-1.] * jaw_frames + [1] * jaw_frames
-  one_jump = ([-1.] * prep_jump_frames + 
-              [1] * (prep_jump_frames + jump_frames) + 
-              [-1] * (prep_jump_frames + jump_frames) + 
-              [1] * prep_jump_frames + 
-              [0] * nb_wait_frames)
-  one_leg_lift = ([0.] * 2 * prep_jump_frames + 
-                [1] * jump_frames + 
-                [-1] * jump_frames + 
-                [0] * (2*prep_jump_frames + nb_wait_frames))
+  one_jaw_turn  = [-1.] * jaw_frames + [1] * jaw_frames
+
+  one_jump      = [-1.] * prep_jump_frames + [1] * (prep_jump_frames + jump_frames) 
+  one_leg_lift  = [0.] * 2 * prep_jump_frames + [1] * jump_frames
+  one_jump     += [-v for v in     one_jump[::-1]] + [0] * nb_wait_frames
+  one_leg_lift += [-v for v in one_leg_lift[::-1]] + [0] * nb_wait_frames
 
   size_shift = size_jump / (prep_jump_frames+jump_frames)
   size_turn =  max_jaw_opening_angle / jaw_frames
-
-  # return the list of the shapes that are moved by animation
-  def init():
-    return get_all_polygons_in_layers()
 
   def animate(i):
     # eyelid blink  
@@ -403,21 +389,18 @@ def example_animated_croc(axes=None):
       for e, eyelid in enumerate(eyelids):
         depth_change_sign = -1 if e%2 == 0 else 1
         eyelid.shift_shape_parameters(depth_1=depth_change_sign*one_eyelid_blick[i2])
-
+    # jaw turn
     t = i - len(one_eyelid_blick) * nb_blinks
     if 0 <= t < len(one_jaw_turn) * nb_jaw_openings:
       t1 = t % len(one_jaw_turn)
       rotate_layer(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
-
+    # jump
     j = t - len(one_jaw_turn) * nb_jaw_openings
     if 0 <= j < len(one_jump) * nb_jumps:
       j1 = j % len(one_jump)
       shift_layer(shift=[0, one_leg_lift[j1]*size_shift], layer_nbs=[leg_layer_nb])
       shift_layer(shift=[0, one_jump[j1]*size_shift]    , layer_nbs=[body_layer_nb, upper_jaw_layer_nb])
 
-    return get_all_polygons_in_layers()
-
   total_frames = len(one_eyelid_blick) * nb_blinks + len(one_jaw_turn) * nb_jaw_openings + len(one_jump) * nb_jumps
 
-  show_drawing_and_save_if_needed( filename="croc" , 
-    animation_func = animate,  animation_init = init, nb_of_frames = total_frames)
+  show_drawing_and_save_if_needed(filename=filename, animation_func = animate, nb_of_frames =total_frames)

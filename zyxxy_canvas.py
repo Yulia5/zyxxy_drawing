@@ -15,10 +15,11 @@
 ########################################################################
 
 import numpy as np
+from functools import partial
 from matplotlib import animation
 import matplotlib.pyplot as plt
 from zyxxy_shape_style import set_diamond_style, set_patch_style, show_outlines_only
-
+from zyxxy_shape_class import get_all_polygons_in_layers
 from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_background_settings, my_default_display_params, my_default_image_params, my_default_animation_params
 
 background_rectangle = None
@@ -115,6 +116,18 @@ def create_canvas_and_axes(canvas_width,
 # more information in the document below
 # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.savefig.html#matplotlib.pyplot.savefig 
 
+# assumes that there is only one set of axes - to be reviewed
+
+def default_animation_init():
+  # return the list of the shapes that are moved by animation
+  return get_all_polygons_in_layers()
+
+def envelope_animate(i, anim_func):
+  result = anim_func(i)
+  if result is not None:
+    return result
+  # return the list of the shapes that are moved by animation
+  return get_all_polygons_in_layers()
 
 def show_drawing_and_save_if_needed(filename=None,
                            figsize4saving = my_default_image_params['figsize'],
@@ -129,7 +142,7 @@ def show_drawing_and_save_if_needed(filename=None,
                            animation_writer = my_default_animation_params['writer'],
                            animation_format = my_default_animation_params['format'],
                            animation_func = None,
-                           animation_init = None,
+                           animation_init = default_animation_init,
                            nb_of_frames = None):
   figure = plt.gcf()
 
@@ -154,7 +167,7 @@ def show_drawing_and_save_if_needed(filename=None,
     # writer = animation.writers[animation_writer](fps=animation_FPS)
     writer = animation.FFMpegWriter(fps=animation_FPS) 
     anim = animation.FuncAnimation( fig=figure, 
-                                    func=animation_func, 
+                                    func=partial(envelope_animate, anim_func=animation_func), 
                                     init_func=animation_init,  
                                     frames=nb_of_frames, 
                                     interval=animation_interval,
