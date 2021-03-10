@@ -3,10 +3,10 @@ from zyxxy_canvas import  show_drawing_and_save_if_needed
 
 from zyxxy_all_EXAMPLES import * 
 
-example_yellow_cat_animation()
-#example_Zyxxy_the_mouse()
-#example_segment() 
-#show_drawing_and_save_if_needed()
+#example_animated_croc()
+#example_Zyxxy_the_mouse()  
+example_yellow_cat_animation() 
+#show_drawing_and_save_if_needed("croc")
 
 print("done")
 

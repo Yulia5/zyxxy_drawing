@@ -210,15 +210,15 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
   def init():
     return get_all_polygons_in_layers()
 
-  def animate(i):
+  def animate(k):
 
     # head nods
-    if i < 4 * nb_head_tilts:
-      turn = angle_one_head_move if (nb_head_tilts <= i < 3*nb_head_tilts) else -angle_one_head_move
-      rotate_layer(turn=turn, diamond=neck_coords, layer_nbs=[head_layer])
+    #if i < 4 * nb_head_tilts:
+    #  turn = angle_one_head_move if (nb_head_tilts <= i < 3*nb_head_tilts) else -angle_one_head_move
+    #  rotate_layer(turn=turn, diamond=neck_coords, layer_nbs=[head_layer])
     
     # eye narrowing
-    k = i - 4 * nb_head_tilts
+    #k = i - 4 * nb_head_tilts
     if 0 <= k < 2 * nb_eye_narrowing:
       depth_shift = (-1 if k < nb_eye_narrowing else 1) * depth_diff
       for eye in eyes:
@@ -237,12 +237,9 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
 
     return get_all_polygons_in_layers()
 
-
   show_drawing_and_save_if_needed(filename="yellow_cat" , 
-   animation_func = animate,  animation_init = init, nb_of_frames = 4 * nb_head_tilts + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1, animation_interval=100)
-
-
-    
+   animation_func = animate,  animation_init = init, nb_of_frames = # 4 * nb_head_tilts 
+   + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1, animation_interval=100)
 
 
 #########################################################
@@ -304,15 +301,12 @@ def example_croc(axes=None):
   draw_a_rectangle(ax=axes, left=left_body, bottom=bottom_body, height=top_body-bottom_body, width=right_body-left_body)
 
   # backside
-
-  backside = draw_a_sector(ax=axes, centre_x=left_body, 
+  backside_clip_contour = build_a_circle(radius=centre_backside-bottom_body) + [left_body, centre_backside]
+  draw_a_sector( ax=axes, centre_x=left_body, 
                  centre_y=(2*centre_backside-bottom_body-tail_width+top_body)/2, 
                  radius=(2*centre_backside-bottom_body-tail_width+top_body)/2-bottom_body, 
                  radius_2=(2*centre_backside-bottom_body-tail_width-top_body)/2, 
-                 angle_start=6, angle_end=12)
-
-  clip_contour = build_a_circle(radius=centre_backside-bottom_body) + [left_body, centre_backside]
-  backside.clip(clip_outline = clip_contour)
+                 angle_start=6, angle_end=12, clip_outline=backside_clip_contour)
 
   # tail
   draw_a_rectangle(ax=axes, left=left_body, top=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body)
@@ -328,7 +322,6 @@ def example_croc(axes=None):
   draw_a_rectangle(ax=axes, left=right_body, bottom=bottom_body, height=lip_y-bottom_body, width=right_head-right_body)
 
   # upper jaw
-
   upper_jaw_layer_nb = new_layer()
 
   draw_a_rectangle(ax=axes, left=right_body, bottom=lip_y, height=top_head-lip_y, width=right_head-right_body)
@@ -372,7 +365,7 @@ def example_animated_croc(axes=None):
   leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond = example_croc(axes=axes)
 
   nb_blinks = 2
-  blink_frames = 3
+  blink_frames = 6
 
   nb_jaw_openings = 2
   jaw_frames = 3
@@ -385,15 +378,12 @@ def example_animated_croc(axes=None):
   nb_wait_frames = 2
 
   one_eyelid_blick = [-1.] * blink_frames + [1] * blink_frames
-
   one_jaw_turn = [-1.] * jaw_frames + [1] * jaw_frames
-
   one_jump = ([-1.] * prep_jump_frames + 
               [1] * (prep_jump_frames + jump_frames) + 
               [-1] * (prep_jump_frames + jump_frames) + 
               [1] * prep_jump_frames + 
               [0] * nb_wait_frames)
-
   one_leg_lift = ([0.] * 2 * prep_jump_frames + 
                 [1] * jump_frames + 
                 [-1] * jump_frames + 
@@ -408,24 +398,26 @@ def example_animated_croc(axes=None):
 
   def animate(i):
     # eyelid blink  
-    if i < (2 * blink_frames) * nb_blinks:
-      i2 = i % (2 * blink_frames)
-      for eyelid in eyelids:
-        eyelid.shift_shape_parameters(depth_1=-one_eyelid_blick[i2])
+    if i < len(one_eyelid_blick) * nb_blinks:
+      i2 = i % len(one_eyelid_blick)
+      for e, eyelid in enumerate(eyelids):
+        depth_change_sign = -1 if e%2 == 0 else 1
+        eyelid.shift_shape_parameters(depth_1=depth_change_sign*one_eyelid_blick[i2])
 
-    t = i - (2 * blink_frames) * nb_blinks
-    if 0 <= t < 2 * jaw_frames * nb_jaw_openings:
-      t1 = t % (2 * jaw_frames)
+    t = i - len(one_eyelid_blick) * nb_blinks
+    if 0 <= t < len(one_jaw_turn) * nb_jaw_openings:
+      t1 = t % len(one_jaw_turn)
       rotate_layer(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
 
-    j = t - 2 * jaw_frames * nb_jaw_openings
-    if 0 <= j < (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames) * nb_jumps:
-      j1 = j % (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames)
-      shift_layer(shift=one_leg_lift[j1]*size_shift, layer_nbs=[leg_layer_nb])
-      shift_layer(shift=    one_jump[j1]*size_shift, layer_nbs=[body_layer_nb])
+    j = t - len(one_jaw_turn) * nb_jaw_openings
+    if 0 <= j < len(one_jump) * nb_jumps:
+      j1 = j % len(one_jump)
+      shift_layer(shift=[0, one_leg_lift[j1]*size_shift], layer_nbs=[leg_layer_nb])
+      shift_layer(shift=[0, one_jump[j1]*size_shift]    , layer_nbs=[body_layer_nb, upper_jaw_layer_nb])
 
-    return get_all_polygons_in_layers(axes)
+    return get_all_polygons_in_layers()
 
-  show_drawing_and_save_if_needed( # filename="croc" , 
-   animation_func = animate,  animation_init = init, nb_of_frames = ((2 * eyelid_shape_moves + 1) * blink_nb + 2 * jaw_frames * nb_jaw_openings + (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames) * nb_jumps)
-    )
+  total_frames = len(one_eyelid_blick) * nb_blinks + len(one_jaw_turn) * nb_jaw_openings + len(one_jump) * nb_jumps
+
+  show_drawing_and_save_if_needed( filename="croc" , 
+    animation_func = animate,  animation_init = init, nb_of_frames = total_frames)
