@@ -122,8 +122,8 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
   # Now let's draw the shapes!                         ##
 
    # settings
-  set_default_outline_style(linewidth=3)
-  set_default_line_style(linewidth=3)
+  set_default_outline_style(linewidth=2)
+  set_default_line_style(linewidth=2)
   set_default_patch_style(colour=cat_colour)#darkorange
 
   # the tail
@@ -197,14 +197,14 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
 def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_colour = 'SeaWave'):
   head_layer, neck_coords, eyes, smile = example_yellow_cat(axes=axes, cat_colour=cat_colour, background_colour=background_colour)
 
-  nb_head_tilts = 3
-  angle_one_head_move = 1/3
-  nb_eye_narrowing = 3
-  depth_diff = 2
-  nb_smile = 6
-  smile_diff = 1/2
-  nb_zoom = 3
-  zoom_factor = 1.1
+  nb_head_tilts = 6
+  angle_one_head_move = 1/12
+  nb_eye_narrowing = 6
+  depth_diff = 0.5
+  nb_smile = 12
+  smile_diff = 1/4
+  nb_zoom = 4
+  zoom_factor = 1.025
 
   # return the list of the shapes that are moved by animation
   def init():
@@ -213,7 +213,7 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
   def animate(i):
 
     # head nods
-    if False and i < 4 * nb_head_tilts:
+    if i < 4 * nb_head_tilts:
       turn = angle_one_head_move if (nb_head_tilts <= i < 3*nb_head_tilts) else -angle_one_head_move
       rotate_layer(turn=turn, diamond=neck_coords, layer_nbs=[head_layer])
     
@@ -232,14 +232,14 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
 
     # zoom
     z = s - nb_smile - 1
-    if False and 0 < z <= nb_zoom:
+    if 0 < z <= nb_zoom:
       stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90], layer_nbs=[])
 
     return get_all_polygons_in_layers()
 
 
-  show_drawing_and_save_if_needed(#filename="abstract_yellow_cat" , 
-   animation_func = animate,  animation_init = init, nb_of_frames = 4 * nb_head_tilts + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1)
+  show_drawing_and_save_if_needed(filename="yellow_cat" , 
+   animation_func = animate,  animation_init = init, nb_of_frames = 4 * nb_head_tilts + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1, animation_interval=100)
 
 
     
