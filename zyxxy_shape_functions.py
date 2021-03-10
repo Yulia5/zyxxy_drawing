@@ -99,6 +99,10 @@ def draw_a_shape(ax, shapename, **kwargs):
   _shape.move(**kwargs_common)
   param_names_used += used_common_keys
 
+  if 'clip_outline' in kwargs:
+    _shape.clip(clip_outline=kwargs['clip_outline'])
+    param_names_used.append('clip_outline')
+
   raise_Exception_if_not_processed(kwarg_keys=kwargs.keys(), allowed_keys=param_names_used)
   
   return _shape

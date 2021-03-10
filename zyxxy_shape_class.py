@@ -22,22 +22,38 @@ from zyxxy_shape_style import set_patch_style, set_line_style, get_diamond_size,
 from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
 from zyxxy_shape_style import raise_Exception_if_not_processed
 
-##################################################################
-def _get_xy(something):
-  if isinstance(something, np.ndarray):
-    return something
-  elif isinstance(something, Polygon):
-    return something.get_xy()
-  raise Exception("Data type ", type(something), " is not handled")
+########################################################################
+# handling shapes per layers
+########################################################################
 
-def _set_xy(something, xy):
-  if isinstance(something, np.ndarray):
-    something = xy
-  elif isinstance(something, Polygon):
-    something.set_xy(xy)
+def get_all_shapes_in_layers(*args_layer_nb):
+  if len(args_layer_nb) == 0:
+    _shapes = Shape.all_shapes
   else:
-    raise Exception("Data type ", type(something), " is not handled")
-  return something
+    _shapes = [sh for sh in Shape.all_shapes if sh.get_layer_nb() in args_layer_nb]
+  return _shapes
+
+def get_all_polygons_in_layers(*args_layer_nb):
+  _shapes = get_all_shapes_in_layers(*args_layer_nb)
+  result = []
+  for _sh in _shapes:
+    result += _sh.get_what_to_move()
+  return result
+
+def shift_layer(shift, layer_nbs):
+  _shapes = get_all_shapes_in_layers(*layer_nbs)
+  for shape in _shapes:
+    shape.shift(shift=shift)
+
+def rotate_layer(turn, diamond, layer_nbs):
+  _shapes = get_all_shapes_in_layers(*layer_nbs)
+  for shape in _shapes:
+    shape.rotate(turn=turn, diamond_override=diamond)
+
+def stretch_layer(diamond, stretch_x=1., stretch_y=1., layer_nbs=[]):
+  _shapes = get_all_shapes_in_layers(*layer_nbs)
+  for shape in _shapes:
+    shape.stretch(diamond_override=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
 
 ##################################################################
 ## SHAPE                                                        ## 
@@ -45,39 +61,25 @@ def _set_xy(something, xy):
 
 class Shape:
 
-########################################################################
-# handling shapes per layers
-########################################################################
+
   all_shapes = []
 
-  def get_all_shapes_in_layers(*args_layer_nb):
-    if len(args_layer_nb) == 0:
-      _shapes = Shape.all_shapes
+##################################################################
+  def _get_xy(something):
+    if isinstance(something, np.ndarray):
+      return something
+    elif isinstance(something, Polygon):
+      return something.get_xy()
+    raise Exception("Data type ", type(something), " is not handled")
+
+  def _set_xy(something, xy):
+    if isinstance(something, np.ndarray):
+      something = xy
+    elif isinstance(something, Polygon):
+      something.set_xy(xy)
     else:
-      _shapes = [sh for sh in Shape.all_shapes if sh.get_layer_nb() in args_layer_nb]
-    return _shapes
-
-  def get_all_polygons_in_layers(*args_layer_nb):
-    _shapes = Shape.get_all_shapes_in_layers(*args_layer_nb)
-    result = []
-    for _sh in _shapes:
-      result += _sh.get_what_to_move()
-    return result
-
-  def shift_layer(shift, layer_nbs):
-    _shapes = Shape.get_all_shapes_in_layers(*layer_nbs)
-    for shape in _shapes:
-      shape.shift(shift=shift)
-
-  def rotate_layer(turn, diamond, layer_nbs):
-    _shapes = Shape.get_all_shapes_in_layers(*layer_nbs)
-    for shape in _shapes:
-      shape.rotate(turn=turn, diamond_override=diamond)
-
-  def stretch_layer(diamond, stretch_x=1., stretch_y=1., layer_nbs=[]):
-    _shapes = Shape.get_all_shapes_in_layers(*layer_nbs)
-    for shape in _shapes:
-      shape.stretch(diamond_override=diamond, stretch_x=stretch_x, stretch_y=stretch_y)
+      raise Exception("Data type ", type(something), " is not handled")
+    return something
 
  ################################################################## 
 
@@ -173,7 +175,7 @@ class Shape:
     # updating the elements
     for what in [self.line, self.outline, self.patch]:
       if what is not None:
-        _set_xy(what, contour)
+        Shape._set_xy(what, contour)
     
     # updating the diamond
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
@@ -189,13 +191,20 @@ class Shape:
     contour = method_to_call(**self.shape_kwargs)
     for what in [self.line, self.outline, self.patch]:
       if what is not None:
-        _set_xy(what, contour)
+        Shape._set_xy(what, contour)
 
     self.move(**self.move_history) # correct for clipping contours
 
     shift = self.diamond_coords # self.shift will restore the value of self.diamond_coords
     self.update_diamond(new_diamond_coords = [0., 0.])
     self.shift(shift=shift)
+
+##################################################################
+
+  def shift_shape_parameters(self, **kwargs):
+    for key in kwargs.keys():
+      kwargs[key]+= self.shape_kwargs[key]
+    self.update_shape_parameters(**kwargs)
 
 ##################################################################
 
@@ -224,9 +233,9 @@ class Shape:
 
   def get_xy(self):
     if self.patch is not None:
-      return _get_xy(self.patch)
+      return Shape._get_xy(self.patch)
     if self.line is not None:
-      return _get_xy(self.line)
+      return Shape._get_xy(self.line)
     raise Exception("Unable to identify xy")
 
 ##################################################################
@@ -244,26 +253,32 @@ class Shape:
     for what in [self.patch, self.line, self.outline]:
       if what is None:
         continue
+      clip_patch = None
       if isinstance(clip_outline, Shape):
         clip_xy = clip_outline.get_xy()
+        for clip_candidate in [clip_outline.patch, clip_outline.line]:
+          if clip_candidate is not None:
+            if clip_candidate.get_zorder() == what.get_zorder():
+              clip_patch = clip_candidate
       else:
-        clip_xy = _get_xy(clip_outline)
-      clip_patch = Polygon(clip_xy, 
+        clip_xy = Shape._get_xy(clip_outline)
+      if clip_patch is None:
+        clip_patch = Polygon(clip_xy, 
                                fc = 'none', 
                                ec = 'none',
-                               zorder = self.patch.get_zorder())
-      what.axes.add_patch(clip_patch)
+                               zorder = what.get_zorder())
+        what.axes.add_patch(clip_patch)
+        self.clip_patches.append(clip_patch)
+        
       what.set_clip_path(clip_patch)
-
-      self.clip_patches.append(clip_patch)
 
 ##################################################################
   
   def update_diamond(self, new_diamond_coords):
     self.diamond_coords = np.array(new_diamond_coords)
     if self.diamond is not None:                  
-      _set_xy(something=self.diamond, 
-              xy=self.diamond_coords+self.diamond_contour)
+      Shape._set_xy(something=self.diamond, 
+                    xy=self.diamond_coords+self.diamond_contour)
 
 ##################################################################
 
@@ -274,28 +289,31 @@ class Shape:
 
 ##################################################################
 
-  def flip(self):
+  def _move_xy(self, func):
     what_to_move = self.get_what_to_move()
     for something in what_to_move:
-      if something is None:
-        continue
-      xy = _get_xy(something=something)
-      xy[:, 1] = 2 * self.diamond_coords[1] - xy[:, 1]
-      _set_xy(something=something, xy=xy)
+      xy = func(xy=Shape._get_xy(something=something))
+      Shape._set_xy(something=something, xy=xy)
 
+##################################################################
+
+  def flip(self):
+    def func(xy):
+      xy[:, 1] = 2 * self.diamond_coords[1] - xy[:, 1]
+      return xy
+
+    self._move_xy(func=func)
     self.move_history['flip'] = not self.move_history['flip']
     self.move_history['turn'] =   - self.move_history['turn']
 
 ##################################################################
 
   def shift(self, shift):
-    what_to_move = self.get_what_to_move()
-    for something in what_to_move:
-      if something is None:
-        continue
-      xy = _get_xy(something=something)
+    def func(xy):
       xy += shift
-      _set_xy(something=something, xy=xy)
+      return xy
+    self._move_xy(func=func)
+
     self.update_diamond(new_diamond_coords = self.diamond_coords + shift)
 
 ##################################################################
@@ -304,13 +322,11 @@ class Shape:
     if turn == 0:
       return
 
-    what_to_move = self.get_what_to_move()
-    for something in what_to_move:
-      if something is None:
-        continue
-      xy = _get_xy(something=something)
+    def func(xy):
       xy = np.array([rotate_point(point=point, diamond=self.diamond_coords, turn=turn) for point in xy])
-      _set_xy(something=something, xy=xy)
+      return xy
+
+    self._move_xy(func=func)
 
     if diamond_override is not None:
       shift = - self.diamond_coords + rotate_point(
@@ -322,16 +338,13 @@ class Shape:
 ##################################################################
 
   def stretch(self, stretch_x, stretch_y, diamond_override = None):
-
-    what_to_move = self.get_what_to_move()
-    for something in what_to_move:
-      if something is None:
-        continue
-      xy = _get_xy(something=something)
+    def func(xy):
       xy = stretch_something(what_to_stretch=xy, 
                              diamond=self.diamond_coords, 
                              stretch_coeff=[stretch_x, stretch_y])
-      _set_xy(something=something, xy=xy)
+      return xy
+      
+    self._move_xy(func=func)
 
     if diamond_override is not None:
       shift = - self.diamond_coords + stretch_something(what_to_stretch=self.diamond_coords, 

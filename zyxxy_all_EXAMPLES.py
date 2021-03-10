@@ -6,7 +6,7 @@ from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer
 from zyxxy_shape_functions import draw_a_circle, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_an_eye
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_circle, build_a_zigzag
-from zyxxy_shape_class import Shape
+from zyxxy_shape_class import shift_layer, rotate_layer, stretch_layer, get_all_polygons_in_layers
 
 #########################################################
 ## THE FLAGS                                           ##
@@ -68,6 +68,42 @@ def example_Zyxxy_the_mouse(axes=None):
 def example_animation_for_Zyxxy_the_mouse(left_eye_white, right_eye_white, left_eye_black, right_eye_black):
   left_eye_black.clip(clip_outline = left_eye_white)
   right_eye_black.clip(clip_outline = right_eye_white)
+
+#########################################################
+def example_segment(axes=None):
+  axes = create_canvas_and_axes(canvas_width = 12,
+                                canvas_height = 10, tick_step=1)
+  set_default_line_style(linewidth=20)
+  set_default_outline_style(linewidth=20)
+  ln = new_layer()
+  segment = draw_a_segment(ax=axes, start_x=6, start_y=3, turn=0, length=4)
+  circle = draw_a_circle(ax=axes, centre_x=6, centre_y=9, radius=1)
+
+  # return the list of the shapes that are moved by animation
+  def init():
+    return get_all_polygons_in_layers()
+
+  def animate(i):
+    # eyelid blink  
+    if i < 20:
+      if i % 10 == 0:
+        shift_layer(shift=[0,  1], layer_nbs=[ln])
+    if 20 <= i < 40:
+      if i % 10 == 0:
+        shift_layer(shift=[0, -1], layer_nbs=[ln])
+    if 60 <= i < 80:
+      if i % 10 == 0:
+        rotate_layer(turn=1, diamond=[6, 3], layer_nbs=[ln])
+    if 40 <= i < 60:
+      if i % 10 == 0:
+        stretch_layer(stretch_x=0.5, stretch_y=0.5, diamond=[6, 3], layer_nbs=[ln])
+    if i % 10 == 0:
+      print(i, segment.get_xy(), circle.diamond_coords)
+
+    return get_all_polygons_in_layers()
+
+  show_drawing_and_save_if_needed( # filename="line", 
+   animation_func = animate,  animation_init = init, nb_of_frames = 80)
 
 #########################################################
 ## YELLOW CAT                                          ##
@@ -132,25 +168,20 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
 
   # vertical stripes
   for c, b in [[-10, 101], [-5, 100], [0, 101]]:
-    stripe = draw_a_rectangle(ax=axes, centre_x=c, bottom=b, width=3, height=20)
-    stripe.clip(clip_outline = head_circle)
+    draw_a_rectangle(ax=axes, centre_x=c, bottom=b, width=3, height=20, clip_outline = head_circle)
 
   # horizontal stripes
   for c, x in [[70, 16], [75, 15], [80, 18]]:
-    stripe_l = draw_a_rectangle(ax=axes, right=-x, centre_y=c, width=20, height=3)
-    stripe_r = draw_a_rectangle(ax=axes, left=+x, centre_y=c, width=20, height=3)
-    stripe_l.clip(clip_outline = head_circle)
-    stripe_r.clip(clip_outline = head_circle)
+    draw_a_rectangle(ax=axes, right=-x, centre_y=c, width=20, height=3, clip_outline = head_circle)
+    draw_a_rectangle(ax=axes, left=+x, centre_y=c, width=20, height=3, clip_outline = head_circle)
     
   # eyes
   eyes = []
   for centre_x in [-12, 12]:
     eye_white= draw_an_eye(ax=axes, centre_x=centre_x, centre_y=90, width=16, depth_1=-8, depth_2=8, colour='white')
-    eye_iris = draw_an_ellipse(ax=axes, centre_x=centre_x, centre_y=90, width=8, height=16, colour='BrightGreen')
-    eye_pupil= draw_a_circle(ax=axes, centre_x=centre_x, centre_y=90, radius=3, colour='black')
-    # the following 3 lines are needed for animation
-    eye_iris.clip(clip_outline = eye_white)
-    eye_pupil.clip(clip_outline = eye_white)
+    draw_an_ellipse(ax=axes, centre_x=centre_x, centre_y=90, width=8, height=16, colour='BrightGreen', clip_outline = eye_white)
+    draw_a_circle(ax=axes, centre_x=centre_x, centre_y=90, radius=3, colour='black', clip_outline = eye_white)
+    # the following line is needed for animation
     eyes.append(eye_white)
 
   # nose
@@ -177,19 +208,19 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
 
   # return the list of the shapes that are moved by animation
   def init():
-    return Shape.get_all_polygons_in_layers(axes)
+    return get_all_polygons_in_layers()
 
   def animate(i):
 
     # head nods
-    if i < 4 * nb_head_tilts:
+    if False and i < 4 * nb_head_tilts:
       turn = angle_one_head_move if (nb_head_tilts <= i < 3*nb_head_tilts) else -angle_one_head_move
-      Shape.rotate_layer(turn=turn, diamond=neck_coords, layer_nbs=[head_layer])
+      rotate_layer(turn=turn, diamond=neck_coords, layer_nbs=[head_layer])
     
     # eye narrowing
     k = i - 4 * nb_head_tilts
     if 0 <= k < 2 * nb_eye_narrowing:
-      depth_shift = (1 if k < nb_eye_narrowing else -1) * depth_diff
+      depth_shift = (-1 if k < nb_eye_narrowing else 1) * depth_diff
       for eye in eyes:
         eye.shift_shape_parameters(depth_1=-depth_shift, depth_2=depth_shift)
 
@@ -201,13 +232,13 @@ def example_yellow_cat_animation(axes=None, cat_colour = 'Yellow', background_co
 
     # zoom
     z = s - nb_smile - 1
-    if 0 < z <= nb_zoom:
-      Shape.stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90], layer_nbs=[])
+    if False and 0 < z <= nb_zoom:
+      stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90], layer_nbs=[])
 
-    return Shape.get_all_polygons_in_layers()
+    return get_all_polygons_in_layers()
 
 
-  show_drawing_and_save_if_needed( # filename="croc" , 
+  show_drawing_and_save_if_needed(#filename="abstract_yellow_cat" , 
    animation_func = animate,  animation_init = init, nb_of_frames = 4 * nb_head_tilts + 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1)
 
 
@@ -373,7 +404,7 @@ def example_animated_croc(axes=None):
 
   # return the list of the shapes that are moved by animation
   def init():
-    return Shape.get_all_polygons_in_layers(axes)
+    return get_all_polygons_in_layers()
 
   def animate(i):
     # eyelid blink  
@@ -385,15 +416,15 @@ def example_animated_croc(axes=None):
     t = i - (2 * blink_frames) * nb_blinks
     if 0 <= t < 2 * jaw_frames * nb_jaw_openings:
       t1 = t % (2 * jaw_frames)
-      Shape.rotate_layer(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
+      rotate_layer(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
 
     j = t - 2 * jaw_frames * nb_jaw_openings
     if 0 <= j < (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames) * nb_jumps:
       j1 = j % (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames)
-      Shape.shift_layer(shift=one_leg_lift[j1]*size_shift, layer_nbs=[leg_layer_nb])
-      Shape.shift_layer(shift=    one_jump[j1]*size_shift, layer_nbs=[body_layer_nb])
+      shift_layer(shift=one_leg_lift[j1]*size_shift, layer_nbs=[leg_layer_nb])
+      shift_layer(shift=    one_jump[j1]*size_shift, layer_nbs=[body_layer_nb])
 
-    return Shape.get_all_polygons_in_layers(axes)
+    return get_all_polygons_in_layers(axes)
 
   show_drawing_and_save_if_needed( # filename="croc" , 
    animation_func = animate,  animation_init = init, nb_of_frames = ((2 * eyelid_shape_moves + 1) * blink_nb + 2 * jaw_frames * nb_jaw_openings + (2 * jump_frames + 4 * prep_jump_frames + nb_wait_frames) * nb_jumps)

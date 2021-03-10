@@ -151,7 +151,8 @@ def show_drawing_and_save_if_needed(filename=None,
   else:
     figure.set_dpi(animation_file_dpi) 
     figure.set_size_inches(animation_file_figsize)
-
+    # writer = animation.writers[animation_writer](fps=animation_FPS)
+    writer = animation.FFMpegWriter(fps=animation_FPS) 
     anim = animation.FuncAnimation( fig=figure, 
                                     func=animation_func, 
                                     init_func=animation_init,  
@@ -159,10 +160,9 @@ def show_drawing_and_save_if_needed(filename=None,
                                     interval=animation_interval,
                                     blit=animation_blit, 
                                     repeat=animation_repeat)
-
-    writer = animation.writers[animation_writer](fps=animation_FPS)
     if (filename is not None) and (filename != ""):
       anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
+      return
   figure.set_dpi(current_dpi) 
   figure.set_size_inches(current_figsize)
   plt.show()

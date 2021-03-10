@@ -78,12 +78,12 @@ my_default_display_params = {'figsize' : [6/screen_zoom, 4/screen_zoom],
                                                      'bottom' : 0.20,
                                                      'hspace' : 0.3}}
 
-my_default_image_params = {'figsize' : [3.6, 2.4], 
+my_default_image_params = {'figsize' : [3.6/screen_zoom, 2.4/screen_zoom], 
                            'dpi'     : 200,
                            'format'  : 'png'}
 
-my_default_animation_params = {'figsize' : [3.6, 2.4],
-                               'dpi'     : 200,
+my_default_animation_params = {'figsize' : [3.6/screen_zoom, 2.4/screen_zoom],
+                               'dpi'     : 100,
                                'interval': 200,
                                'blit'    : True,
                                'repeat'  : False,

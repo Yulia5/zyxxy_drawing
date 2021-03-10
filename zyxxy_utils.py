@@ -25,7 +25,7 @@ full_turn_angle = 12 # 12 for hours
 ##################################################################
 
 def is_number(val):
-  return isinstance(val, (int, float, np.float64))
+  return isinstance(val, (int, float, np.float64, np.int64))
 
 ##################################################################
 def is_the_same_point(p1, p2):
@@ -62,6 +62,9 @@ def stretch_something(what_to_stretch, diamond, stretch_coeff):
                                           diamond=diamond[i], 
                                           stretch_coeff=stretch_coeff[i]) for i in [0, 1]]) 
   else:
+    x=what_to_stretch[0][0]
+    y=diamond[0]
+    z=stretch_coeff[0]
     result = np.array([[_stretch_something(what_to_stretch=point[i], 
                                            diamond=diamond[i], 
                                            stretch_coeff=stretch_coeff[i]) for i in [0, 1]] for point in what_to_stretch]) 
