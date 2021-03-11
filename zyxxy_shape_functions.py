@@ -33,6 +33,7 @@ bespoke_diamonds = { 'a_coil' : 'start',
                      'a_heart' : 'tip',
                      'a_triangle' : 'tip',
                      'an_elliptic_drop' : 'tip',
+                     'an_egg' : 'tip',
                      'a_square' : ['left', 'bottom']} 
 
 def get_diamond_label(shapename, original_label=None):

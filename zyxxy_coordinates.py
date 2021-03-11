@@ -337,9 +337,9 @@ def _build_an_egg(power, tip_addon):
   pf_points_qty = int(my_default_vertices_qty_in_circle/4)
 
   power_func_x = sqrt(1 - cos_alpha_solution*cos_alpha_solution) * (1. - np.array([n/pf_points_qty for n in range(pf_points_qty+1)]))
-  power_func_2D = [[x, a * (x**power) - (1 + tip_addon)] for x in power_func_x]
+  power_func_2D = [[x, a * (x**power) ] for x in power_func_x]
 
-  right_half_contour = link_contours(_arc, power_func_2D) 
+  right_half_contour = link_contours(_arc + [0, (1 + tip_addon)], power_func_2D) 
 
   # adding the left half and
   # moving the egg so that its centre were where needed
