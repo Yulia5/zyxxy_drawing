@@ -18,7 +18,7 @@ import numpy as np
 from functools import partial
 from matplotlib import animation
 import matplotlib.pyplot as plt
-from zyxxy_shape_style import set_diamond_style, set_patch_style, show_outlines_only
+from zyxxy_shape_style import set_diamond_size_factor, set_patch_style, show_outlines_only
 from zyxxy_shape_class import get_all_polygons_in_layers
 from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_background_settings, my_default_display_params, my_default_image_params, my_default_animation_params
 
@@ -88,7 +88,7 @@ def create_canvas_and_axes(canvas_width,
     bottom_y, top_y = 0, canvas_height
 
   # show diamond points and grid and axis if and only if tick_step is set
-  set_diamond_style(show = (tick_step is not None))
+  set_diamond_size_factor(value=(tick_step is not None))
   axes.grid(tick_step is not None)
   if tick_step is not None:
     axes.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)

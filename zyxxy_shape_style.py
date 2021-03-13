@@ -35,7 +35,7 @@ format_arg_dict = { "line"    : line_arg_types,
                     "diamond" : patch_arg_types }
 
 _default_arguments = my_default_colour_etc_settings
-_show_diamond = True
+__diamond_size_factor = 1.
 
 ##################################################################
 ## CANVAS HELPERS                                               ## 
@@ -56,12 +56,12 @@ def get_height(ax=None):
 ## DIAMOND HELPERS                                              ## 
 ##################################################################
 
-def set_diamond_style(show):
-  global _show_diamond
-  _show_diamond = show
+def set_diamond_size_factor(value=1.):
+  global __diamond_size_factor
+  __diamond_size_factor = float(value)
 
 def get_diamond_size(ax):
-  return get_width(ax=ax) * my_default_diamond_size * int(_show_diamond)
+  return get_width(ax=ax) * my_default_diamond_size * __diamond_size_factor
 
 ##################################################################
 ## COLOUR HELPERS                                               ## 

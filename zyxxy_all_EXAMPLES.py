@@ -16,7 +16,7 @@ def example_japanese_flag(axes=None):
   axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
   draw_a_circle(ax=axes, centre_x=15, centre_y=10, radius=6, colour='crimson')   
 
-def draw_belgian_flag(axes=None):
+def example_belgian_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=6, canvas_height=4, axes=axes)
   draw_a_square(ax=ax, left=0, bottom=0, side=2, colour='black')
   draw_a_square(ax=ax, left=0, bottom=2, side=2, colour='black')
@@ -25,43 +25,43 @@ def draw_belgian_flag(axes=None):
   draw_a_square(ax=ax, left=4, bottom=0, side=2, colour='red')
   draw_a_square(ax=ax, left=4, bottom=2, side=2, colour='red')
 
-def draw_cuban_flag(axes=None):
+def example_cuban_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
   draw_a_rectangle(ax=ax, left=0, centre_y=10, width=30, height=4, colour='blue')
   draw_a_rectangle(ax=ax, left=0, bottom=0, width=30, height=4, colour='blue')
   draw_a_rectangle(ax=ax, left=0, top=20, width=30, height=4, colour='blue')
   draw_a_triangle(ax=ax, tip_x=17, tip_y=10, width=20, height=17, colour='red', turn=9)
-  draw_a_star(ax=ax, centre_x=6, centre_y=10, radius1=3, radius2=1, ends_qty=5, colour='white') 
+  draw_a_star(ax=ax, centre_x=6, centre_y=10, radius_1=3, radius_2=1, ends_qty=5, colour='white') 
 
-def draw_finnish_flag(axes=None): 
+def example_finnish_flag(axes=None): 
   axes = create_canvas_and_axes(canvas_width=36, canvas_height=22, axes=axes)
   draw_a_rectangle(ax=axes, centre_x=13, bottom=0, width=6, height=22, colour='midnightblue')
   draw_a_rectangle(ax=axes, left=0, centre_y=11, width=36, height=6, colour='midnightblue')
 
-def draw_japanese_naval_flag(axes=None):
+def example_japanese_naval_flag(axes=None):
   axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
   draw_a_circle(ax=axes, centre_x=12, centre_y=10, radius=6, colour='crimson')
   for i in range(32):
     if i % 2 == 0:
       draw_a_triangle(ax=axes, tip_x=12, tip_y=10, height=30, width=6, turn=12/32*i, colour='crimson')
 
-def draw_british_flag(axes=None):
+def example_british_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=18, canvas_height=12, axes=axes)
 
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=12, colour='navy')
+  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=12, colour='navy')
 
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', direction=7)
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', direction=7)
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', direction=5)
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', direction=5)
+  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=7)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=7)
+  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=5)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=5)
 
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=4, colour='white')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red') 
+  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=4, colour='white')
+  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
+  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red', turn=2) 
 
 
-def draw_american_flag(axes=None):
+def example_us_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width = 19*13*2, canvas_height = 10*13*2, axes=axes)
 
   for stripe_nb in range(7):
@@ -80,7 +80,7 @@ def draw_american_flag(axes=None):
       first_star_centre_x = 33 
     # centre_y=260-(row+1)*14 because we are counting star rows from the top
     for column in range(stars_qty):
-        draw_a_star(ax=ax, centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius1=6, radius2=2, ends_qty=5, colour='white')               
+        draw_a_star(ax=ax, centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius_1=9, radius_2=3, ends_qty=5, colour='white')               
 
 #########################################################
 ## ZYXXY THE MOUSE                                     ##
@@ -127,15 +127,10 @@ def example_animation_for_Zyxxy_the_mouse(axes=None):
 #########################################################
 ## THE PENGUINS                                        ##
 #########################################################
-
-#########################################################
-## CREATING THE DRAWING!                               ##
-def draw_half_circle(turn, **kwargs):
-  draw_a_sector(angle_start=turn, angle_end=turn+6, **kwargs)
-
-#########################################################
-## CREATING THE DRAWING!                               ##
-def draw_penguins():
+def example_penguins():
+  
+  def draw_half_circle(turn, **kwargs):
+    draw_a_sector(angle_start=turn, angle_end=turn+6, **kwargs)
   #######################################################
   # Creating the canvas!                               ##  
   axes = create_canvas_and_axes(canvas_width = 220,
