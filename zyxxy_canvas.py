@@ -22,6 +22,14 @@ from zyxxy_shape_style import set_diamond_style, set_patch_style, show_outlines_
 from zyxxy_shape_class import get_all_polygons_in_layers
 from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_background_settings, my_default_display_params, my_default_image_params, my_default_animation_params
 
+__is_running_tests = False
+
+def is_running_tests(val=None):
+  global __is_running_tests
+  if val is not None:
+    __is_running_tests = val
+  return __is_running_tests
+
 background_rectangle = None
 
 def set_background_colour(new_background_colour):
@@ -178,4 +186,5 @@ def show_drawing_and_save_if_needed(filename=None,
       return
   figure.set_dpi(current_dpi) 
   figure.set_size_inches(current_figsize)
-  plt.show()
+  if not is_running_tests():
+    plt.show()

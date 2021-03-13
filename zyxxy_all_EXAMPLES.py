@@ -65,45 +65,10 @@ def example_Zyxxy_the_mouse(axes=None):
 #########################################################
 ## we will call this function if we want to animate Zyxxy
 #########################################################
-def example_animation_for_Zyxxy_the_mouse(left_eye_white, right_eye_white, left_eye_black, right_eye_black):
+def example_animation_for_Zyxxy_the_mouse(axes=None):
+  left_eye_white, right_eye_white, left_eye_black, right_eye_black = example_Zyxxy_the_mouse(axes=axes)
   left_eye_black.clip(clip_outline = left_eye_white)
   right_eye_black.clip(clip_outline = right_eye_white)
-
-#########################################################
-def example_segment(axes=None):
-  axes = create_canvas_and_axes(canvas_width = 12,
-                                canvas_height = 10, tick_step=1)
-  set_default_line_style(linewidth=20)
-  set_default_outline_style(linewidth=20)
-  ln = new_layer()
-  segment = draw_a_segment(ax=axes, start_x=6, start_y=3, turn=0, length=4)
-  circle = draw_a_circle(ax=axes, centre_x=6, centre_y=9, radius=1)
-
-  # return the list of the shapes that are moved by animation
-  def init():
-    return get_all_polygons_in_layers()
-
-  def animate(i):
-    # eyelid blink  
-    if i < 20:
-      if i % 10 == 0:
-        shift_layer(shift=[0,  1], layer_nbs=[ln])
-    if 20 <= i < 40:
-      if i % 10 == 0:
-        shift_layer(shift=[0, -1], layer_nbs=[ln])
-    if 60 <= i < 80:
-      if i % 10 == 0:
-        rotate_layer(turn=1, diamond=[6, 3], layer_nbs=[ln])
-    if 40 <= i < 60:
-      if i % 10 == 0:
-        stretch_layer(stretch_x=0.5, stretch_y=0.5, diamond=[6, 3], layer_nbs=[ln])
-    if i % 10 == 0:
-      print(i, segment.get_xy(), circle.diamond_coords)
-
-    return get_all_polygons_in_layers()
-
-  show_drawing_and_save_if_needed( # filename="line", 
-   animation_func = animate,  animation_init = init, nb_of_frames = 80)
 
 #########################################################
 ## YELLOW CAT                                          ##
