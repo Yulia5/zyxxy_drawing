@@ -2,34 +2,90 @@
 ## Importing functions that we will use below        ##
 
 import numpy as np
-from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
+from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed, get_width, get_height
 from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer
-from zyxxy_shape_functions import draw_a_circle, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_an_eye
+from zyxxy_shape_functions import draw_a_circle, draw_a_square, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_an_eye, draw_a_star
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_circle, build_a_zigzag
 from zyxxy_shape_class import shift_layer, rotate_layer, stretch_layer, get_all_polygons_in_layers
+from zyxxy_utils import random_element, random_number
 
 #########################################################
 ## THE FLAGS                                           ##
 #########################################################
 def example_japanese_flag(axes=None):
-  #####################################################
-  # Creating the canvas!
-  axes = create_canvas_and_axes(canvas_width = 30,
-                                canvas_height = 20,
-                                axes=axes)
-
-  #######################################################
-  # Now let's draw the shapes!                         ##
+  axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
   draw_a_circle(ax=axes, centre_x=15, centre_y=10, radius=6, colour='crimson')   
+
+def draw_belgian_flag(axes=None):
+  ax = create_canvas_and_axes(canvas_width=6, canvas_height=4, axes=axes)
+  draw_a_square(ax=ax, left=0, bottom=0, side=2, colour='black')
+  draw_a_square(ax=ax, left=0, bottom=2, side=2, colour='black')
+  draw_a_square(ax=ax, left=2, bottom=0, side=2, colour='yellow')
+  draw_a_square(ax=ax, left=2, bottom=2, side=2, colour='yellow')
+  draw_a_square(ax=ax, left=4, bottom=0, side=2, colour='red')
+  draw_a_square(ax=ax, left=4, bottom=2, side=2, colour='red')
+
+def draw_cuban_flag(axes=None):
+  ax = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
+  draw_a_rectangle(ax=ax, left=0, centre_y=10, width=30, height=4, colour='blue')
+  draw_a_rectangle(ax=ax, left=0, bottom=0, width=30, height=4, colour='blue')
+  draw_a_rectangle(ax=ax, left=0, top=20, width=30, height=4, colour='blue')
+  draw_a_triangle(ax=ax, tip_x=17, tip_y=10, width=20, height=17, colour='red', turn=9)
+  draw_a_star(ax=ax, centre_x=6, centre_y=10, radius1=3, radius2=1, ends_qty=5, colour='white') 
+
+def draw_finnish_flag(axes=None): 
+  axes = create_canvas_and_axes(canvas_width=36, canvas_height=22, axes=axes)
+  draw_a_rectangle(ax=axes, centre_x=13, bottom=0, width=6, height=22, colour='midnightblue')
+  draw_a_rectangle(ax=axes, left=0, centre_y=11, width=36, height=6, colour='midnightblue')
+
+def draw_japanese_naval_flag(axes=None):
+  axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
+  draw_a_circle(ax=axes, centre_x=12, centre_y=10, radius=6, colour='crimson')
+  for i in range(32):
+    if i % 2 == 0:
+      draw_a_triangle(ax=axes, tip_x=12, tip_y=10, height=30, width=6, turn=12/32*i, colour='crimson')
+
+def draw_british_flag(axes=None):
+  ax = create_canvas_and_axes(canvas_width=18, canvas_height=12, axes=axes)
+
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=12, colour='navy')
+
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', direction=7)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', direction=7)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', direction=5)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', direction=5)
+
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=4, colour='white')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red') 
+
+
+def draw_american_flag(axes=None):
+  ax = create_canvas_and_axes(canvas_width = 19*13*2, canvas_height = 10*13*2, axes=axes)
+
+  for stripe_nb in range(7):
+    draw_a_rectangle(ax=ax, centre_x=19*13, centre_y=10+2*20*stripe_nb, width=19*13*2, height=20, colour='red')
+    
+  draw_a_rectangle(ax=ax, centre_x=100, centre_y=190, width=200, height=140, colour='navy')   
+
+  for row in range(9): # there are 9 rows of stars
+    # let's define how many stars are in this row
+    # and where is the centre_x of the first star    
+    if row%2==0: # if row number is even
+      stars_qty=6
+      first_star_centre_x = 15 
+    else:        # if row number is odd
+      stars_qty=5
+      first_star_centre_x = 33 
+    # centre_y=260-(row+1)*14 because we are counting star rows from the top
+    for column in range(stars_qty):
+        draw_a_star(ax=ax, centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius1=6, radius2=2, ends_qty=5, colour='white')               
 
 #########################################################
 ## ZYXXY THE MOUSE                                     ##
 #########################################################
 def example_Zyxxy_the_mouse(axes=None):
-  #########################################################
-  ## CREATING THE DRAWING!                               ##
-  #########################################################
-  # Creating the canvas!                                 ##
   axes = create_canvas_and_axes(canvas_width = 12,
                                 canvas_height = 10, 
                                 title = "Hello, I am Zyxxy!", 
@@ -63,12 +119,84 @@ def example_Zyxxy_the_mouse(axes=None):
   return left_eye_white, right_eye_white, left_eye_black, right_eye_black
 
 #########################################################
-## we will call this function if we want to animate Zyxxy
-#########################################################
 def example_animation_for_Zyxxy_the_mouse(axes=None):
   left_eye_white, right_eye_white, left_eye_black, right_eye_black = example_Zyxxy_the_mouse(axes=axes)
   left_eye_black.clip(clip_outline = left_eye_white)
   right_eye_black.clip(clip_outline = right_eye_white)
+
+#########################################################
+## THE PENGUINS                                        ##
+#########################################################
+
+#########################################################
+## CREATING THE DRAWING!                               ##
+def draw_half_circle(turn, **kwargs):
+  draw_a_sector(angle_start=turn, angle_end=turn+6, **kwargs)
+
+#########################################################
+## CREATING THE DRAWING!                               ##
+def draw_penguins():
+  #######################################################
+  # Creating the canvas!                               ##  
+  axes = create_canvas_and_axes(canvas_width = 220,
+                                canvas_height = 120,
+                                #tick_step = 10,
+                                background_colour = 'lightskyblue')
+
+  #######################################################
+  # Now let's draw the shapes!                         ##
+  # snowflakes
+  for s in range(150):
+    draw_a_star(ax=axes, centre_x=random_number(max = get_width(axes)), 
+                       centre_y=random_number(max = get_height(axes)), 
+                       radius1=1, radius2=3, ends_qty=8, colour='aliceblue')
+
+  # ice
+  ice_colours = ['aliceblue', 'steelblue', 'skyblue']
+  for s in range(1500):
+    draw_a_triangle(ax=axes, 
+                  tip_x=random_number(max = get_width(axes)), 
+                  tip_y=0.2*random_number(max = get_height(axes)),
+                  height=random_number(30), 
+                  width=random_number(15), 
+                  turn=random_element(range(2, 11)),
+                  colour = random_element(ice_colours)) 
+
+  # penguins!
+
+  # the penguin on the left
+  # body
+  draw_a_circle(ax=axes, centre_x=60, centre_y=40, radius=20, colour='white')
+  # feet
+  draw_half_circle(ax=axes, centre_x=55, centre_y=16, radius=6, colour='orangered', turn=5)
+  draw_half_circle(ax=axes, centre_x=65, centre_y=16, radius=6, colour='orangered', turn=7)
+  # wings
+  draw_half_circle(ax=axes, centre_x=30, centre_y=60, radius=30, colour='black', turn=11)
+  draw_half_circle(ax=axes, centre_x=90, centre_y=60, radius=30, colour='black', turn=1)
+  # head
+  draw_a_circle(ax=axes, centre_x=60, centre_y=80, radius=15, colour='black')
+  # eyes
+  draw_a_circle(ax=axes, centre_x=55, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  draw_a_circle(ax=axes, centre_x=65, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  # beck
+  draw_a_triangle(ax=axes, tip_x=65, tip_y=72, height=10, width=8, colour='orangered', turn=10+1/2)
+
+  # the penguin on the right
+  # first foot 
+  draw_half_circle(ax=axes, centre_x=170, centre_y=16, radius=6, colour='orangered', turn=6)
+  # body - white
+  draw_half_circle(ax=axes, centre_x=180, centre_y=50, radius=30, colour='white', turn=2)
+  # second foot 
+  draw_half_circle(ax=axes, centre_x=180, centre_y=15, radius=6,  colour='orangered', turn=5)
+  # body - black
+  draw_half_circle(ax=axes, centre_x=190, centre_y=50, radius=30, colour='black', turn=2)
+  # beck
+  draw_half_circle(ax=axes, centre_x=155, centre_y=75, radius=6, colour='orangered', turn=5 + 1/2)
+  # head
+  draw_a_circle(ax=axes, centre_x=170, centre_y=80, radius=15, colour='black')
+  # an eye
+  draw_a_circle(ax=axes, centre_x=163, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+
 
 #########################################################
 ## YELLOW CAT                                          ##

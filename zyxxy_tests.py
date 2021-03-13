@@ -23,7 +23,7 @@ def run_all_drawings():
 
   files = [f for f in os.listdir('.') if os.path.isfile(f)]
   for f in files:
-    if f.startswith("draw"):
+    if f.startswith("draw") or f.startswith("zyxxy_shape_demo"):
       print(f, datetime.datetime.now())
       loader = importlib.machinery.SourceFileLoader(f[:-3], f)
       mod = types.ModuleType(loader.name)

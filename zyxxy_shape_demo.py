@@ -20,7 +20,7 @@ import numpy as np
 import functools, inspect
 
 from zyxxy_utils import full_turn_angle
-from zyxxy_canvas import create_canvas_and_axes
+from zyxxy_canvas import create_canvas_and_axes, is_running_tests
 from zyxxy_shape_class import Shape
 from zyxxy_coordinates import shape_names_params_dicts_definition, get_type_given_shapename
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
@@ -379,4 +379,5 @@ for side in sides:
 
 fig.set_dpi(figure_params['dpi']) 
 fig.set_size_inches(figure_params['figsize'])
-plt.show()
+if not is_running_tests():
+  plt.show()
