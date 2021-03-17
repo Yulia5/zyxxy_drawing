@@ -166,6 +166,12 @@ def get_active_shape(side):
   return _shape
 
 ##########################################################################################
+def get_common_kwarg_key(shapename, common_label):
+  if common_label in ["diamond_x", "diamond_y"]:
+    return get_diamond_label(shapename=shapename, original_label=common_label)
+  return common_label
+
+##########################################################################################
 def update_shape_form_given_side(_, side):
 
   shapename = active_shapename[side]
@@ -173,10 +179,12 @@ def update_shape_form_given_side(_, side):
 
   _sliders_specific = specific_widgets_by_side_by_shapename[side][shapename]
   kwargs_shape = {key : _sliders_specific[key].val for key in _sliders_specific.keys()}
-  _shape.update_xy_by_shapename(shapename, **kwargs_shape)
-  
   _widgets_common = common_widgets_by_side[side]
   kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
+  kwargs_common2= {get_common_kwarg_key(shapename=shapename, common_label=key) : value for key, value in kwargs_common.items()}
+
+  _shape.update_xy_by_shapename(shapename, **kwargs_shape)
+  _shape.adjust_the_diamond(**kwargs_common2)
   _shape.move(**kwargs_common)
 
   fig.canvas.draw_idle()

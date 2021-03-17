@@ -143,6 +143,42 @@ def build_a_rectangle_and_its_diamond(width, height, left=None, centre_x=None, r
   contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]]) - presumed_diamond
   return contour_array, presumed_diamond
 
+############################################################################################################
+def init_shift(contour, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None):
+  # checking that we the right number of inputs
+  how_many_are_defined = {'x' : (left is not None) + (centre_x is not None) + (right is not None), 'y' :  (bottom is not None) + (centre_y is not None) + (top is not None)}
+  errorMsg = ['One and only one ' + key + ' coordinate should be defined, but ' + str(value) + ' are defined' for key, value in how_many_are_defined.items() if value != 1]
+  if len(errorMsg) != 0:
+    raise Exception('; '.join(errorMsg))
+
+  presumed_diamond = [abs(contour[0][0]), abs(contour[0][1])]
+  if left is not None:
+    presumed_diamond[0] *= -1
+  elif centre_x is not None:
+    presumed_diamond[0] *= 0
+  elif right is not None:
+    pass
+  if bottom is not None:
+    presumed_diamond[1] *= -1
+  elif centre_y is not None:
+    presumed_diamond[1] *= 0
+  elif top is not None:
+    pass
+
+  contour -= presumed_diamond
+  return contour
+
+
+# a rectangle ######################################################
+def build_a_rectangle(height, width):
+  contour = np.array([[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]) * [width/2, height/2]
+  return contour
+
+# a square ######################################################
+def build_a_square(side):
+  contour = build_a_rectangle(height=side, width=side)
+  return contour
+
 # a segment ######################################################
 def build_a_segment(length):
   contour = np.array([[0, 0], [0, length]])

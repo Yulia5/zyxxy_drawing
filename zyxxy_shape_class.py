@@ -181,6 +181,21 @@ class Shape:
     self.update_diamond(new_diamond_coords=np.array([0, 0]))
 
 ##################################################################
+  def adjust_the_diamond(self, **kwargs):
+    if self.shapename not in ["a_rectangle", "a_square"]:
+      return
+
+    contour = self.get_xy()
+    useful_args = {key: kwargs[key] for key in ['left', 'centre_x', 'right', 'bottom', 'centre_y', 'top'] if key in kwargs}
+
+    new_contour = zyxxy_coordinates.init_shift(contour=contour, **useful_args)    
+
+    # updating the elements
+    for what in [self.line, self.outline, self.patch]:
+      if what is not None:
+        Shape._set_xy(what, new_contour)
+
+##################################################################
 
   def update_shape_parameters(self, **kwargs):
     
