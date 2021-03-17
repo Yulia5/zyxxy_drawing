@@ -96,7 +96,7 @@ def add_a_left_mirror(contour, mirror_x=0):
 #####################################################
 #####################################################
 # a rectangle ####################################################
-def build_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None):
+def build_a_rectangle_and_its_diamond(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None):
 
   # checking that we the right number of inputs
   how_many_are_defined = {'x' : (left is not None) + (centre_x is not None) + (right is not None), 'y' :  (bottom is not None) + (centre_y is not None) + (top is not None)}
@@ -104,43 +104,48 @@ def build_a_rectangle(width, height, left=None, centre_x=None, right=None, botto
   if len(errorMsg) != 0:
     raise Exception('; '.join(errorMsg))
 
+  presumed_diamond = [None, None]
+
   # defining coordinates that are undefined - x
   if left is not None:
     centre_x = left + width / 2
     right = left + width
+    presumed_diamond[0] = left
   elif centre_x is not None:
-      left = centre_x - width / 2
-      right = centre_x + width / 2
+    left = centre_x - width / 2
+    right = centre_x + width / 2
+    presumed_diamond[0] = centre_x
   elif right is not None:
-      left = right - width
-      centre_x = right - width / 2  
+    left = right - width
+    centre_x = right - width / 2
+    presumed_diamond[0] = right 
   else:
     left, right = - width / 2, width / 2
+    presumed_diamond[0] = 0 
 
   # defining coordinates that are undefined - y
   if bottom is not None:
     centre_y = bottom + height / 2
     top = bottom + height
+    presumed_diamond[1] = bottom
   elif centre_y is not None:
-      bottom = centre_y - height / 2
-      top = centre_y + height / 2
+    bottom = centre_y - height / 2
+    top = centre_y + height / 2
+    presumed_diamond[1] = centre_y
   elif top is not None:
-      bottom = top - height
-      centre_y = top - height / 2 
+    bottom = top - height
+    centre_y = top - height / 2 
+    presumed_diamond[1] = top
   else:
     bottom, top = - height / 2, height / 2
+    presumed_diamond[1] = 0
  
-  contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]])
-  return contour_array
+  contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]]) - presumed_diamond
+  return contour_array, presumed_diamond
 
 # a segment ######################################################
 def build_a_segment(length):
   contour = np.array([[0, 0], [0, length]])
-  return contour
-
-# a square ######################################################
-def build_a_square(side):
-  contour = np.array([[0, 0], [0, 1], [1, 1], [1, 0]]) * side
   return contour
 
 # a triangle ######################################################

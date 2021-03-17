@@ -1,4 +1,4 @@
-# import zyxxy_shape_demo  
+#import zyxxy_shape_demo  
 # import draw_Nowruz_postcard
 
 #from zyxxy_canvas import  show_drawing_and_save_if_needed
@@ -15,3 +15,6 @@
 #import draw_a_flag_of_Cuba
 import draw_a_flag_of_the_UK
 #import draw_a_flag_of_Finland
+
+# from zyxxy_tests import check_rectangle
+# check_rectangle()

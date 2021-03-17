@@ -34,9 +34,11 @@ bespoke_diamonds = { 'a_coil' : 'start',
                      'a_triangle' : 'tip',
                      'an_elliptic_drop' : 'tip',
                      'an_egg' : 'tip',
-                     'a_square' : ['left', 'bottom']} 
+                     'a_square' : [['left', 'centre_x', 'right'], ['bottom', 'centre_y', 'top']],
+                     'a_rectangle' : [['centre_x', 'left', 'right'], ['centre_y', 'bottom', 'top']]} 
 
-def get_diamond_label(shapename, original_label=None):
+def get_diamond_label(shapename, original_label=None, available_arguments=None):
+  # get the first part of the label, without the axis
   if isinstance(shapename, str):   
     if shapename in bespoke_diamonds:
       result = bespoke_diamonds[shapename]
@@ -45,22 +47,33 @@ def get_diamond_label(shapename, original_label=None):
   else:
     result = 'diamond'
 
-  if original_label is not None:
-    if isinstance(result, str):
-      result += '_' + original_label[-1]
-    else:
-      if original_label == 'diamond_x':
-        result = result[0]
-      elif original_label == 'diamond_y':
-        result = result[1]
-      else:
-        raise Exception(original_label, "is not a recognised diamond label")
-  return result
+  # modify the result by adding the axis based on original_label, or find the right label
+  assert original_label in ['diamond_x', 'diamond_y']
+  if isinstance(result, str): 
+    result += '_' + original_label[-1]
+    return result
+  
+  i1 = 0 if original_label == 'diamond_x' else 1
+  if isinstance(result[0], str):
+    return result[i1]
+  
+  # assume this is an array of arrays
+  if available_arguments is None:
+    return result[i1][0]
+  else:
+    intersection_arguments = [a for a in available_arguments if a in result[i1]]
+    if len(intersection_arguments) == 0:
+      raise Exception("Among the arguments provided,", available_arguments, "there are no suitable candidates,", result[i1])
+    if len(intersection_arguments) > 1:
+      raise Exception("In the arguments provided,", available_arguments, "there is more than one suitable candidate,", result[i1])
+    return intersection_arguments
+
 
 def get_common_kwargs(kwargs, shapename):
   common_keys = {key : key for key in common_params_dict_definition.keys() if not key.startswith('diamond_')}
-  common_keys['diamond_x'] = get_diamond_label(shapename=shapename, original_label='diamond_x')
-  common_keys['diamond_y'] = get_diamond_label(shapename=shapename, original_label='diamond_y')
+  for dk in ['diamond_x', 'diamond_y']:
+    common_keys[dk] = get_diamond_label(shapename=shapename, original_label=dk, available_arguments=kwargs.keys())
+  
   used_keys = []
   common_kwargs = {}
   for key, value in common_keys.items():
@@ -88,7 +101,7 @@ def draw_a_shape(ax, shapename, **kwargs):
   kwargs_common = {}
   if isinstance(shapename, str):
     admissible_shape_args = [k for k in zyxxy_coordinates.shape_names_params_dicts_definition[shapename].keys()]
-    if shapename == "a_rectangle":
+    if shapename in ["a_rectangle", "a_square"]:
       admissible_shape_args += ['left', 'right', 'bottom', 'top']
     kwargs_shape = {key : value for key, value in kwargs.items() if key in admissible_shape_args}
     param_names_used += [k for k in kwargs_shape.keys()]
@@ -108,11 +121,15 @@ def draw_a_shape(ax, shapename, **kwargs):
   
   return _shape
 
-# code for three special draw_* functions
+# code for four special draw_* functions
 def draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None, ax=None, **kwargs):
-  contour = zyxxy_coordinates.build_a_rectangle(width=width, height=height, 
+  contour, diamond = zyxxy_coordinates.build_a_rectangle_and_its_diamond(width=width, height=height, 
     left=left, centre_x=centre_x, right=right, bottom=bottom, centre_y=centre_y, top=top)
-  result = draw_a_shape(ax=ax, shapename=contour, shapetype="patch", **kwargs)
+  result = draw_a_shape(ax=ax, shapename=contour, shapetype="patch", diamond_x=diamond[0], diamond_y=diamond[1], **kwargs)
+  return result
+
+def draw_a_square(side, **kwargs):
+  result = draw_a_rectangle(width=side, height=side, **kwargs)
   return result
 
 def draw_a_broken_line(contour, ax=None, **kwargs):
@@ -125,5 +142,5 @@ def draw_a_polygon(contour, ax=None, **kwargs):
 
 # autogenerate all other draw_* functions
 for shapename in zyxxy_coordinates.shape_names_params_dicts_definition.keys():
-  if shapename != "a_rectangle":
+  if shapename not in ["a_rectangle", "a_square"]:
     globals()["draw_" + shapename] = partial(draw_a_shape, shapename=shapename)

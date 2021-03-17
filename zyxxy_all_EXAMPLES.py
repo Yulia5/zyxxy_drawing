@@ -48,17 +48,17 @@ def example_japanese_naval_flag(axes=None):
 def example_british_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=18, canvas_height=12, axes=axes)
 
-  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=12, colour='navy')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=12, colour='navy')
 
-  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=7)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=7)
   draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=7)
-  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=5)
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=5)
   draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=5)
 
-  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=4, colour='white')
-  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
-  #draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red', turn=2) 
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=4, colour='white')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
+  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red') 
 
 
 def example_us_flag(axes=None):

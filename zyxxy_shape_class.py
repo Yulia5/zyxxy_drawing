@@ -229,6 +229,9 @@ class Shape:
       shift[1] = kwargs_common['diamond_y']
     self.shift(shift=shift)
 
+    raise_Exception_if_not_processed(kwarg_keys=kwargs_common.keys(), 
+    allowed_keys=['flip', 'stretch_x', 'stretch_y', 'turn', 'diamond_x', 'diamond_y'])
+
 ##################################################################
 
   def get_xy(self):

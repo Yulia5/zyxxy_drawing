@@ -360,16 +360,18 @@ def place_shapes_and_widgets(side):
       s_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
       specific_widgets_by_side_by_shapename[side][shapename][param_name] = s_slider
 
-  # ... and update the visibility and style!
+  # ... and style!
+  for st in shape_types:
+    style_widgets = style_widgets_side_by_shapetype[side][st]
+    kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
+    shapes_by_side_by_shapetype[side][st].set_style(**kwargs_style)
+
+  # Now switch off all the shapes' visibility
   for shapename in shape_names_params_dicts_definition.keys():
     active_shapename[side] = shapename
     update_visibility(side=side, switch_on=False)
-
-    style_widgets = style_widgets_side_by_shapetype[side][get_active_shapetype(side)]
-    kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
-
-    get_active_shape(side=side).set_style(**kwargs_style)
-
+ 
+  # ... and  switch on those that need to be active!
   switch_active_shapename_given_side(label=my_default_demo_shapes[side], side=side)
   
 

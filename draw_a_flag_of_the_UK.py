@@ -14,7 +14,7 @@ axes = create_canvas_and_axes(canvas_width = 18,
 
 #######################################################
 # Now let's draw the shapes!                         ##
-draw_a_rectangle(ax=axes, centre_x=9, centre_y=2, width=22, height=1, colour='red', turn=6)
+draw_a_rectangle(ax=axes, centre_x=9, centre_y=2, width=22, height=1, colour='red', turn=1)
 
 draw_a_rectangle(ax=axes, centre_x=3, centre_y=2, width=22, height=2, colour='red', turn=3)
 
