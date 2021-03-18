@@ -64,18 +64,22 @@ def check_rectangle():
     compare_contours(s1=r, s2=other_r, **kwargs)
 
   # make sure shift works
-  # print(r.get_xy());
-  r_1 = clone_a_shape(r ); r_1.shift(shift=[1, 2]); # print(r.get_xy()); return; print(r_1.get_xy()); 
-  r31 = clone_a_shape(r3); r31.shift(shift=[1, 2])
-  r41 = clone_a_shape(r4); r41.shift(shift=[1, 2])
+  for other_r_init in [r, r3, r4]:
+    other_r = clone_a_shape(other_r_init)
+    other_r.shift(shift=[101, 202])
+    compare_contours(s1=r.get_xy() + [101, 202], s2=other_r)
 
-  for other_r in [r_1, r31, r41]:
-    compare_contours(s1=r.get_xy() + [1, 2], s2=other_r)
+  # make sure flipping works
 
-  # make sure shift works
-  
+  # make sure rotation works
+  r31 = clone_a_shape(r3); r31.rotate(turn=6)
+  r41 = clone_a_shape(r4); r41.rotate(turn=6)
+  compare_contours(r31.get_xy() + [20, -4], r41.get_xy())
 
-  #r_1.update_shape_parameters(centre_x)
+  # make sure parameters update works
+  r502 = clone_a_shape(r); r502.stretch(stretch_x=1/5, stretch_y=50)
+  r5033 = clone_a_shape(r);r5033.update_shape_parameters(width=2, height=100)
+  compare_contours(r5033, r502)
 
 
   with pytest.raises(Exception):
