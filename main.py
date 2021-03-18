@@ -16,6 +16,7 @@ from zyxxy_all_EXAMPLES import *
 #import draw_a_flag_of_Cuba
 #import draw_a_flag_of_the_UK
 #import draw_a_flag_of_Finland
+import draw_Pythagoras_Puzzle
 
 from zyxxy_tests import check_rectangle
-check_rectangle()
+#check_rectangle()

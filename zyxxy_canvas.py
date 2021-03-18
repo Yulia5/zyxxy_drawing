@@ -151,7 +151,8 @@ def show_drawing_and_save_if_needed(filename=None,
                            animation_format = my_default_animation_params['format'],
                            animation_func = None,
                            animation_init = default_animation_init,
-                           nb_of_frames = None):
+                           nb_of_frames = None,
+                           block=True):
   figure = plt.gcf()
 
   current_dpi = figure.get_dpi() 
@@ -187,4 +188,4 @@ def show_drawing_and_save_if_needed(filename=None,
   figure.set_dpi(current_dpi) 
   figure.set_size_inches(current_figsize)
   if not is_running_tests():
-    plt.show()
+    plt.show(block=block)
