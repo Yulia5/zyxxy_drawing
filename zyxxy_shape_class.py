@@ -14,10 +14,11 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+import copy
 import numpy as np
 from matplotlib.pyplot import Polygon
 import zyxxy_coordinates
-from zyxxy_utils import rotate_point, stretch_something
+from zyxxy_utils import rotate_point, stretch_something, is_the_same_contour
 from zyxxy_shape_style import set_patch_style, set_line_style, get_diamond_size, format_arg_dict
 from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
 from zyxxy_shape_style import raise_Exception_if_not_processed
@@ -61,7 +62,6 @@ def stretch_layer(diamond, stretch_x=1., stretch_y=1., layer_nbs=[]):
 
 class Shape:
 
-
   all_shapes = []
 
 ##################################################################
@@ -83,47 +83,74 @@ class Shape:
 
  ################################################################## 
 
-  def __init__(self, ax, shapetype):
+  def __init__(self, **kwargs):
 
-    self.diamond_coords = np.array([0, 0])
-
-    if shapetype == "patch":  
-      self.patch = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=True, closed=True)
-      ax.add_patch(self.patch)
-      self.outline = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=False, closed=True) 
-      ax.add_patch(self.outline)
-      self.line = None
-    elif shapetype == "line":
-      self.patch = None
-      self.outline = None
-      self.line = Polygon(np.array([[0,0], [0,1], [1,1]]), fill=False, closed=False) 
-      ax.add_patch(self.line)
-    else:
-      raise Exception(shapetype, "not a recognized shapetype")
-
-    diamond_size = get_diamond_size(ax)
-    if diamond_size is not None:
-      self.diamond_contour = np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * diamond_size
-      self.diamond = Polygon(self.diamond_contour, fill=True, closed=True)
-      ax.add_patch(self.diamond)
-    else:
-      self.diamond_contour = None
-      self.diamond = None
-
-    for attr_name in format_arg_dict.keys():
-      _attr = getattr(self, attr_name)
-      if _attr is None:
-        continue
-      if "line" in attr_name:
-        set_line_style(_attr, **my_default_colour_etc_settings[attr_name])
-      else:
-        set_patch_style(_attr, **my_default_colour_etc_settings[attr_name])
-
-    self.clip_patches = []
-    self.move_history = {'flip' : False, 'stretch_x' : 1., 'stretch_y' : 1., 'turn' : 0}
-    self.shape_kwargs = {}
-    self.shapename = None
     Shape.all_shapes.append(self)
+
+    dummy_xy = np.array([[0,0], [0,1], [1,1]])
+
+    # clone constructor
+    if len(kwargs) == 1:
+      init_shape = kwargs['init_shape']
+      assert isinstance(init_shape, Shape)
+
+      def clone_patch(init_patch):
+        if init_patch is None:
+          return None
+        else:
+          result = Polygon(xy=dummy_xy)
+          result.update_from(other=init_patch)
+          result.set_xy(init_patch.get_xy())
+          init_patch.axes.add_patch(result)
+
+          assert is_the_same_contour(p1=result.get_xy(), p2=init_patch.get_xy())
+          return result
+
+      self.patch = clone_patch(init_patch=init_shape.patch)
+      self.outline = clone_patch(init_patch=init_shape.outline)
+      self.line = clone_patch(init_patch=init_shape.line)
+      self.diamond = clone_patch(init_patch=init_shape.diamond)
+
+      self.shapename = init_shape.shapename
+      self.clip_patches = copy.deepcopy(init_shape.clip_patches)
+      self.move_history = copy.deepcopy(init_shape.move_history)
+      self.shape_kwargs = copy.deepcopy(init_shape.shape_kwargs)
+      self.diamond_coords = np.copy(init_shape.diamond_coords)
+
+    # from-scratch constructor
+    elif len(kwargs) == 2:
+      ax = kwargs['ax']
+      shapetype = kwargs['shapetype']
+      assert shapetype in ["patch", "line"]
+
+      self.diamond_coords = np.array([0, 0])
+      diamond_size = get_diamond_size(ax)
+      diamond_contour = np.array([[1, 0], [0, -1], [-1, 0], [0, 1]]) * diamond_size if diamond_size is not None else None 
+
+      self.patch   = Polygon(xy=dummy_xy, fill=True,  closed=True)  if shapetype == "patch" else None
+      self.outline = Polygon(xy=dummy_xy, fill=False, closed=True)  if shapetype == "patch" else None
+      self.line    = Polygon(xy=dummy_xy, fill=False, closed=False) if shapetype == "line"  else None
+      self.diamond = Polygon(xy=diamond_contour, fill=True, closed=True) if diamond_size is not None else None
+
+      for what in [self.patch, self.outline, self.line, self.diamond]:
+        if what is not None:
+          ax.add_patch(what)
+
+      for attr_name in format_arg_dict.keys():
+        _attr = getattr(self, attr_name)
+        if _attr is None:
+          continue
+        if "line" in attr_name:
+          set_line_style(_attr, **my_default_colour_etc_settings[attr_name])
+        else:
+          set_patch_style(_attr, **my_default_colour_etc_settings[attr_name])
+
+      self.clip_patches = []
+      self.move_history = {'flip' : False, 'stretch_x' : 1., 'stretch_y' : 1., 'turn' : 0}
+      self.shape_kwargs = {}
+      self.shapename = None
+    else:
+      raise Exception("Constructor arguments are invalid")
 
 ##################################################################
 
@@ -293,10 +320,11 @@ class Shape:
 ##################################################################
   
   def update_diamond(self, new_diamond_coords):
+    diamond_shift = new_diamond_coords - self.diamond_coords
     self.diamond_coords = np.array(new_diamond_coords)
     if self.diamond is not None:                  
       Shape._set_xy(something=self.diamond, 
-                    xy=self.diamond_coords+self.diamond_contour)
+                    xy=Shape._get_xy(self.diamond)+diamond_shift)
 
 ##################################################################
 

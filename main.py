@@ -16,5 +16,5 @@
 #import draw_a_flag_of_the_UK
 #import draw_a_flag_of_Finland
 
-# from zyxxy_tests import check_rectangle
-# check_rectangle()
+from zyxxy_tests import check_rectangle
+check_rectangle()

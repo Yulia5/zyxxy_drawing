@@ -164,7 +164,7 @@ def init_shift(contour, left=None, centre_x=None, right=None, bottom=None, centr
 
 # a rectangle ######################################################
 def build_a_rectangle(height, width):
-  contour = np.array([[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]) * [width/2, height/2]
+  contour = np.array([[-1, -1], [-1, 1], [1, 1], [1, -1]]) * [width/2, height/2]
   return contour
 
 # a square ######################################################

@@ -123,17 +123,11 @@ def draw_a_shape(ax, shapename, **kwargs):
   
   return _shape
 
-# code for four special draw_* functions
-def __draw_a_rectangle(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None, ax=None, **kwargs):
-  contour, diamond = zyxxy_coordinates.build_a_rectangle_and_its_diamond(width=width, height=height, 
-    left=left, centre_x=centre_x, right=right, bottom=bottom, centre_y=centre_y, top=top)
-  result = draw_a_shape(ax=ax, shapename=contour, shapetype="patch", diamond_x=diamond[0], diamond_y=diamond[1], **kwargs)
-  return result
+def clone_a_shape(init_shape):
+   _shape = Shape(init_shape=init_shape)
+   return _shape
 
-def __draw_a_square(side, **kwargs):
-  result = __draw_a_rectangle(width=side, height=side, **kwargs)
-  return result
-
+# code for two special draw_* functions
 def draw_a_broken_line(contour, ax=None, **kwargs):
   _shape = draw_a_shape(ax=ax, shapename=contour, shapetype="line", **kwargs)
   return _shape
@@ -144,5 +138,4 @@ def draw_a_polygon(contour, ax=None, **kwargs):
 
 # autogenerate all other draw_* functions
 for shapename in zyxxy_coordinates.shape_names_params_dicts_definition.keys():
-  #if shapename not in ["a_rectangle", "a_square"]:
-    globals()["draw_" + shapename] = partial(draw_a_shape, shapename=shapename)
+  globals()["draw_" + shapename] = partial(draw_a_shape, shapename=shapename)
