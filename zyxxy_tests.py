@@ -70,6 +70,11 @@ def check_rectangle():
     compare_contours(s1=r.get_xy() + [101, 202], s2=other_r)
 
   # make sure flipping works
+  r001 = clone_a_shape(r) ; r001.flip()
+  r301 = clone_a_shape(r3); r301.flip()
+  r401 = clone_a_shape(r4); r401.flip()
+  compare_contours(r001.get_xy() + [0, 2], r301.get_xy())
+  compare_contours(r001.get_xy() + [0,-2], r401.get_xy())
 
   # make sure rotation works
   r31 = clone_a_shape(r3); r31.rotate(turn=6)
