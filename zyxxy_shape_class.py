@@ -86,6 +86,7 @@ class Shape:
   def __init__(self, **kwargs):
 
     Shape.all_shapes.append(self)
+    self.exc = False
 
     dummy_xy = np.array([[0,0], [0,1], [1,1]])
 
@@ -100,7 +101,7 @@ class Shape:
         else:
           result = Polygon(xy=dummy_xy)
           result.update_from(other=init_patch)
-          result.set_xy(init_patch.get_xy())
+          result.set_xy(np.copy(init_patch.get_xy()))
           init_patch.axes.add_patch(result)
 
           assert is_the_same_contour(p1=result.get_xy(), p2=init_patch.get_xy())
@@ -354,11 +355,18 @@ class Shape:
 
 ##################################################################
 
+  def raise_e(self):
+    self.exc = True
+
   def shift(self, shift):
-    def func(xy):
+    def func(xy):     
       xy += shift
       return xy
+
+    prior_xy = np.copy(self.get_xy())
     self._move_xy(func=func)
+    if self.exc:
+      raise Exception(prior_xy, shift, self.get_xy())
 
     self.update_diamond(new_diamond_coords = self.diamond_coords + shift)
 
