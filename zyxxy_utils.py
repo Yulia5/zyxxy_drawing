@@ -23,7 +23,6 @@ tolerance = 0.0001
 full_turn_angle = 12 # 12 for hours
 
 ##################################################################
-
 def is_number(val):
   return isinstance(val, (int, float, np.float64, np.int64))
 
@@ -35,6 +34,24 @@ def is_the_same_point(p1, p2):
   else:
     sqr_dist = np.sum(diff**2) 
   return (sqr_dist < tolerance)
+
+##################################################################
+def conc_1_or_2_dim(a, b):
+  if a.ndim != b.ndim:
+    raise Exception("Dimension number mismatch", a.ndim, "!=", b.ndim)
+  if a.ndim == 1:
+    return np.hstack((a, b))
+  else:
+    return np.vstack((a, b))  
+
+##################################################################
+def is_the_same_contour(p1, p2, start_1=0, start_2=0, opposite_directions=False):
+  p1_modif = conc_1_or_2_dim(p1[start_1:], p1[:start_1])
+  p2_modif = conc_1_or_2_dim(p2[start_2:], p2[:start_2])
+  if opposite_directions:
+    p2_modif = p2_modif[::-1]
+  result = is_the_same_point(p1=p1_modif, p2=p2_modif)
+  return result
 
 ##################################################################
 ## MOVEMENT HELPERS                                             ## 

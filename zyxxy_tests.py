@@ -1,7 +1,7 @@
 
 import zyxxy_canvas
 zyxxy_canvas.is_running_tests(True)
-import datetime
+import datetime, pytest
 
 def run_all_examples():
   import inspect
@@ -33,17 +33,31 @@ def run_all_drawings():
 def check_rectangle():
   from zyxxy_shape_functions import draw_a_rectangle
   from zyxxy_canvas import create_canvas_and_axes
-  from zyxxy_utils import is_the_same_point
+  from zyxxy_utils import is_the_same_contour #, is_the_same_point
 
   axes = create_canvas_and_axes(canvas_width = 18,
-                              canvas_height = 12)
+                                canvas_height = 12)
   r  = draw_a_rectangle(ax=axes, centre_x=9, centre_y=2, width=22, height=1)
   r0 = draw_a_rectangle(ax=axes, centre_x=9, centre_y=2, width=22, height=1, turn=0)
+
+  assert is_the_same_contour(p1=r.get_xy(), p2=r0.get_xy())
+
+  with pytest.raises(Exception):
+        x = 1 / 0
+
+
+
+
   r1 = draw_a_rectangle(ax=axes, centre_x=9, centre_y=2, width=22, height=1, turn=6)
   print(r.get_xy())
   print(r.diamond_coords)
   print(r0.get_xy())
   #print(r0.get_xy() + r1.get_xy())
-  print(is_the_same_point(p1=r.get_xy(), p2=r0.get_xy()))
+  print()
+
+
+  #is_the_same_contour(p1, p2, start_1=0, start_2=0, opposite_directions=False)
+
+
   r0.rotate(turn=6)
   print(r0.get_xy())

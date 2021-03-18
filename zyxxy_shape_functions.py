@@ -87,8 +87,6 @@ def draw_a_shape(ax, shapename, **kwargs):
   
   if isinstance(shapename, str):
     admissible_shape_args = [k for k in zyxxy_coordinates.shape_names_params_dicts_definition[shapename].keys()]
-    if shapename in ["a_rectangle", "a_square"]:
-      admissible_shape_args += ['left', 'right', 'bottom', 'top']
     kwargs_shape = {key : value for key, value in kwargs.items() if key in admissible_shape_args}
     param_names_used += [k for k in kwargs_shape.keys()]
     _shape.update_xy_by_shapename(shapename=shapename, **kwargs_shape)

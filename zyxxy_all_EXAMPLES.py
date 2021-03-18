@@ -144,7 +144,7 @@ def example_penguins():
   for s in range(150):
     draw_a_star(ax=axes, centre_x=random_number(max = get_width(axes)), 
                        centre_y=random_number(max = get_height(axes)), 
-                       radius1=1, radius2=3, ends_qty=8, colour='aliceblue')
+                       radius_1=1, radius_2=3, ends_qty=8, colour='aliceblue')
 
   # ice
   ice_colours = ['aliceblue', 'steelblue', 'skyblue']

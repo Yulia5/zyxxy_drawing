@@ -13,7 +13,7 @@
 #import draw_a_flag_of_the_USA 
 #import draw_a_flag_of_Belgium
 #import draw_a_flag_of_Cuba
-import draw_a_flag_of_the_UK
+#import draw_a_flag_of_the_UK
 #import draw_a_flag_of_Finland
 
 # from zyxxy_tests import check_rectangle

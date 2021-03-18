@@ -15,7 +15,7 @@
 ########################################################################
 
 import numpy as np
-from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point, my_default_vertices_qty_in_circle, full_turn_angle
+from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point, my_default_vertices_qty_in_circle, full_turn_angle, conc_1_or_2_dim
 
 from scipy.optimize import fsolve
 from math import sqrt, ceil, floor
@@ -59,13 +59,6 @@ sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle*full_turn_angle), 
 #####################################################
 ## contours manipulation                           ##
 #####################################################
-def conc_1_or_2_dim(a, b):
-  if a.ndim != b.ndim:
-    raise Exception("Dimension number mismatch", a.ndim, "!=", b.ndim)
-  if a.ndim == 1:
-    return np.hstack((a, b))
-  else:
-    return np.vstack((a, b))
 
 #####################################################
 def link_contours(*arg):
