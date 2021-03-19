@@ -101,10 +101,11 @@ def set_line_style(something, **kwargs):
     something.set_fc('none')
     if SHOW_OUTLINES_ONLY:
       something.set_linestyle('dotted')
+      something.set_ec(find_colour_code( kwargs['colour'] ))
     else:
       something.set_linestyle('solid')
-    if "colour" in kwargs:
-      something.set_ec(find_colour_code( kwargs['colour'] ))
+      if "colour" in kwargs:
+        something.set_ec(find_colour_code( kwargs['colour'] ))
     if "layer_nb" in kwargs:
       something.set_zorder(kwargs['layer_nb'])
 

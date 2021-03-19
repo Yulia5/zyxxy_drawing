@@ -23,19 +23,19 @@ axes = create_canvas_and_axes(canvas_width = 21,
                               background_colour=bg_colour)
 
 
-draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=0, radius_2=4, angle_start=0, angle_end= 6, colour=beige)
-draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=0, radius_2=4, angle_start=6, angle_end=12, colour=mustard)
-draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=4, radius_2=5, angle_start=0, angle_end=6, colour=bluegreen)
-draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=5, radius_2=7, angle_start=0, angle_end=6, colour=deepblue)
+draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=0, radius_2=3.5, angle_start=0, angle_end= 6, colour=beige)
+draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=0, radius_2=3.5, angle_start=6, angle_end=12, colour=mustard)
+draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=3.5, radius_2=4.5, angle_start=0, angle_end=6, colour=bluegreen)
+draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=4.5, radius_2=6, angle_start=0, angle_end=6, colour=deepblue)
 
-draw_a_sector(ax=axes, centre_x=0, centre_y=9, radius=2, radius_2=4, angle_start=6, angle_end=12, colour=deepgreen)
+draw_a_sector(ax=axes, centre_x=-2, centre_y=8, radius=2.5, radius_2=4.5, angle_start=5, angle_end=12.5, colour=deepgreen)
 
-draw_a_circle(ax=axes, centre_x=-0.5, centre_y=9, radius=1.5, colour=brickred)
-draw_a_circle(ax=axes, centre_x=0, centre_y=5.5, radius=2, colour='black')
+draw_a_circle(ax=axes, centre_x=-2, centre_y=8, radius=1.85, colour=brickred)
+draw_a_circle(ax=axes, centre_x=0, centre_y=4.5, radius=1.85, colour='black')
 
-for radius in [1, 2, 3, 4]:
-  angle_to_horizontal = asin_hours(0.75 / radius)
-  draw_an_arc(ax=axes, centre_x=0, centre_y=-8, radius=radius, angle_start=3-angle_to_horizontal, angle_end=9+angle_to_horizontal, linewidth=5, colour='black')
+for radius in [1.5, 2.5, 3.5, 4.5]:
+  angle_to_horizontal = asin_hours(1.25 / radius)
+  draw_an_arc(ax=axes, centre_x=0, centre_y=-7.5, radius=radius, angle_start=3-angle_to_horizontal, angle_end=9+angle_to_horizontal, linewidth=5, colour='black', stretch_x=0.95)
 
 
 
