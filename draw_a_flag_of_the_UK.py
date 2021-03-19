@@ -10,7 +10,7 @@ axes = create_canvas_and_axes(canvas_width = 18,
                               tick_step = 1,
                               title = "Flag Of The U.K.",
                               model = example_british_flag,
-                              show_outlines = True)
+                              outlines_colour = "cyan")
 
 #######################################################
 # Now let's draw the shapes!                         ##

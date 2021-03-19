@@ -16,7 +16,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import is_color_like
-from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings, my_default_diamond_size
+from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings, my_default_diamond_size, default_outlines_width, default_outlines_widthlayer_nb
 from zyxxy_utils import raise_Exception_if_not_processed
 
 ########################################################################
@@ -82,11 +82,11 @@ def find_colour_code(colour_name):
 
 ########################################################################
 
-SHOW_OUTLINES_ONLY = False
+OUTLINES_COLOUR = None
 
-def show_outlines_only(val):
-  global SHOW_OUTLINES_ONLY
-  SHOW_OUTLINES_ONLY = val
+def set_outlines_colour(val):
+  global OUTLINES_COLOUR
+  OUTLINES_COLOUR = val
 
 ########################################################################
 
@@ -99,18 +99,20 @@ def extract_colour_etc_kwargs(kwargs):
 def set_line_style(something, **kwargs):
 
     something.set_fc('none')
-    if SHOW_OUTLINES_ONLY:
-      something.set_linestyle('dotted')
-      something.set_ec(find_colour_code( kwargs['colour'] ))
+    if OUTLINES_COLOUR is not None:
+      something.set_linestyle('--')
+      something.set_ec(OUTLINES_COLOUR)
+      something.set_lw(default_outlines_width)
+      something.set_zorder(default_outlines_widthlayer_nb)
     else:
       something.set_linestyle('solid')
       if "colour" in kwargs:
         something.set_ec(find_colour_code( kwargs['colour'] ))
-    if "layer_nb" in kwargs:
-      something.set_zorder(kwargs['layer_nb'])
+      if "linewidth" in kwargs:
+        something.set_lw(kwargs['linewidth'])
+      if "layer_nb" in kwargs:
+        something.set_zorder(kwargs['layer_nb'])
 
-    if "linewidth" in kwargs:
-      something.set_lw(kwargs['linewidth'])
     if "joinstyle" in kwargs:
       something.set_joinstyle(kwargs['joinstyle'])
     if 'capstyle' in kwargs:
@@ -120,20 +122,22 @@ def set_patch_style(something, **kwargs):
 
     if "colour" in kwargs:
       this_colour = find_colour_code( kwargs['colour'] )
-      if not SHOW_OUTLINES_ONLY:
+      if OUTLINES_COLOUR is None:
         something.set_ec('none')
         something.set_fc(this_colour)
       else:
         something.set_fc('none')
-        something.set_ec(this_colour)
-        something.set_linestyle('dotted')
+        something.set_ec(OUTLINES_COLOUR)
+        something.set_lw(default_outlines_width)
+        something.set_linestyle('--')
+        something.set_zorder(default_outlines_widthlayer_nb)
     
     something.set_lw(_default_arguments['line']['linewidth'])
 
     if "layer_nb" in kwargs:
       something.set_zorder(kwargs['layer_nb'])
 
-    if not SHOW_OUTLINES_ONLY:
+    if OUTLINES_COLOUR is not None:
       if "opacity" in kwargs:
         something.set_alpha(kwargs['opacity'])
 

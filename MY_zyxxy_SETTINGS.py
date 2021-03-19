@@ -53,7 +53,7 @@ my_default_colour_etc_settings = {
                                              'linewidth' : 0, 
                                              'joinstyle' : 'miter', 
                                              'layer_nb' : 1},
-                     "diamond" : {'colour' : 'blue', #  None #
+                     "diamond" : {'colour' : 'cyan', #  None #
                                   'opacity' : 1.0,
                                   'layer_nb' : 1000}} 
 
@@ -62,7 +62,9 @@ my_default_background_settings =  {'fc' : 'none',
                                    'zorder' : -1000,
                                    'alpha' : 1}   
 
-my_default_diamond_size = 0.015         
+my_default_diamond_size = 0.015 
+default_outlines_width = 10 
+default_outlines_widthlayer_nb = 501       
 
 # Font sizes and adjustment needed to fit them
 my_default_font_sizes = {'title'      : 18/screen_zoom,

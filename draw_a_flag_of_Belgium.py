@@ -10,7 +10,7 @@ ax = create_canvas_and_axes(  canvas_width = 6,
                               tick_step = 1,
                               title = "Belgian flag",
                               model = example_belgian_flag,
-                              show_outlines = True)
+                              outlines_colour = "cyan")
 
 #######################################################
 # Now let's draw the shapes!                         ##

@@ -10,11 +10,10 @@ axes = create_canvas_and_axes(canvas_width = 36,
                               tick_step = 2,
                               title = "Flag Of Finland",
                               model = example_finnish_flag,
-                              show_outlines = True
-                              )
+                              outlines_colour = "red")
 
 #######################################################
 # Now let's draw the shapes!                         ##
-draw_a_rectangle(ax=axes, left=13, centre_y=11, width=6, height=10, colour='midnightblue') 
+draw_a_rectangle(ax=axes, left=22, centre_y=11, width=6, height=10, colour='midnightblue') 
 
 show_drawing_and_save_if_needed()

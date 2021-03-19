@@ -11,7 +11,7 @@ ax = create_canvas_and_axes(  canvas_width = 19*13*2,
                               tick_step = 50,
                               title = "Flag Of The U.S.A.",
                               model = example_us_flag,
-                              show_outlines = True)
+                              outlines_colour = "cyan")
 
 set_diamond_size_factor(0.75)
 

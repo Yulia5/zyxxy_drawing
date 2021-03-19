@@ -19,9 +19,8 @@ from functools import partial
 from math import floor
 from matplotlib import animation
 import matplotlib.pyplot as plt
-import types
 
-from zyxxy_shape_style import set_diamond_size_factor, set_patch_style, show_outlines_only
+from zyxxy_shape_style import set_diamond_size_factor, set_outlines_colour
 from zyxxy_shape_class import get_all_polygons_in_layers
 from zyxxy_external_images import filename_to_image, show_image
 from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_background_settings, my_default_display_params, my_default_image_params, my_default_animation_params
@@ -34,20 +33,13 @@ def is_running_tests(val=None):
     __is_running_tests = val
   return __is_running_tests
 
-background_rectangle = None
-
-def set_background_colour(new_background_colour):
-  global background_rectangle
-  if background_rectangle is not None:
-    set_patch_style(background_rectangle, colour=new_background_colour)
-
 # create the axis, set their sizes, 
 # add the grid and ticks if needed
 def create_canvas_and_axes(canvas_width,
                            canvas_height,
                            make_symmetric = False,
                            tick_step = None,
-                           background_colour = None,
+                           background_colour = 'none',
                            title = None,
                            title_font_size = my_default_font_sizes['title'],
                            axes_label_font_size = my_default_font_sizes['axes_label'],
@@ -57,7 +49,7 @@ def create_canvas_and_axes(canvas_width,
                            margin_adjustments = my_default_display_params['margin_adjustments'],
                            axes = None,
                            model = None,
-                           show_outlines = False):
+                           outlines_colour = None):
   global background_rectangle
 
   # helper function to make sure the ticks are in the right place
@@ -106,6 +98,14 @@ def create_canvas_and_axes(canvas_width,
     a_.set_aspect('equal')
     a_.set_xlim(left=left_x, right=right_x)
     a_.set_ylim(bottom=bottom_y, top=top_y)
+
+  if tick_step is None:
+    background_rectangle = plt.Polygon([[left_x, bottom_y], 
+                                       [left_x+canvas_width, bottom_y], 
+                                       [left_x+canvas_width, bottom_y+canvas_height], 
+                                       [left_x, bottom_y+canvas_height]], 
+                                       **my_default_background_settings)
+    axes.set_facecolor(background_colour)
   
   if model is not None:
     # handle the model drawing
@@ -132,25 +132,17 @@ def create_canvas_and_axes(canvas_width,
       margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
 
     axs[1].set_title(model_title, fontdict={'size': title_font_size})
-    if show_outlines and model is not None and not isinstance(model, str):
-      show_outlines_only(True)
+    if outlines_colour is not None and model is not None and not isinstance(model, str):
+      set_outlines_colour(outlines_colour)
+      set_diamond_size_factor(0)
       model(axes=axes)
       axes.set_title("") # remove the title if needed
-      show_outlines_only(False)
+      set_outlines_colour(None)
 
   axes.set_title(title, fontdict={'size': title_font_size})
 
   # show diamond points and grid and axis if and only if tick_step is set
   set_diamond_size_factor(value=(tick_step is not None))
-
-  if tick_step is None:
-    background_rectangle = plt.Polygon([[left_x, bottom_y], 
-                                       [left_x+canvas_width, bottom_y], 
-                                       [left_x+canvas_width, bottom_y+canvas_height], 
-                                       [left_x, bottom_y+canvas_height]], 
-                                       **my_default_background_settings)
-    axes.add_patch(background_rectangle)
-    set_background_colour(new_background_colour=background_colour)
 
   plt.subplots_adjust(**margin_adjustments)
   figure = plt.gcf()
