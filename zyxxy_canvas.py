@@ -52,7 +52,7 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_font_sizes['title'],
                            axes_label_font_size = my_default_font_sizes['axes_label'],
                            axes_tick_font_size = my_default_font_sizes['tick'],
-                           figsize = my_default_display_params['figsize'],
+                           figsize = my_default_display_params['max_figsize'],
                            dpi = my_default_display_params['dpi'],
                            margin_adjustments = my_default_display_params['margin_adjustments'],
                            axes = None,
@@ -84,7 +84,10 @@ def create_canvas_and_axes(canvas_width,
       _, axes = plt.subplots()
       all_axes.append(axes)
     else:
-      _, axs = plt.subplots(2)
+      if True:
+        _, axs = plt.subplots(1, 2)
+      else:
+        _, axs = plt.subplots(2, 1)
       all_axes += [axs[0], axs[1]]
       axes = axs[0]
 
@@ -111,17 +114,23 @@ def create_canvas_and_axes(canvas_width,
       image = filename_to_image(filename=model)
       scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
       # defining LB_position to center the model image
-      LB_position=[left_x   + 0.5 * (canvas_width - image.shape[1] * scaling_factor), 
+      LB_position=[left_x   + 0.5 * (canvas_width  - image.shape[1] * scaling_factor), 
                    bottom_y + 0.5 * (canvas_height - image.shape[0] * scaling_factor)]
       # placing the image
       show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor,  LB_position=LB_position)  
     else:
       model(axes=axs[1]) 
       model_title = "Completed Drawing"
+
+    if True:
       
-    figsize[1] *= 2 # because we plot 2 images
-    margin_adjustments['bottom'] /= 2.
-    margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
+      margin_adjustments['left'] /= 2.
+      margin_adjustments['right'] = (1 + margin_adjustments['right']) / 2.
+    else:
+      
+      margin_adjustments['bottom'] /= 2.
+      margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
+
     axs[1].set_title(model_title, fontdict={'size': title_font_size})
     if show_outlines and model is not None and not isinstance(model, str):
       show_outlines_only(True)

@@ -15,7 +15,7 @@ bg_colour = 'oldlace'
 #######################################################
 # Creating the canvas!                               ##
 axes = create_canvas_and_axes(canvas_width = 21,
-                              canvas_height = 29,
+                              canvas_height = 28,
                               tick_step = 2,
                               make_symmetric = True,
                               title = "My Coccinelle",
@@ -35,7 +35,7 @@ draw_a_circle(ax=axes, centre_x=0, centre_y=4.5, radius=1.85, colour='black')
 
 for radius in [1.5, 2.5, 3.5, 4.5]:
   angle_to_horizontal = asin_hours(1.25 / radius)
-  draw_an_arc(ax=axes, centre_x=0, centre_y=-7.5, radius=radius, angle_start=3-angle_to_horizontal, angle_end=9+angle_to_horizontal, linewidth=5, colour='black', stretch_x=0.95)
+  draw_an_arc(ax=axes, centre_x=0, centre_y=-7.5, radius=radius, angle_start=3-angle_to_horizontal, angle_end=9+angle_to_horizontal, linewidth=9, colour='black', stretch_x=0.95)
 
 
 
