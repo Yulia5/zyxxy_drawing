@@ -19,7 +19,7 @@ from zyxxy_all_EXAMPLES import *
 #import draw_a_flag_of_Finland
 #import drawn_Pythagoras_Puzzle
 
-#import drawn_a_Coccinelle
+import drawn_a_Coccinelle
 
 #from zyxxy_tests import check_rectangle
 #check_rectangle()

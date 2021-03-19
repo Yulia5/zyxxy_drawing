@@ -55,12 +55,7 @@ my_default_colour_etc_settings = {
                                              'layer_nb' : 1},
                      "diamond" : {'colour' : 'cyan', #  None #
                                   'opacity' : 1.0,
-                                  'layer_nb' : 1000}} 
-
-my_default_background_settings =  {'fc' : 'none', 
-                                   'ec' : 'none',
-                                   'zorder' : -1000,
-                                   'alpha' : 1}   
+                                  'layer_nb' : 1000}}
 
 my_default_diamond_size = 0.015 
 default_outlines_width = 10 
