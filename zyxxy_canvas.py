@@ -87,27 +87,6 @@ def create_canvas_and_axes(canvas_width,
       _, axs = plt.subplots(2)
       all_axes += [axs[0], axs[1]]
       axes = axs[0]
-      # handle the model drawing
-      if isinstance(model, str):
-        image = filename_to_image(filename=model)
-        axs[1].set_xlim(left=0,   right=canvas_width)
-        axs[1].set_ylim(bottom=0, top=canvas_height)
-        axs[1].set_aspect('equal')
-        scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
-        show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor,  LB_position=[0, 0])
-        model_title = "Original Drawing"
-      else:
-        model(axes=axs[1]) 
-        model_title = "Completed Drawing"
-      figsize[1] *= 2 # because we plot 2 images
-      margin_adjustments['bottom'] /= 2.
-      margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
-      axs[1].set_title(model_title, fontdict={'size': title_font_size})
-      if show_outlines and model is not None and not isinstance(model, str):
-         show_outlines_only(True)
-         model(axes=axes)
-         axes.set_title("") # remove the title if needed
-         show_outlines_only(False)
 
   for a_ in all_axes:
     a_.grid(tick_step is not None)
@@ -124,6 +103,31 @@ def create_canvas_and_axes(canvas_width,
     a_.set_aspect('equal')
     a_.set_xlim(left=left_x, right=right_x)
     a_.set_ylim(bottom=bottom_y, top=top_y)
+  
+  if model is not None:
+    # handle the model drawing
+    if isinstance(model, str):
+      model_title = "Original Drawing"
+      image = filename_to_image(filename=model)
+      scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
+      # defining LB_position to center the model image
+      LB_position=[left_x   + 0.5 * (canvas_width - image.shape[1] * scaling_factor), 
+                   bottom_y + 0.5 * (canvas_height - image.shape[0] * scaling_factor)]
+      # placing the image
+      show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor,  LB_position=LB_position)  
+    else:
+      model(axes=axs[1]) 
+      model_title = "Completed Drawing"
+      
+    figsize[1] *= 2 # because we plot 2 images
+    margin_adjustments['bottom'] /= 2.
+    margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
+    axs[1].set_title(model_title, fontdict={'size': title_font_size})
+    if show_outlines and model is not None and not isinstance(model, str):
+      show_outlines_only(True)
+      model(axes=axes)
+      axes.set_title("") # remove the title if needed
+      show_outlines_only(False)
 
   axes.set_title(title, fontdict={'size': title_font_size})
 
