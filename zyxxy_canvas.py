@@ -16,10 +16,14 @@
 
 import numpy as np
 from functools import partial
+from math import floor
 from matplotlib import animation
 import matplotlib.pyplot as plt
+import types
+
 from zyxxy_shape_style import set_diamond_size_factor, set_patch_style, show_outlines_only
 from zyxxy_shape_class import get_all_polygons_in_layers
+from zyxxy_external_images import filename_to_image, show_image
 from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_background_settings, my_default_display_params, my_default_image_params, my_default_animation_params
 
 __is_running_tests = False
@@ -60,18 +64,28 @@ def create_canvas_and_axes(canvas_width,
     if model is None:
       _, axes = plt.subplots()
     else:
-     _, axs = plt.subplots(2)
-     axes = axs[0]
-     model(axes=axs[1]) 
-     figsize[1] *= 2 # because we plot 2 images
-     margin_adjustments['bottom'] /= 2.
-     margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
-     axs[1].set_title("Completed Drawing", fontdict={'size': title_font_size})
-     if show_outlines:
-       show_outlines_only(True)
-       model(axes=axes)
-       axes.set_title("") # remove the title if needed
-       show_outlines_only(False)
+      _, axs = plt.subplots(2)
+      axes = axs[0]
+      if isinstance(model, str):
+        image = filename_to_image(filename=model)
+        axs[1].set_xlim(left=0,   right=canvas_width)
+        axs[1].set_ylim(bottom=0, top=canvas_height)
+        axs[1].set_aspect('equal')
+        scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
+        show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor, where_position="")
+        model_title = "Original Drawing"
+      else:
+        model(axes=axs[1]) 
+        model_title = "Completed Drawing"
+      figsize[1] *= 2 # because we plot 2 images
+      margin_adjustments['bottom'] /= 2.
+      margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
+      axs[1].set_title(model_title, fontdict={'size': title_font_size})
+      if show_outlines and model is not None and not isinstance(model, str):
+         show_outlines_only(True)
+         model(axes=axes)
+         axes.set_title("") # remove the title if needed
+         show_outlines_only(False)
 
   axes.set_title(title, fontdict={'size': title_font_size})
 
@@ -87,6 +101,13 @@ def create_canvas_and_axes(canvas_width,
   else:
     bottom_y, top_y = 0, canvas_height
 
+  # helper function to make sure the ticks are in the right place
+  def get_round_multiple_range(min_, max_, step):
+    _sign = -1 if min_ < 0 else 1
+    min_multiple = _sign * floor(abs(min_/step)) * abs(step)
+    result = np.arange(min_multiple, max_, step)
+    return result
+
   # show diamond points and grid and axis if and only if tick_step is set
   set_diamond_size_factor(value=(tick_step is not None))
   axes.grid(tick_step is not None)
@@ -94,8 +115,8 @@ def create_canvas_and_axes(canvas_width,
     axes.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)
     axes.set_ylabel("RULER FOR Y's", fontsize=axes_label_font_size)
     axes.tick_params(axis='both', which='major', labelsize=axes_tick_font_size)
-    axes.set_xticks(ticks = np.arange(left_x, right_x, tick_step))
-    axes.set_yticks(ticks = np.arange(bottom_y, top_y, tick_step))
+    axes.set_xticks(ticks = get_round_multiple_range(left_x, right_x, tick_step))
+    axes.set_yticks(ticks = get_round_multiple_range(bottom_y, top_y, tick_step))
   else:
     axes.set_xticks(ticks = [])
     axes.set_yticks(ticks = [])
