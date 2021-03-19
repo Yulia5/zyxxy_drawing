@@ -35,7 +35,7 @@ draw_a_circle(ax=axes, centre_x=0, centre_y=4.75, radius=1.85, colour='black')
 
 for radius in [1.25, 2.25, 3.25, 4.25]:
   angle_to_horizontal = asin_hours(1 / radius)
-  draw_an_arc(ax=axes, centre_x=0, centre_y=-7.5, radius=radius, angle_start=3-angle_to_horizontal, angle_end=9+angle_to_horizontal, linewidth=9, colour='black', stretch_x=0.95)
+  draw_an_arc(ax=axes, centre_x=0, centre_y=-7.25, radius=radius, angle_start=3-angle_to_horizontal, angle_end=9+angle_to_horizontal, linewidth=9, colour='black', stretch_x=0.9)
 
 
 
