@@ -19,8 +19,8 @@ def filename_to_image(filename):
       request = urllib.request.Request(url, headers=headers)
       resp = urllib.request.urlopen(request).read()
       image_array = np.asarray(bytearray(resp), dtype="uint8")
-      # raise Exception(len(image_array))
-      image = cv2.imdecode(image_array, cv2.IMREAD_COLOR) 
+      imageBGR = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+      image = cv2.cvtColor(imageBGR , cv2.COLOR_BGR2RGB)
       
     # return the image
     return image
