@@ -129,3 +129,17 @@ def raise_Exception_if_not_processed(kwarg_keys, allowed_keys):
   not_processed = [arg_name for arg_name in kwarg_keys if arg_name not in allowed_keys]
   if len(not_processed) > 0:
     raise Exception("Arguments", ', '.join(not_processed), " are not recognised, allowed keys:", allowed_keys)
+
+########################################################################
+
+__is_running_tests = False
+
+def is_running_tests(val=None):
+  global __is_running_tests
+  if val is not None:
+    __is_running_tests = val
+  return __is_running_tests
+
+def wait_for_enter(msg = "Press ENTER when you are ready ..."):
+  if not is_running_tests():
+    _ = input(msg)

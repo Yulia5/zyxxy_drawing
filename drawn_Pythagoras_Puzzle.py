@@ -1,5 +1,5 @@
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_utils import atan_hours
+from zyxxy_utils import atan_hours, wait_for_enter, is_running_tests
 from zyxxy_shape_functions import draw_a_square, clone_a_shape, draw_a_polygon
 import matplotlib.pyplot as plt
 from MY_zyxxy_SETTINGS import my_default_font_sizes
@@ -35,7 +35,7 @@ header_txts = [plt.text(x=0, y=ax_side+yp, s=s, fontdict={'size': my_default_fon
 #######################################################
 
 show_drawing_and_save_if_needed(block=False)
-input("Press ENTER when you are ready ...")
+wait_for_enter()
 
 #######################################################
 # Kian's code that puts [all triangles] + [a square] => [a bigger square] goes here ...
@@ -46,4 +46,4 @@ a_square.set_style(colour="violet")
 header_txts[0].set_text("A Square + 4 Triangles Together")
 header_txts[1].set_text(" -> A Bigger Square")
 
-plt.show()
+plt.show(block = not is_running_tests())
