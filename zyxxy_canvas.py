@@ -60,19 +60,41 @@ def create_canvas_and_axes(canvas_width,
                            show_outlines = False):
   global background_rectangle
 
+  # helper function to make sure the ticks are in the right place
+  def get_round_multiple_range(min_, max_, step):
+    _sign = -1 if min_ < 0 else 1
+    min_multiple = _sign * floor(abs(min_/step)) * abs(step)
+    result = np.arange(min_multiple, max_, step)
+    return result
+
+  assert make_symmetric in ['x', 'y', True, False]
+
+  if make_symmetric in ['x', True]:
+    left_x, right_x = -canvas_width/2, canvas_width/2
+  else:
+    left_x, right_x = 0, canvas_width
+  if make_symmetric in ['y', True]: 
+    bottom_y, top_y = -canvas_height/2, canvas_height/2
+  else:
+    bottom_y, top_y = 0, canvas_height
+
+  all_axes = []
   if axes is None:
     if model is None:
       _, axes = plt.subplots()
+      all_axes.append(axes)
     else:
       _, axs = plt.subplots(2)
+      all_axes += [axs[0], axs[1]]
       axes = axs[0]
+      # handle the model drawing
       if isinstance(model, str):
         image = filename_to_image(filename=model)
         axs[1].set_xlim(left=0,   right=canvas_width)
         axs[1].set_ylim(bottom=0, top=canvas_height)
         axs[1].set_aspect('equal')
         scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
-        show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor, where_position="")
+        show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor,  LB_position=[0, 0])
         model_title = "Original Drawing"
       else:
         model(axes=axs[1]) 
@@ -87,39 +109,28 @@ def create_canvas_and_axes(canvas_width,
          axes.set_title("") # remove the title if needed
          show_outlines_only(False)
 
+  for a_ in all_axes:
+    a_.grid(tick_step is not None)
+    if tick_step is not None:
+      a_.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)
+      a_.set_ylabel("RULER FOR Y's", fontsize=axes_label_font_size)
+      a_.tick_params(axis='both', which='major', labelsize=axes_tick_font_size)
+      a_.set_xticks(ticks = get_round_multiple_range(left_x, right_x, tick_step))
+      a_.set_yticks(ticks = get_round_multiple_range(bottom_y, top_y, tick_step))
+    else:
+      a_.set_xticks(ticks = [])
+      a_.set_yticks(ticks = [])
+    # set axis limits
+    a_.set_aspect('equal')
+    a_.set_xlim(left=left_x, right=right_x)
+    a_.set_ylim(bottom=bottom_y, top=top_y)
+
   axes.set_title(title, fontdict={'size': title_font_size})
-
-  assert make_symmetric in ['x', 'y', True, False]
-
-  if make_symmetric in ['x', True]:
-    left_x, right_x = -canvas_width/2, canvas_width/2
-  else:
-    left_x, right_x = 0, canvas_width
-
-  if make_symmetric in ['y', True]: 
-    bottom_y, top_y = -canvas_height/2, canvas_height/2
-  else:
-    bottom_y, top_y = 0, canvas_height
-
-  # helper function to make sure the ticks are in the right place
-  def get_round_multiple_range(min_, max_, step):
-    _sign = -1 if min_ < 0 else 1
-    min_multiple = _sign * floor(abs(min_/step)) * abs(step)
-    result = np.arange(min_multiple, max_, step)
-    return result
 
   # show diamond points and grid and axis if and only if tick_step is set
   set_diamond_size_factor(value=(tick_step is not None))
-  axes.grid(tick_step is not None)
-  if tick_step is not None:
-    axes.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)
-    axes.set_ylabel("RULER FOR Y's", fontsize=axes_label_font_size)
-    axes.tick_params(axis='both', which='major', labelsize=axes_tick_font_size)
-    axes.set_xticks(ticks = get_round_multiple_range(left_x, right_x, tick_step))
-    axes.set_yticks(ticks = get_round_multiple_range(bottom_y, top_y, tick_step))
-  else:
-    axes.set_xticks(ticks = [])
-    axes.set_yticks(ticks = [])
+
+  if tick_step is None:
     background_rectangle = plt.Polygon([[left_x, bottom_y], 
                                        [left_x+canvas_width, bottom_y], 
                                        [left_x+canvas_width, bottom_y+canvas_height], 
@@ -127,11 +138,6 @@ def create_canvas_and_axes(canvas_width,
                                        **my_default_background_settings)
     axes.add_patch(background_rectangle)
     set_background_colour(new_background_colour=background_colour)
-
-  # set axis limits
-  axes.set_aspect('equal')
-  axes.set_xlim(left=left_x, right=right_x)
-  axes.set_ylim(bottom=bottom_y, top=top_y)
 
   plt.subplots_adjust(**margin_adjustments)
   figure = plt.gcf()

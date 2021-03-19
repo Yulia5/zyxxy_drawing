@@ -47,12 +47,11 @@ def prepare_image(filename_with_path, mirror=False):
         prepared_image = mirror_image(img=prepared_image)
     return prepared_image
 
-def show_image(ax, prepared_image, origin, zorder=0, scaling_factor=1, where_position=""):
-    extent=[origin[0], origin[0] + prepared_image.shape[1] * scaling_factor, 
-            origin[1], origin[1] + prepared_image.shape[0] * scaling_factor]
-    if 'R' in where_position:
-        extent[0] -= prepared_image.shape[0]*scaling_factor
-        extent[1] -= prepared_image.shape[0]*scaling_factor
+def show_image(ax, prepared_image, origin, zorder=0, scaling_factor=1, LB_position=[0, 0]):
+    extent = np.array([origin[0], origin[0] + prepared_image.shape[1] * scaling_factor, 
+                       origin[1], origin[1] + prepared_image.shape[0] * scaling_factor])
+    extent[0:2] -= LB_position[0]
+    extent[2:4] -= LB_position[1]
 
     result = ax.imshow(prepared_image, extent=extent, zorder=zorder)
     return result
