@@ -90,6 +90,7 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes_tick_font_size=figure_params['font_size'],
                             axes=ax)
 
+
 ##########################################################################################
 # widget-creating functions
 ##########################################################################################

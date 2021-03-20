@@ -1,8 +1,8 @@
-# import zyxxy_shape_demo  
+import zyxxy_shape_demo  
 # import draw_Nowruz_postcard
 from zyxxy_all_EXAMPLES import *
 
-#from zyxxy_canvas import  show_drawing_and_save_if_needed
+from zyxxy_canvas import  show_drawing_and_save_if_needed
 #
 #example_animated_croc()#filename="croccy")
 #example_Zyxxy_the_mouse()  
@@ -19,7 +19,7 @@ from zyxxy_all_EXAMPLES import *
 #import draw_a_flag_of_Finland
 #import drawn_Pythagoras_Puzzle
 
-import drawn_a_Coccinelle
+#import drawn_a_Coccinelle
 
 #from zyxxy_tests import check_rectangle
 #check_rectangle()

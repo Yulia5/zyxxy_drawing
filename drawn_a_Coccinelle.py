@@ -30,7 +30,7 @@ draw_a_sector(ax=axes, centre_x=0, centre_y=0, radius=4.5, radius_2=6, angle_sta
 
 draw_a_sector(ax=axes, centre_x=-2, centre_y=8, radius=2.6, radius_2=4.1, angle_start=5, angle_end=12.5, colour=deepgreen)
 
-draw_a_circle(ax=axes, centre_x=-2, centre_y=8, radius=1.85, colour=brickred)
+draw_a_circle(ax=axes, centre_x=-2, centre_y=8, radius=1.85, colour=brickred) #hello!!
 draw_a_circle(ax=axes, centre_x=0, centre_y=4.75, radius=1.85, colour='black')
 
 for radius in [1.25, 2.25, 3.25, 4.25]:

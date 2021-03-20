@@ -74,6 +74,8 @@ def create_canvas_and_axes(canvas_width,
         _, axs = plt.subplots(2, 1)
       all_axes += [axs[0], axs[1]]
       axes = axs[0]
+  else:
+    all_axes = [axes]
 
   for a_ in all_axes:
     a_.grid(tick_step is not None)

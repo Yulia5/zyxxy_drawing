@@ -120,26 +120,21 @@ def set_line_style(something, **kwargs):
 
 def set_patch_style(something, **kwargs):
 
+  if OUTLINES_COLOUR is None:
+    something.set_ec('none')
     if "colour" in kwargs:
       this_colour = find_colour_code( kwargs['colour'] )
-      if OUTLINES_COLOUR is None:
-        something.set_ec('none')
-        something.set_fc(this_colour)
-      else:
-        something.set_fc('none')
-        something.set_ec(OUTLINES_COLOUR)
-        something.set_lw(default_outlines_width)
-        something.set_linestyle('--')
-        something.set_zorder(default_outlines_widthlayer_nb)
-    
-    something.set_lw(_default_arguments['line']['linewidth'])
-
+      something.set_fc(this_colour)
     if "layer_nb" in kwargs:
       something.set_zorder(kwargs['layer_nb'])
-
-    if OUTLINES_COLOUR is not None:
-      if "opacity" in kwargs:
-        something.set_alpha(kwargs['opacity'])
+    if "opacity" in kwargs:
+      something.set_alpha(kwargs['opacity'])
+  else:
+      something.set_fc('none')
+      something.set_ec(OUTLINES_COLOUR)
+      something.set_lw(default_outlines_width)
+      something.set_linestyle('--')
+      something.set_zorder(default_outlines_widthlayer_nb)
 
 
 ########################################################################
