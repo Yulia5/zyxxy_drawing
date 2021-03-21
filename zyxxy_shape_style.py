@@ -73,7 +73,7 @@ def get_diamond_size(ax):
 def find_colour_code(colour_name):
   if colour_name is None:
     return 'none'
-  if colour_name in my_colour_palette:
+  if isinstance(colour_name, str) and colour_name in my_colour_palette:
     return my_colour_palette[colour_name] 
 
   if not is_color_like(colour_name):

@@ -19,7 +19,7 @@ import random
 import numpy as np
 
 my_default_vertices_qty_in_circle = 72 
-tolerance = 0.0001
+tolerance = 0.000000001
 full_turn_angle = 12 # 12 for hours
 
 ##################################################################

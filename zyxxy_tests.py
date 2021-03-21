@@ -4,6 +4,8 @@ zyxxy_canvas.is_running_tests(True)
 import datetime, pytest
 import matplotlib.pyplot as plt
 from zyxxy_shape_class import Shape
+from zyxxy_colours import create_gradient_colours
+from zyxxy_utils import is_the_same_point
 
 def run_all_examples(): 
   import inspect
@@ -89,3 +91,10 @@ def check_rectangle():
 
   with pytest.raises(Exception):
     x = 1 / 0
+
+
+def test_gradient():
+  for test_end in ([255, 255, 255], [2, 3, 5], [2, 3, 15]):
+    result = create_gradient_colours(rgb_start=[0, 0, 0], rgb_end=[2, 3, 15])
+    for i in range(3):
+      assert is_the_same_point(result[-1][i], test_end[i]/255.)
