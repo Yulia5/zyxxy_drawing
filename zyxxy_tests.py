@@ -5,7 +5,7 @@ import datetime, pytest
 import matplotlib.pyplot as plt
 from zyxxy_shape_class import Shape
 
-def run_all_examples():
+def run_all_examples(): 
   import inspect
   import zyxxy_all_EXAMPLES
   

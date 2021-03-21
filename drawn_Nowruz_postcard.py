@@ -35,7 +35,7 @@ draw_a_rectangle(ax=axes, left=0, bottom=0, width=width, height=height_ground, c
 draw_a_square(ax=axes, left=0, bottom=height_ground, side=aquarium_side, colour='PastelBlue')
 
 # fish
-draw_an_eye(ax=axes, centre_x=10, centre_y=13, width=8, depth_1=1, depth_2=-1, colour='orange')
+draw_a_crescent(ax=axes, centre_x=10, centre_y=13, width=8, depth_1=1, depth_2=-1, colour='orange')
 draw_a_triangle(ax=axes, tip_x=6, tip_y=13, width=1, height=2, turn=9, colour='orange')
 draw_a_circle(ax=axes, centre_x=12, centre_y=13, radius=.3, colour='black', outline_linewidth=0)
 
@@ -48,7 +48,7 @@ draw_a_sector(ax=axes, centre_x=30, centre_y=stripe_radius+(3+height_ground), an
 for x in [40-0.75, 40+0.75]:
   draw_an_egg(ax=axes, power=3, height_widest_point=3, width=4, height=5, tip_x=x, tip_y=height_ground, colour='greenyellow', outline_linewidth=4, layer_nb=2)
 draw_a_smile(ax=axes, centre_x=40+stalk_depth, centre_y=5+height_ground, width=stalk_width, depth=stalk_depth, turn=3, colour='black', linewidth=5)
-draw_an_eye(ax=axes, centre_x=40+stalk_depth+leaf_width/2, centre_y=5+height_ground+stalk_width/2, width=leaf_width, depth_1=1, depth_2=-1, colour='green', opacity=0.7)
+draw_a_crescent(ax=axes, centre_x=40+stalk_depth+leaf_width/2, centre_y=5+height_ground+stalk_width/2, width=leaf_width, depth_1=1, depth_2=-1, colour='green', opacity=0.7)
 
 #######################################################
 # If you need to save it, and an argument filename="my_postcard", or whatever filename you like! ##

@@ -1,5 +1,6 @@
-import zyxxy_shape_demo  
+#import zyxxy_shape_demo  
 # import draw_Nowruz_postcard
+#import draw_a_cat_gif
 from zyxxy_all_EXAMPLES import *
 
 from zyxxy_canvas import  show_drawing_and_save_if_needed
@@ -23,3 +24,5 @@ from zyxxy_canvas import  show_drawing_and_save_if_needed
 
 #from zyxxy_tests import check_rectangle
 #check_rectangle()
+
+from zyxxy_tests import *; run_all_examples(); run_all_drawings(); check_rectangle()

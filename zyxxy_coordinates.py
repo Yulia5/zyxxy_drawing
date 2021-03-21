@@ -43,7 +43,7 @@ shape_names_params_dicts_definition = {
                             'a_smile': {'width' : 'half_min_size', 'depth' : ['plus_minus_half_min_size', 1]},
                             'a_star': {'ends_qty' : 'vertices', 'radius_1' : 'half_min_size_34', 'radius_2' : ['half_min_size', 2]},
                             'a_regular_polygon': {'radius' : 'half_min_size', 'vertices_qty' : 'vertices'},
-                            'an_eye': {'width' : ['half_min_size', 4], 'depth_1' : ['plus_minus_half_min_size', -1], 'depth_2' : ['plus_minus_half_min_size', 1]},
+                            'a_crescent': {'width' : ['half_min_size', 4], 'depth_1' : ['plus_minus_half_min_size', -1], 'depth_2' : ['plus_minus_half_min_size', 1]},
                             'a_heart': {'angle_top_middle' : ['quarter_turn', 3], 'tip_addon' : 'stretch'},
                             'an_egg' : {'power' : ['vertices', 3], 'height_widest_point': ['half_height', 3], 'width' : ['half_width', 4], 'height' : ['half_height', 5]},
                             'a_sector': {'angle_start' : 'turn', 'angle_end' : ['double_turn', 3], 'radius' : 'half_min_size', 'radius_2' : 'half_min_size_34'},
@@ -295,8 +295,8 @@ def build_a_smile(width, depth):
   # all done!
   return result
 
-# an eye ########################################################
-def build_an_eye(width, depth_1, depth_2): 
+# a crescent ####################################################
+def build_a_crescent(width, depth_1, depth_2): 
   smile1 = build_a_smile(width=width, depth=depth_1)
   smile2 = build_a_smile(width=width, depth=depth_2)
   result = link_contours(smile1, smile2[::-1])

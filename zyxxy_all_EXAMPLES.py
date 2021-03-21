@@ -4,7 +4,7 @@
 import numpy as np
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer, get_width, get_height
-from zyxxy_shape_functions import draw_a_circle, draw_a_square, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_an_eye, draw_a_star
+from zyxxy_shape_functions import draw_a_circle, draw_a_square, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_a_crescent, draw_a_star
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_circle, build_a_zigzag
 from zyxxy_shape_class import shift_layer, rotate_layer, stretch_layer, get_all_polygons_in_layers
 from zyxxy_utils import random_element, random_number
@@ -266,7 +266,7 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
   # eyes
   eyes = []
   for centre_x in [-12, 12]:
-    eye_white= draw_an_eye(ax=axes, centre_x=centre_x, centre_y=90, width=16, depth_1=-8, depth_2=8, colour='white')
+    eye_white= draw_a_crescent(ax=axes, centre_x=centre_x, centre_y=90, width=16, depth_1=-8, depth_2=8, colour='white')
     draw_an_ellipse(ax=axes, centre_x=centre_x, centre_y=90, width=8, height=16, colour='BrightGreen', clip_outline = eye_white)
     draw_a_circle(ax=axes, centre_x=centre_x, centre_y=90, radius=3, colour='black', clip_outline = eye_white)
     # the following line is needed for animation
@@ -420,7 +420,7 @@ def example_croc(axes=None):
   for eye_x in [right_body, right_body+12]:
     for td in [-1, 1]:
       mid_y = td * eyelid_width / 2
-      eyelid = draw_an_eye(ax=axes, centre_x=eye_x, centre_y=eye_y, width=eyelid_width, depth_1=mid_y, depth_2=mid_y, colour='green')
+      eyelid = draw_a_crescent(ax=axes, centre_x=eye_x, centre_y=eye_y, width=eyelid_width, depth_1=mid_y, depth_2=mid_y, colour='green')
       eyelids.append(eyelid)
 
   # ... and the nostrils
