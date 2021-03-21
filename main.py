@@ -25,4 +25,10 @@ from zyxxy_canvas import  show_drawing_and_save_if_needed
 #from zyxxy_tests import check_rectangle
 #check_rectangle()
 
-from zyxxy_tests import *; run_all_examples(); run_all_drawings(); check_rectangle()
+from zyxxy_colours import create_gradient_colours
+
+r = create_gradient_colours(rgb_start=[0, 0, 0], rgb_end=[2, 3, 15])
+
+print(r)
+
+#from zyxxy_tests import *; run_all_examples(); run_all_drawings(); check_rectangle()
