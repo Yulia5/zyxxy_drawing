@@ -15,6 +15,7 @@ from zyxxy_utils import random_element, random_number
 def example_japanese_flag(axes=None):
   axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
   draw_a_circle(ax=axes, centre_x=15, centre_y=10, radius=6, colour='crimson')   
+  show_drawing_and_save_if_needed()
 
 def example_belgian_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=6, canvas_height=4, axes=axes)
@@ -24,6 +25,7 @@ def example_belgian_flag(axes=None):
   draw_a_square(ax=ax, left=2, bottom=2, side=2, colour='yellow')
   draw_a_square(ax=ax, left=4, bottom=0, side=2, colour='red')
   draw_a_square(ax=ax, left=4, bottom=2, side=2, colour='red')
+  show_drawing_and_save_if_needed()
 
 def example_cuban_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
@@ -32,11 +34,13 @@ def example_cuban_flag(axes=None):
   draw_a_rectangle(ax=ax, left=0, top=20, width=30, height=4, colour='blue')
   draw_a_triangle(ax=ax, tip_x=17, tip_y=10, width=20, height=17, colour='red', turn=9)
   draw_a_star(ax=ax, centre_x=6, centre_y=10, radius_1=3, radius_2=1, ends_qty=5, colour='white') 
+  show_drawing_and_save_if_needed()
 
 def example_finnish_flag(axes=None): 
   axes = create_canvas_and_axes(canvas_width=36, canvas_height=22, axes=axes)
   draw_a_rectangle(ax=axes, centre_x=13, bottom=0, width=6, height=22, colour='midnightblue')
   draw_a_rectangle(ax=axes, left=0, centre_y=11, width=36, height=6, colour='midnightblue')
+  show_drawing_and_save_if_needed()
 
 def example_japanese_naval_flag(axes=None):
   axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
@@ -44,6 +48,7 @@ def example_japanese_naval_flag(axes=None):
   for i in range(32):
     if i % 2 == 0:
       draw_a_triangle(ax=axes, tip_x=12, tip_y=10, height=30, width=6, turn=12/32*i, colour='crimson')
+  show_drawing_and_save_if_needed()
 
 def example_british_flag(axes=None):
   ax = create_canvas_and_axes(canvas_width=18, canvas_height=12, axes=axes)
@@ -59,6 +64,8 @@ def example_british_flag(axes=None):
   draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
   draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
   draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red') 
+
+  show_drawing_and_save_if_needed()
 
 
 def example_us_flag(axes=None):
@@ -80,7 +87,9 @@ def example_us_flag(axes=None):
       first_star_centre_x = 33 
     # centre_y=260-(row+1)*14 because we are counting star rows from the top
     for column in range(stars_qty):
-        draw_a_star(ax=ax, centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius_1=9, radius_2=3, ends_qty=5, colour='white')               
+        draw_a_star(ax=ax, centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius_1=9, radius_2=3, ends_qty=5, colour='white') 
+
+  show_drawing_and_save_if_needed()              
 
 #########################################################
 ## ZYXXY THE MOUSE                                     ##
@@ -116,13 +125,15 @@ def example_Zyxxy_the_mouse(axes=None):
   left_eye_black = draw_a_circle(ax=axes, centre_x=5, centre_y=5, radius=0.5, colour='black')
   right_eye_black= draw_a_circle(ax=axes, centre_x=7, centre_y=5, radius=0.5, colour='black')
 
+  show_drawing_and_save_if_needed()
+
   return left_eye_white, right_eye_white, left_eye_black, right_eye_black
 
 #########################################################
 def example_animation_for_Zyxxy_the_mouse(axes=None):
   left_eye_white, right_eye_white, left_eye_black, right_eye_black = example_Zyxxy_the_mouse(axes=axes)
   left_eye_black.clip(clip_outline = left_eye_white)
-  right_eye_black.clip(clip_outline = right_eye_white)
+  right_eye_black.clip(clip_outline = right_eye_white) # unfinished
 
 #########################################################
 ## THE PENGUINS                                        ##
@@ -191,6 +202,7 @@ def example_penguins():
   draw_a_circle(ax=axes, centre_x=170, centre_y=80, radius=15, colour='black')
   # an eye
   draw_a_circle(ax=axes, centre_x=163, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  show_drawing_and_save_if_needed()
 
 
 #########################################################
@@ -278,6 +290,8 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
   # smile
   draw_a_segment(ax=axes, start_x=0, start_y=72, length=7, turn=6)
   smile = draw_a_smile(ax=axes, centre_x=0, centre_y=69, depth=4, width=20)
+
+  show_drawing_and_save_if_needed()
 
   return head_layer, neck_coords, eyes, smile
 
@@ -438,6 +452,8 @@ def example_croc(axes=None):
   draw_a_broken_line(ax=axes, contour=lipline, colour='green', linewidth=2)
 
   upper_jaw_diamond = [right_body-lip_r, lip_y+lip_r]
+
+  show_drawing_and_save_if_needed()
 
   return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond
 

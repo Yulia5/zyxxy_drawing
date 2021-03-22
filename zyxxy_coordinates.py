@@ -50,7 +50,7 @@ shape_names_params_dicts_definition = {
                             'a_zigzag' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_segments': 'vertices'},
                             'a_wave' : {'width': 'half_min_size', 'height': 'half_min_size', 'angle_start': 'turn', 'nb_waves': 'vertices'},
                             'a_coil' : {'angle_start' : 'turn', 'nb_turns' : ['stretch', 3], 'speed_x' : 'stretch', 'speed_out' : ['stretch', 1.2]},
-                            'an_arc_multispeed': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : ['half_width', 2], 'height' : 'half_height'}}
+                            'a_squiggle': {'angle_start' : ['turn', 0], 'angle_end' : ['double_turn', 24], 'speed_x' : ['stretch', 3], 'width' : ['half_width', 2], 'height' : 'half_height'}}
 
 ########################################################################
 

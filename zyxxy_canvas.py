@@ -27,6 +27,8 @@ from zyxxy_external_images import filename_to_image, show_image
 from zyxxy_utils import is_running_tests
 from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_display_params, my_default_image_params, my_default_animation_params
 
+USE_PLT_SHOW = True
+
 def __prepare_axes(ax, canvas_width,
                        canvas_height, make_symmetric, axes_label_font_size, axes_tick_font_size, tick_step, background_colour):
 
@@ -80,7 +82,7 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_font_sizes['title'],
                            max_figsize = my_default_display_params['max_figsize'],
                            dpi = my_default_display_params['dpi'],
-                           default_margin_adjustments = my_default_display_params['margin_adjustments'],
+                           margin_side = 0.5,
                            axes = None,
                            model = None,
                            outlines_colour = None):
@@ -97,71 +99,81 @@ def create_canvas_and_axes(canvas_width,
     __prepare_axes(ax=axes, **params_for_axes)
     return axes
 
-  margin_adjustments = {key:value for key, value in default_margin_adjustments.items() if key!='ticks'}
+  axis_width_add = 2 * margin_side
+  axis_height_add = 2 * margin_side + title_font_size/72
+  axis_left, axis_bottom = margin_side, margin_side
   if tick_step is not None:
-    margin_adjustments['left']   += default_margin_adjustments['ticks']
-    margin_adjustments['bottom'] += default_margin_adjustments['ticks']
-  
-  scale_horizontal = (margin_adjustments['right'] - margin_adjustments['left']) * max_figsize[0] / canvas_width
-  scale_vertical = (margin_adjustments['top'] - margin_adjustments['bottom']) * max_figsize[1] / canvas_height
+    axis_width_add  += (axes_label_font_size + axes_tick_font_size) / 72
+    axis_height_add += (axes_label_font_size + axes_tick_font_size) / 72
+    axis_left       += (axes_label_font_size + axes_tick_font_size) / 72
+    axis_bottom     += (axes_label_font_size + axes_tick_font_size) / 72
+
   figsize = max_figsize
+  figure = plt.figure(1)
+
   if model is not None:
+
+      scale_horizontal = (max_figsize[0] - axis_width_add) / canvas_width
+      scale_vertical = (max_figsize[1] - axis_height_add) / canvas_height
+      scale_horizontal_2 = (max_figsize[0]/2 - axis_width_add) / canvas_width
+      scale_vertical_2 = (max_figsize[1]/2 - axis_height_add) / canvas_height
+
       # decide if the model should be below (vertical) or to the right (horizontal) of the working axes
-      scale_if_V_placement = min(scale_vertical/2, scale_horizontal)
-      scale_if_H_placement = min(scale_vertical, scale_horizontal/2)
+      scale_if_V_placement = min(scale_vertical_2, scale_horizontal)
+      scale_if_H_placement = min(scale_vertical, scale_horizontal_2)
 
       place_model_H_not_V = (scale_if_H_placement > scale_if_V_placement)
+      scale = max(scale_if_V_placement, scale_if_H_placement)
+      figsize = [canvas_width * scale + axis_width_add, canvas_height * scale + axis_height_add]
       
       if place_model_H_not_V:
-        figsize[1] *= scale_if_V_placement/scale_if_H_placement
-        margin_adjustments['left'] /= 2.
-        margin_adjustments['right'] = (1 + margin_adjustments['right']) / 2.
+        figsize[0] *= 2
       else:
-        figsize[0] *= scale_if_H_placement/scale_if_V_placement
-        margin_adjustments['bottom'] /= 2.
-        margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
+        figsize[1] *= 2
 
+      axes = plt.axes([axis_left/figsize[0], axis_bottom/ figsize[1],
+                     canvas_width * scale/figsize[0], canvas_height * scale/ figsize[1]])
+      axes_model = plt.axes([axis_left/figsize[0]+ 0.5 * place_model_H_not_V, 
+                             axis_bottom/figsize[1] + 0.5 * (1 - place_model_H_not_V),
+                             canvas_width * scale/figsize[0], canvas_height * scale/ figsize[1]])
   else:
-      if scale_horizontal < scale_vertical:
-        figsize[1] *= scale_horizontal / scale_vertical
-      else:
-        figsize[0] *= scale_vertical / scale_horizontal
+    scale_horizontal = (max_figsize[0] - axis_width_add) / canvas_width
+    scale_vertical = (max_figsize[1] - axis_height_add) / canvas_height
+    scale = min(scale_horizontal, scale_vertical)
+    figsize = [canvas_width * scale + axis_width_add, canvas_height * scale + axis_height_add]
+    axes = plt.axes([axis_left/figsize[0], axis_bottom / figsize[1], canvas_width * scale / figsize[0], canvas_height * scale / figsize[1]])
 
-  spa = [] if model is None else ([1, 2] if place_model_H_not_V else [2, 1])
-  figure, axs = plt.subplots(*spa)
-  axes = axs if not isinstance(axs, np.ndarray) else axs[0]
-  
-  figure.subplots_adjust(**margin_adjustments)
   figure.set_dpi(dpi) 
   figure.set_size_inches(figsize)
   
   if model is not None:
     # handle the model drawing
     if isinstance(model, str):
-      __prepare_axes(ax=axs[1], **params_for_axes)
+      __prepare_axes(ax=axes_model, **params_for_axes)
       model_title = "Original Drawing"
       image = filename_to_image(filename=model)
       scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
       # defining LB_position to center the model image
-      LB_position=[axs[1].get_xticks()[0] + 0.5 * (canvas_width  - image.shape[1] * scaling_factor), 
-                   axs[1].get_yticks()[0] + 0.5 * (canvas_height - image.shape[0] * scaling_factor)]
+      LB_position=[axes_model.get_xlim()[0] + 0.5 * (canvas_width  - image.shape[1] * scaling_factor), 
+                   axes_model.get_ylim()[0] + 0.5 * (canvas_height - image.shape[0] * scaling_factor)]
       # placing the image
-      show_image(ax=axs[1], prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor,  LB_position=LB_position)  
+      show_image(ax=axes_model, prepared_image=image, origin=[0, 0], zorder=0, scaling_factor=scaling_factor,  LB_position=LB_position)  
     else:
-      model(axes=axs[1]) 
+      global USE_PLT_SHOW
+      USE_PLT_SHOW = False
+      model(axes=axes_model) 
+      USE_PLT_SHOW = True
       model_title = "Completed Drawing"
       if outlines_colour is not None:
         set_outlines_colour(outlines_colour)
         set_diamond_size_factor(0)
         model(axes=axes)
         set_outlines_colour(None)
-      __prepare_axes(ax=axs[1], **params_for_axes)
-    axs[1].set_title(model_title, fontdict={'size': title_font_size})
+      __prepare_axes(ax=model_title, **params_for_axes)
+    axes_model.set_title(model_title, fontdict={'size': title_font_size})
  
   __prepare_axes(ax=axes, **params_for_axes)
   axes.set_title(title, fontdict={'size': title_font_size})
-
-  # show diamond points and grid and axis if and only if tick_step is set
   set_diamond_size_factor(value=(tick_step is not None))
 
   return axes
@@ -229,4 +241,4 @@ def show_drawing_and_save_if_needed(filename=None,
   figure.set_dpi(current_dpi) 
 
   if not is_running_tests():
-    plt.show(block=block)
+    plt.show(block=(block and USE_PLT_SHOW))

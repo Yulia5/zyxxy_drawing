@@ -3,12 +3,10 @@
 # import draw_a_cat_gif
 from zyxxy_all_EXAMPLES import *
 
-from zyxxy_canvas import  show_drawing_and_save_if_needed
 #
 #example_animated_croc(filename="croccy")
 #example_Zyxxy_the_mouse()  
 #example_yellow_cat_animation(filename="yellowww_cat") 
-#show_drawing_and_save_if_needed()
 
 # print("done")
 

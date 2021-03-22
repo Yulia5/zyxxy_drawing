@@ -75,7 +75,9 @@ my_default_display_params = {'max_figsize' : [7/screen_zoom, 6.0/screen_zoom],
                                                      'bottom' : 0.05,
                                                      'left'   : 0.05,
                                                      'right'  : 0.95,
-                                                     'ticks'  : 0.15}}
+                                                     'ticks'  : 0.15,
+                                                     'wspace' : 0.30,
+                                                     'hspace' : 0.30}}
 my_default_image_params = {'dpi'     : 50,
                            'format'  : 'png'}
 
