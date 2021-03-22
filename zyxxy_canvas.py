@@ -159,10 +159,8 @@ def envelope_animate(i, anim_func):
   return get_all_polygons_in_layers()
 
 def show_drawing_and_save_if_needed(filename=None,
-                           figsize4saving = my_default_image_params['figsize'],
                            dpi4saving = my_default_image_params['dpi'],
                            image_format = my_default_image_params['format'],
-                           animation_file_figsize = my_default_animation_params['figsize'],
                            animation_file_dpi = my_default_animation_params['dpi'],
                            animation_interval = my_default_animation_params['interval'],
                            animation_blit = my_default_animation_params['blit'],
@@ -177,7 +175,6 @@ def show_drawing_and_save_if_needed(filename=None,
   figure = plt.gcf()
 
   current_dpi = figure.get_dpi() 
-  current_figsize = figure.get_size_inches()
 
   if (animation_func is None) != (nb_of_frames is None):
     raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
@@ -187,13 +184,11 @@ def show_drawing_and_save_if_needed(filename=None,
       if last_dot_position < 0:
         filename += '.' + image_format
         last_dot_position = filename.rfind(".")
-      figure.set_size_inches(figsize4saving)
       plt.savefig(fname="images_videos/"+filename, 
                   format = filename[last_dot_position+1:],
                   dpi = dpi4saving)
   else:
     figure.set_dpi(animation_file_dpi) 
-    figure.set_size_inches(animation_file_figsize)
     # writer = animation.writers[animation_writer](fps=animation_FPS)
     writer = animation.FFMpegWriter(fps=animation_FPS) 
     anim = animation.FuncAnimation( fig=figure, 
@@ -207,6 +202,5 @@ def show_drawing_and_save_if_needed(filename=None,
       anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
       return
   figure.set_dpi(current_dpi) 
-  figure.set_size_inches(current_figsize)
   if not is_running_tests():
     plt.show(block=block)

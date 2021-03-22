@@ -50,9 +50,9 @@ my_default_colour_etc_settings = {
                                 'layer_nb' : 1, 
                                 'colour' : 'none'},
                      "outline" : {'colour' : 'black', 
-                                             'linewidth' : 0, 
-                                             'joinstyle' : 'miter', 
-                                             'layer_nb' : 1},
+                                  'linewidth' : 0, 
+                                  'joinstyle' : 'miter', 
+                                  'layer_nb' : 1},
                      "diamond" : {'colour' : 'cyan', #  None #
                                   'opacity' : 1.0,
                                   'layer_nb' : 1000}}
@@ -76,12 +76,10 @@ my_default_display_params = {'max_figsize' : [8/screen_zoom, 7.5/screen_zoom],
                                                      'left'   : 0.18,
                                                      'right'  : 0.95}}
 
-my_default_image_params = {'figsize' : [8/screen_zoom, 7.5/screen_zoom], #[3.6/screen_zoom, 2.4/screen_zoom], 
-                           'dpi'     : 50,# 200,
+my_default_image_params = {'dpi'     : 20,
                            'format'  : 'png'}
 
-my_default_animation_params = {'figsize' : [3.6/screen_zoom, 2.4/screen_zoom],
-                               'dpi'     : 100,
+my_default_animation_params = {'dpi'     : 70,
                                'interval': 200,
                                'blit'    : True,
                                'repeat'  : False,

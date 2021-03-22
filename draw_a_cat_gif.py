@@ -10,6 +10,7 @@ ax = create_canvas_and_axes(  canvas_width = 30,
                               make_symmetric = 'x',
                               #tick_step = 2,
                               title = "Excited Cat",
+                              model = 'https://i.pinimg.com/564x/de/21/fd/de21fdb9fa70d9d54ce7e4c0f07910d5.jpg',
                               background_colour='aliceblue')
 
 #######################################################
@@ -60,7 +61,6 @@ draw_a_segment(ax=ax, start_x=-2, start_y=eye_height-3, turn=8, length=3.5)
 # the mouth
 draw_a_crescent(ax=ax, width=2, depth_1=1, depth_2=1.5, centre_x=0, centre_y=12.5, colour='pink')
 
-
 draw_a_star(ax=ax, centre_x=-8, centre_y=18, radius_1=3, radius_2=1, ends_qty=8, colour='red')
 
-show_drawing_and_save_if_needed()
+show_drawing_and_save_if_needed(filename="PopCat")

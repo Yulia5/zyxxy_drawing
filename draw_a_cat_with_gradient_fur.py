@@ -25,7 +25,7 @@ aw = 1
 whiskers_length = 7 # whiskers length
 body_bottom = -9
 tail_height = 3
-tail_coeff = 1.5
+tail_coeff = 1.7
 
 tail_arc_1 = build_an_arc(angle_start=0, angle_end=6, radius=1)
 tail_arc_1[:, 0] *= 5
@@ -57,7 +57,7 @@ gradient_colours = create_gradient_colours(rgb_start=[255, 0, 255], rgb_end=(0, 
 gradient_bottom = body_bottom - tail_coeff * tail_height
 grh = (ear_height + body_height + tail_coeff * tail_height) / len(gradient_colours)
 for i, gc in enumerate(gradient_colours):
-  draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=body, colour=gc, outline_linewidth=0)
+  draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=body, colour=gc, outline_linewidth=1)
   draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=tail_shape, colour=gc, outline_linewidth=0)
 
 # a vertical line
