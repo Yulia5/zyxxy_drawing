@@ -19,7 +19,6 @@ from functools import partial
 from math import floor
 from matplotlib import animation
 import matplotlib.pyplot as plt
-import numpy as np
 
 from zyxxy_shape_style import set_diamond_size_factor, set_outlines_colour, find_colour_code
 from zyxxy_shape_class import get_all_polygons_in_layers
@@ -82,7 +81,7 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_font_sizes['title'],
                            max_figsize = my_default_display_params['max_figsize'],
                            dpi = my_default_display_params['dpi'],
-                           margin_side = 0.5,
+                           margin_side = my_default_display_params['margin_side'],
                            axes = None,
                            model = None,
                            outlines_colour = None):
@@ -136,6 +135,9 @@ def create_canvas_and_axes(canvas_width,
       axes_model = plt.axes([axis_left/figsize[0]+ 0.5 * place_model_H_not_V, 
                              axis_bottom/figsize[1] + 0.5 * (1 - place_model_H_not_V),
                              canvas_width * scale/figsize[0], canvas_height * scale/ figsize[1]])
+
+      if not place_model_H_not_V:
+        axes_model, axes = axes, axes_model
   else:
     scale_horizontal = (max_figsize[0] - axis_width_add) / canvas_width
     scale_vertical = (max_figsize[1] - axis_height_add) / canvas_height
@@ -167,9 +169,11 @@ def create_canvas_and_axes(canvas_width,
       if outlines_colour is not None:
         set_outlines_colour(outlines_colour)
         set_diamond_size_factor(0)
+        USE_PLT_SHOW = False
         model(axes=axes)
+        USE_PLT_SHOW = True
         set_outlines_colour(None)
-      __prepare_axes(ax=model_title, **params_for_axes)
+      __prepare_axes(ax=axes_model, **params_for_axes)
     axes_model.set_title(model_title, fontdict={'size': title_font_size})
  
   __prepare_axes(ax=axes, **params_for_axes)

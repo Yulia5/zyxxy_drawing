@@ -10,7 +10,7 @@ from zyxxy_all_EXAMPLES import *
 
 # print("done")
 
-import draw_a_flag_of_Japan
+#import draw_a_flag_of_Japan
 #import draw_a_flag_of_the_USA 
 #import draw_a_flag_of_Belgium
 #import draw_a_flag_of_Cuba
@@ -26,4 +26,4 @@ import draw_a_flag_of_Japan
 # import draw_a_cat_with_gradient_fur
 
 
-#from zyxxy_tests import *; run_all_examples(); run_all_drawings(); check_rectangle(); test_gradient()
+from zyxxy_tests import *; check_rectangle(); test_gradient(); run_all_examples(); run_all_drawings(); 

@@ -95,6 +95,7 @@ def check_rectangle():
 
 def test_gradient():
   for test_end in ([255, 255, 255], [2, 3, 5], [2, 3, 15]):
-    result = create_gradient_colours(rgb_start=[0, 0, 0], rgb_end=[2, 3, 15])
+    result = create_gradient_colours(rgb_start=[0, 0, 0], rgb_end=test_end)
     for i in range(3):
       assert is_the_same_point(result[-1][i], test_end[i]/255.)
+    print("succeeded gradient test", [0, 0, 0], '->', test_end)
