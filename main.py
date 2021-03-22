@@ -12,7 +12,7 @@ from zyxxy_canvas import  show_drawing_and_save_if_needed
 
 # print("done")
 
-#import draw_a_flag_of_Japan
+import draw_a_flag_of_Japan
 #import draw_a_flag_of_the_USA 
 #import draw_a_flag_of_Belgium
 #import draw_a_flag_of_Cuba
@@ -20,7 +20,7 @@ from zyxxy_canvas import  show_drawing_and_save_if_needed
 #import draw_a_flag_of_Finland
 #import drawn_Pythagoras_Puzzle
 
-import drawn_a_Coccinelle
+#import drawn_a_Coccinelle
 
 #from zyxxy_tests import check_rectangle
 #check_rectangle()

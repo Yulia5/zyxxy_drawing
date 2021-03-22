@@ -15,9 +15,9 @@
 ########################################################################
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import is_color_like
-from MY_zyxxy_SETTINGS import my_colour_palette, my_default_colour_etc_settings, my_default_diamond_size, default_outlines_width, default_outlines_widthlayer_nb
+from MY_zyxxy_SETTINGS import my_default_colour_etc_settings, my_default_diamond_size, default_outlines_width, default_outlines_layer_nb
 from zyxxy_utils import raise_Exception_if_not_processed
+from zyxxy_colours import find_colour_code
 
 ########################################################################
 # as defined by matplotlib
@@ -63,23 +63,6 @@ def set_diamond_size_factor(value=1.):
 def get_diamond_size(ax):
   return get_width(ax=ax) * my_default_diamond_size * __diamond_size_factor
 
-##################################################################
-## COLOUR HELPERS                                               ## 
-##################################################################
-
-# Find colour that should be used. 
-# Assume that it's a name of a standard colour.
-# Attention, names are case-sensitive
-def find_colour_code(colour_name):
-  if colour_name is None:
-    return 'none'
-  if isinstance(colour_name, str) and colour_name in my_colour_palette:
-    return my_colour_palette[colour_name] 
-
-  if not is_color_like(colour_name):
-    raise Exception(colour_name, "is not a valid colour!")
-  return colour_name
-
 ########################################################################
 
 OUTLINES_COLOUR = None
@@ -103,7 +86,7 @@ def set_line_style(something, **kwargs):
       something.set_linestyle('--')
       something.set_ec(OUTLINES_COLOUR)
       something.set_lw(default_outlines_width)
-      something.set_zorder(default_outlines_widthlayer_nb)
+      something.set_zorder(default_outlines_layer_nb)
     else:
       something.set_linestyle('solid')
       if "colour" in kwargs:
@@ -134,7 +117,7 @@ def set_patch_style(something, **kwargs):
       something.set_ec(OUTLINES_COLOUR)
       something.set_lw(default_outlines_width)
       something.set_linestyle('--')
-      something.set_zorder(default_outlines_widthlayer_nb)
+      something.set_zorder(default_outlines_layer_nb)
 
 
 ########################################################################

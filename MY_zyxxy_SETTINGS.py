@@ -59,7 +59,7 @@ my_default_colour_etc_settings = {
 
 my_default_diamond_size = 0.015 
 default_outlines_width = 10 
-default_outlines_widthlayer_nb = 501       
+default_outlines_layer_nb = 501       
 
 # Font sizes and adjustment needed to fit them
 my_default_font_sizes = {'title'      : 18/screen_zoom,
@@ -72,10 +72,10 @@ my_default_font_sizes = {'title'      : 18/screen_zoom,
 my_default_display_params = {'max_figsize' : [8/screen_zoom, 7.5/screen_zoom],
                              'dpi' : 50,
                              'margin_adjustments' : {'top'    : 0.85, 
-                                                     'bottom' : 0.20,
-                                                     'left'   : 0.18,
-                                                     'right'  : 0.95}}
-
+                                                     'bottom' : 0.05,
+                                                     'left'   : 0.05,
+                                                     'right'  : 0.95,
+                                                     'ticks'  : 0.15}}
 my_default_image_params = {'dpi'     : 20,
                            'format'  : 'png'}
 

@@ -83,9 +83,6 @@ def stretch_something(what_to_stretch, diamond, stretch_coeff):
                                           diamond=diamond[i], 
                                           stretch_coeff=stretch_coeff[i]) for i in [0, 1]]) 
   else:
-    x=what_to_stretch[0][0]
-    y=diamond[0]
-    z=stretch_coeff[0]
     result = np.array([[_stretch_something(what_to_stretch=point[i], 
                                            diamond=diamond[i], 
                                            stretch_coeff=stretch_coeff[i]) for i in [0, 1]] for point in what_to_stretch]) 

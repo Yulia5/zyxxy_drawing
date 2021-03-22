@@ -37,12 +37,38 @@ def create_canvas_and_axes(canvas_width,
                            title_font_size = my_default_font_sizes['title'],
                            axes_label_font_size = my_default_font_sizes['axes_label'],
                            axes_tick_font_size = my_default_font_sizes['tick'],
-                           figsize = my_default_display_params['max_figsize'],
+                           max_figsize = my_default_display_params['max_figsize'],
                            dpi = my_default_display_params['dpi'],
-                           margin_adjustments = my_default_display_params['margin_adjustments'],
+                           default_margin_adjustments = my_default_display_params['margin_adjustments'],
                            axes = None,
                            model = None,
                            outlines_colour = None):
+
+  margin_adjustments = {key:value for key, value in default_margin_adjustments.items() if key!='ticks'}
+  if tick_step is not None:
+    margin_adjustments['left']   += default_margin_adjustments['ticks']
+    margin_adjustments['bottom'] += default_margin_adjustments['ticks']
+
+  
+  scale_horizontal = (margin_adjustments['right'] - margin_adjustments['left']) * max_figsize[0] / canvas_width
+  scale_vertical = (margin_adjustments['top'] - margin_adjustments['bottom']) * max_figsize[1] / canvas_height
+  if model is not None:
+    # decide if the model should be below (vertical) or to the right (horizontal) of the working axes
+    scale_if_V_placement = min(scale_vertical/2, scale_horizontal)
+    scale_if_H_placement = min(scale_vertical, scale_horizontal/2)
+
+    place_model_H_not_V = (scale_if_H_placement > scale_if_V_placement)
+    figsize = max_figsize
+    if place_model_H_not_V:
+      figsize[1] *= scale_if_V_placement/scale_if_H_placement
+    else:
+      figsize[0] *= scale_if_H_placement/scale_if_V_placement
+  else:
+    figsize = max_figsize
+    if scale_horizontal < scale_vertical:
+      figsize[1] *= scale_horizontal/scale_vertical
+    else:
+      figsize[0] *= scale_vertical/scale_horizontal
 
   # helper function to make sure the ticks are in the right place
   def get_round_multiple_range(min_, max_, step):
@@ -68,7 +94,7 @@ def create_canvas_and_axes(canvas_width,
       _, axes = plt.subplots()
       all_axes.append(axes)
     else:
-      if True:
+      if place_model_H_not_V:
         _, axs = plt.subplots(1, 2)
       else:
         _, axs = plt.subplots(2, 1)
@@ -111,12 +137,10 @@ def create_canvas_and_axes(canvas_width,
       model(axes=axs[1]) 
       model_title = "Completed Drawing"
 
-    if True:
-      
+    if place_model_H_not_V:   
       margin_adjustments['left'] /= 2.
       margin_adjustments['right'] = (1 + margin_adjustments['right']) / 2.
     else:
-      
       margin_adjustments['bottom'] /= 2.
       margin_adjustments['top'] = (1 + margin_adjustments['top']) / 2.
 

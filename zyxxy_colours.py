@@ -1,4 +1,25 @@
 import numpy as np
+from matplotlib.colors import is_color_like
+from MY_zyxxy_SETTINGS import my_colour_palette
+
+##################################################################
+## COLOUR HELPERS                                               ## 
+##################################################################
+
+# Find colour that should be used. 
+# Assume that it's a name of a standard colour.
+# Attention, names are case-sensitive
+def find_colour_code(colour_name):
+  if colour_name is None:
+    return 'none'
+  if isinstance(colour_name, str) and colour_name in my_colour_palette:
+    return my_colour_palette[colour_name] 
+
+  if not is_color_like(colour_name):
+    raise Exception(colour_name, "is not a valid colour!")
+  return colour_name
+
+##################################################################
 
 def find_GCD(n, m):
   while n % m != 0:
