@@ -60,6 +60,7 @@ def __prepare_axes(ax, canvas_width,
 
   ax.set_xticks(ticks = get_round_multiple_range(left_x, right_x, tick_step))
   ax.set_yticks(ticks = get_round_multiple_range(bottom_y, top_y, tick_step))
+
   # set axis limits
   ax.set_xlim(left=left_x, right=right_x)
   ax.set_ylim(bottom=bottom_y, top=top_y)
@@ -133,8 +134,6 @@ def create_canvas_and_axes(canvas_width,
   figure.subplots_adjust(**margin_adjustments)
   figure.set_dpi(dpi) 
   figure.set_size_inches(figsize)
-
-  __prepare_axes(ax=axes, **params_for_axes)
   
   if model is not None:
     # handle the model drawing
@@ -156,8 +155,10 @@ def create_canvas_and_axes(canvas_width,
         set_diamond_size_factor(0)
         model(axes=axes)
         set_outlines_colour(None)
+      __prepare_axes(ax=axs[1], **params_for_axes)
     axs[1].set_title(model_title, fontdict={'size': title_font_size})
-
+ 
+  __prepare_axes(ax=axes, **params_for_axes)
   axes.set_title(title, fontdict={'size': title_font_size})
 
   # show diamond points and grid and axis if and only if tick_step is set

@@ -69,7 +69,7 @@ my_default_font_sizes = {'title'      : 18/screen_zoom,
 # Figure sizes (in inches) and DPIs  
 # Figure size in pixels is DPI * figure size in inches
 
-my_default_display_params = {'max_figsize' : [8/screen_zoom, 7.5/screen_zoom],
+my_default_display_params = {'max_figsize' : [7/screen_zoom, 6.0/screen_zoom],
                              'dpi' : 100,
                              'margin_adjustments' : {'top'    : 0.85, 
                                                      'bottom' : 0.05,
