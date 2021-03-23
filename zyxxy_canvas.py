@@ -29,7 +29,7 @@ from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_display_params, 
 USE_PLT_SHOW = True
 
 def __prepare_axes(ax, canvas_width,
-                       canvas_height, make_symmetric, axes_label_font_size, axes_tick_font_size, tick_step, background_colour):
+                       canvas_height, make_symmetric, axes_label_font_size, axes_tick_font_size, tick_step, background_colour=None):
 
   assert make_symmetric in ['x', 'y', True, False]
 
@@ -176,7 +176,7 @@ def create_canvas_and_axes(canvas_width,
       __prepare_axes(ax=axes_model, **params_for_axes)
     axes_model.set_title(model_title, fontdict={'size': title_font_size})
  
-  __prepare_axes(ax=axes, **params_for_axes)
+  __prepare_axes(ax=axes, background_colour=background_colour, **params_for_axes)
   axes.set_title(title, fontdict={'size': title_font_size})
   set_diamond_size_factor(value=(tick_step is not None))
 
