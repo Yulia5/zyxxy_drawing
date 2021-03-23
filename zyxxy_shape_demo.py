@@ -212,11 +212,13 @@ def update_shape_form_given_side(_, side):
   shapename = active_shapename[side]
   _shape = get_active_shape(side=side)
 
-  kwargs_shape = {silder_.label : silder_.val for silder_ in specific_widgets_by_side[side] if silder_.ax.get_visible()}
+  kwargs_shape = {silder_.label.get_text() : silder_.val for silder_ in specific_widgets_by_side[side] if silder_.ax.get_visible()}
   
   _widgets_common = common_widgets_by_side[side]
   kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
   kwargs_common2= {get_common_kwarg_key(shapename=shapename, common_label=key) : value for key, value in kwargs_common.items()}
+
+  print(kwargs_shape)
 
   _shape.update_xy_by_shapename(active_shapename[side], **kwargs_shape)
   _shape.adjust_the_diamond(**kwargs_common2)
@@ -238,6 +240,9 @@ def update_visibility(side, switch_on):
 
   spec_param_dict = specific_inputs_values_by_shapename[active_shapename[side]]
   current_slider_nb = 0
+
+  if switch_on:
+    print([[current_slider.label.get_text(), current_slider.val, current_slider.valinit, current_slider.valmax] for current_slider in specific_widgets_by_side[side]])
   
   for param_name, slider_params in spec_param_dict.items():
     current_slider_nb -= 1
@@ -246,11 +251,16 @@ def update_visibility(side, switch_on):
     if switch_on:
       for attr_name, attr_value in spec_param_dict[param_name].items():
         setattr(current_slider, attr_name, attr_value)
+      
       current_slider.val = specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name]
-      current_slider.label = param_name  
+      current_slider.label.set_text(param_name) 
+      
     else:
       specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name] = current_slider.val
-    
+  
+  if switch_on:
+    print([[current_slider.label.get_text(), current_slider.val, current_slider.valinit, current_slider.valmax] for current_slider in specific_widgets_by_side[side]])
+  
   for i in range(get_max_specific_sliders() + current_slider_nb):
     specific_widgets_by_side[side][i].ax.set_visible(False)
   
