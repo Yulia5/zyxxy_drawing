@@ -233,9 +233,6 @@ def update_visibility(side, switch_on):
 
   spec_param_dict = specific_inputs_values_by_shapename[active_shapename[side]]
   current_slider_nb = 0
-
-  if switch_on:
-    print([[current_slider.label.get_text(), current_slider.val, current_slider.valinit, current_slider.valmax] for current_slider in specific_widgets_by_side[side]])
   
   for param_name, slider_params in spec_param_dict.items():
     current_slider_nb -= 1
@@ -250,13 +247,9 @@ def update_visibility(side, switch_on):
       if current_slider.label.get_text() == param_name:
         specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name] = current_slider.val
   
-  if switch_on:
-    print([[current_slider.label.get_text(), current_slider.val, current_slider.valinit, current_slider.valmax] for current_slider in specific_widgets_by_side[side]])
-  
   for i in range(get_max_specific_sliders() + current_slider_nb):
     specific_widgets_by_side[side][i].ax.set_visible(False)
   
-
   # style widgets visibility
   patch_or_line = get_active_shapetype(side=side)
   for key, sw_or_all_texts in style_widgets_side_by_shapetype[side][patch_or_line].items():
