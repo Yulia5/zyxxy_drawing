@@ -57,10 +57,39 @@ shape_types = ["patch", "line"]
 active_shapename = {side : None for side in sides}
 shapes_by_side_by_shapetype = {side : {st : None for st in shape_types} for side in sides}
 common_widgets_by_side = {side : {} for side in sides}
-specific_widgets_by_side_by_shapename = {side : {} for side in sides}
+specific_widgets_by_side = {side : [] for side in sides}                    # slider objects
+specific_widgets_values_by_side_by_shapename= {side : {} for side in sides} # current values
+specific_inputs_values_by_shapename = {}                                    # min, max etc. params
+
 style_widgets_side_by_shapetype = {side : {st : {'text' : []} for st in shape_types} for side in sides}
 shape_switchers = {side : None for side in sides}
 buttons = {side : None for side in sides}
+
+##########################################################################################
+def fill_in_specific_inputs_values_by_shapename_widgets_values_by_side_by_shapename():
+  global specific_inputs_values_by_shapename
+  global specific_widgets_values_by_side_by_shapename
+  # specific sliders # todo
+  for shapename, shape_params in shape_names_params_dicts_definition.items():
+    specific_inputs_values_by_shapename[shapename] = {}
+    for side in sides:
+        specific_widgets_values_by_side_by_shapename[side][shapename] = {}
+    for param_name, param_name_range in shape_params.items():
+
+      if isinstance(param_name_range, str):
+        param_params = np.copy(slider_range[param_name_range])
+      else:
+        param_params = np.copy(slider_range[param_name_range[0]]) 
+        param_params[2] = param_name_range[1] 
+
+      specific_inputs_values_by_shapename[shapename][param_name] = {'valmin' : param_params[0], 
+                                                                    'valmax' : param_params[1], 
+                                                                    'valinit' : param_params[2], 
+                                                                    'valstep' : param_params[3]}
+      for side in sides:
+        specific_widgets_values_by_side_by_shapename[side][shapename][param_name] = param_params[2]
+
+fill_in_specific_inputs_values_by_shapename_widgets_values_by_side_by_shapename()
 
 ##########################################################################################
 # create the figure
@@ -69,11 +98,16 @@ fig = plt.figure()
 # Creating the canvas!
 ##########################################################################################
 
-def get_demo_rax_bottom():
-  max_widget_qty = 0
+def get_max_specific_sliders():
+  max_specific_sliders = 0
   for spec_param_dict in shape_names_params_dicts_definition.values():
-    max_widget_qty = max(max_widget_qty, len(spec_param_dict))
-  demo_rax_bottom = (max_widget_qty + len(common_params_dict_definition) + 2) * (widget_params['height'] + widget_params['gap']) + figure_params['plot_bottom_gap']
+    max_specific_sliders = max(max_specific_sliders, len(spec_param_dict))
+  return max_specific_sliders
+
+def get_demo_rax_bottom():
+  max_widget_qty = get_max_specific_sliders() + len(common_params_dict_definition) + 2
+  demo_rax_bottom = max_widget_qty * (widget_params['height'] + widget_params['gap']) 
+  demo_rax_bottom += figure_params['plot_bottom_gap']
   return demo_rax_bottom
 
 plot_ax_left   = 2 * (widget_params['radio_side_margin'] + widget_params['radio_width']) + figure_params['plot_gap']
@@ -124,7 +158,7 @@ def add_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_option):
 
 def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=True, **slider_qwargs):
   _, sax = get_axes_for_widget(w_left=w_left, 
-                                        w_bottom=w_bottom)
+                               w_bottom=w_bottom)
   label = w_caption if caption_in_the_same_line else ""
   result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], color='black', **slider_qwargs)
 
@@ -178,29 +212,48 @@ def update_shape_form_given_side(_, side):
   shapename = active_shapename[side]
   _shape = get_active_shape(side=side)
 
-  _sliders_specific = specific_widgets_by_side_by_shapename[side][shapename]
-  kwargs_shape = {key : _sliders_specific[key].val for key in _sliders_specific.keys()}
+  kwargs_shape = {silder_.label : silder_.val for silder_ in specific_widgets_by_side[side] if silder_.ax.get_visible()}
+  
   _widgets_common = common_widgets_by_side[side]
   kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
   kwargs_common2= {get_common_kwarg_key(shapename=shapename, common_label=key) : value for key, value in kwargs_common.items()}
 
-  _shape.update_xy_by_shapename(shapename, **kwargs_shape)
+  _shape.update_xy_by_shapename(active_shapename[side], **kwargs_shape)
   _shape.adjust_the_diamond(**kwargs_common2)
   _shape.move(**kwargs_common)
 
   fig.canvas.draw_idle()
 
+
+#specific_widgets_by_side = {side : [] for side in sides}                    # slider objects
+#specific_widgets_values_by_side_by_shapename= {side : {} for side in sides} # current values
+#specific_inputs_values_by_shapename = {}  # min, max etc. params
+
 ##########################################################################################
 def update_visibility(side, switch_on):
-  shapename = active_shapename[side]
 
   #shape visibility
   _shape = shapes_by_side_by_shapetype[side][get_active_shapetype(side=side)]
-  _shape.set_visible(switch_on)  
+  _shape.set_visible(switch_on)
 
-  # shape-specific form widgets visibility
-  for _s in specific_widgets_by_side_by_shapename[side][shapename].values():
-    _s.ax.set_visible(switch_on)
+  spec_param_dict = specific_inputs_values_by_shapename[active_shapename[side]]
+  current_slider_nb = 0
+  
+  for param_name, slider_params in spec_param_dict.items():
+    current_slider_nb -= 1
+    current_slider = specific_widgets_by_side[side][current_slider_nb]
+    current_slider.ax.set_visible(switch_on)
+    if switch_on:
+      for attr_name, attr_value in spec_param_dict[param_name].items():
+        setattr(current_slider, attr_name, attr_value)
+      current_slider.val = specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name]
+      current_slider.label = param_name  
+    else:
+      specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name] = current_slider.val
+    
+  for i in range(get_max_specific_sliders() + current_slider_nb):
+    specific_widgets_by_side[side][i].ax.set_visible(False)
+  
 
   # style widgets visibility
   patch_or_line = get_active_shapetype(side=side)
@@ -228,7 +281,7 @@ def switch_active_shapename_given_side(label, side):
 
 ##########################################################################################
 def reset(_, side):
-  for w in specific_widgets_by_side_by_shapename[side][active_shapename[side]].values():
+  for w in specific_widgets_by_side[side]:
     w.reset()
   for w in common_widgets_by_side[side].values():
     if isinstance(w, Slider):
@@ -275,7 +328,6 @@ def place_style_widgets(side, shapetype, arg_category, w_left, w_bottom):
   return w_bottom
 
 ##########################################################################################
-
 def update_shape_style(_, side, shapetype, argname):
   argvalue = get_value(style_widgets_side_by_shapetype[side][shapetype][argname])
   style_kwargs = {argname : argvalue}
@@ -350,24 +402,14 @@ def place_shapes_and_widgets(side):
   common_widgets_by_side[side]['flip'] = flip_checkbox
 
   # ... and specific sliders
-  for sh_counter, shapename in enumerate(shape_names_params_dicts_definition.keys()):
-    specific_widgets_by_side_by_shapename[side][shapename] = {}
-    w_left = figure_params['widget_lefts'][side] + sh_counter * 0.0001
-    w_bottom = start_bottom_for_specific
-    for param_name, param_name_range in shape_names_params_dicts_definition[shapename].items():
-      
-      if isinstance(param_name_range, str):
-        param_params = np.copy(slider_range[param_name_range])
-      else:
-        param_params = np.copy(slider_range[param_name_range[0]]) 
-        param_params[2] = param_name_range[1] 
-   
-      w_bottom, s_slider, _ = add_a_slider(w_left=w_left,
-                                              w_bottom=w_bottom,
-                                              w_caption=param_name, 
-                                              s_vals=param_params)
-      s_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
-      specific_widgets_by_side_by_shapename[side][shapename][param_name] = s_slider
+  w_bottom = start_bottom_for_specific
+  for s in range(get_max_specific_sliders()):
+    w_bottom, s_slider, _ = add_a_slider(w_left=figure_params['widget_lefts'][side],
+                                         w_bottom=w_bottom,
+                                         w_caption="Dummy", #todo: add dummies
+                                         s_vals=[0, 1, 1/2, 1/2])
+    specific_widgets_by_side[side] += [s_slider]
+    s_slider.on_changed(functools.partial(update_shape_form_given_side, side=side))
 
   # ... and style!
   for st in shape_types:

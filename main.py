@@ -1,7 +1,7 @@
 #import zyxxy_shape_demo  
 # import draw_Nowruz_postcard
 # import draw_a_cat_gif
-import draw_a_cat_with_gradient_fur
+#import draw_a_cat_with_gradient_fur
 
 from zyxxy_all_EXAMPLES import *
 
@@ -26,3 +26,13 @@ from zyxxy_all_EXAMPLES import *
 
 
 #from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); test_all_drawings(); 
+
+import zyxxy_canvas, datetime
+
+#zyxxy_canvas.is_running_tests(True)
+
+print(datetime.datetime.now())
+
+import zyxxy_shape_demo
+
+print(datetime.datetime.now())

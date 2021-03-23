@@ -7,6 +7,7 @@ from zyxxy_shape_class import Shape
 from zyxxy_colours import create_gradient_colours
 from zyxxy_utils import is_the_same_point
 
+##################################################################
 def test_all_examples(): 
   import inspect
   import zyxxy_all_EXAMPLES
@@ -20,7 +21,7 @@ def test_all_examples():
       plt.close('all')
   print(datetime.datetime.now())
   
-
+##################################################################
 def test_all_drawings():
   import os
   import types
@@ -36,6 +37,7 @@ def test_all_drawings():
       plt.close('all')
   print(datetime.datetime.now())
 
+##################################################################
 n=0
 def test_rectangle():
   from zyxxy_shape_functions import draw_a_rectangle, clone_a_shape
@@ -92,7 +94,7 @@ def test_rectangle():
   with pytest.raises(Exception):
     x = 1 / 0
 
-
+##################################################################
 def test_gradient():
   for test_end in ([255, 255, 255], [2, 3, 5], [2, 3, 15]):
     result = create_gradient_colours(rgb_start=[0, 0, 0], rgb_end=test_end)
