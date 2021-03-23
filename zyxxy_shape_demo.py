@@ -218,18 +218,11 @@ def update_shape_form_given_side(_, side):
   kwargs_common= {key : get_value(_widgets_common[key]) for key in _widgets_common.keys()}
   kwargs_common2= {get_common_kwarg_key(shapename=shapename, common_label=key) : value for key, value in kwargs_common.items()}
 
-  print(kwargs_shape)
-
   _shape.update_xy_by_shapename(active_shapename[side], **kwargs_shape)
   _shape.adjust_the_diamond(**kwargs_common2)
   _shape.move(**kwargs_common)
 
   fig.canvas.draw_idle()
-
-
-#specific_widgets_by_side = {side : [] for side in sides}                    # slider objects
-#specific_widgets_values_by_side_by_shapename= {side : {} for side in sides} # current values
-#specific_inputs_values_by_shapename = {}  # min, max etc. params
 
 ##########################################################################################
 def update_visibility(side, switch_on):
@@ -251,12 +244,11 @@ def update_visibility(side, switch_on):
     if switch_on:
       for attr_name, attr_value in spec_param_dict[param_name].items():
         setattr(current_slider, attr_name, attr_value)
-      
       current_slider.val = specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name]
       current_slider.label.set_text(param_name) 
-      
     else:
-      specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name] = current_slider.val
+      if current_slider.label.get_text() == param_name:
+        specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name] = current_slider.val
   
   if switch_on:
     print([[current_slider.label.get_text(), current_slider.val, current_slider.valinit, current_slider.valmax] for current_slider in specific_widgets_by_side[side]])
