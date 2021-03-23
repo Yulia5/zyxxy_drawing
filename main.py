@@ -1,7 +1,7 @@
 #import zyxxy_shape_demo  
 # import draw_Nowruz_postcard
 # import draw_a_cat_gif
-# import draw_a_cat_with_gradient_fur
+import draw_a_cat_with_gradient_fur
 
 from zyxxy_all_EXAMPLES import *
 
@@ -24,10 +24,5 @@ from zyxxy_all_EXAMPLES import *
 
 #import drawn_a_Coccinelle
 
-#from zyxxy_tests import check_rectangle
-#check_rectangle()
 
-# import draw_a_cat_with_gradient_fur
-
-
-from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); test_all_drawings(); 
+#from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); test_all_drawings(); 

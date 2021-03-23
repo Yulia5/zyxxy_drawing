@@ -17,8 +17,8 @@ ax = create_canvas_and_axes(  canvas_width = 30,
                               title = "Gradient Cat",
                               background_colour='aliceblue')
 
-set_default_outline_style(linewidth=5*2)
-set_default_line_style(linewidth=5)
+set_default_outline_style(linewidth=7*2)
+set_default_line_style(linewidth=7)
 
 body_height=25
 eye_y = 11
@@ -47,7 +47,7 @@ for e_end, p in enumerate(body_shape):
     break
 
 for lr in [-1, 1]:
-  body_shape[lr*e_start, :] = [-4.5 * lr, ear_height]
+  body_shape[lr*e_start, :] = [-5.5 * lr, ear_height]
   body_shape = np.delete(body_shape, np.arange(lr*(e_start+1), lr*e_end, lr), axis=0)
 
 body_shape[:, 1] += body_height + body_bottom

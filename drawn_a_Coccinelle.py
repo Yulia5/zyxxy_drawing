@@ -16,7 +16,7 @@ bg_colour = 'oldlace'
 # Creating the canvas!                               ##
 axes = create_canvas_and_axes(canvas_width = 21,
                               canvas_height = 28,
-                              tick_step = 2,
+                              #tick_step = 2,
                               make_symmetric = True,
                               title = "My Coccinelle",
                               model = 'https://assets.catawiki.nl/assets/2020/6/17/c/7/9/c79f120c-acb0-472e-8447-d334163ee436.jpg', 
@@ -41,4 +41,4 @@ for radius in [1.25, 2.25, 3.25, 4.25]:
 
 #######################################################
 # If you need to save it, and an argument filename="my_postcard", or whatever filename you like! ##
-show_drawing_and_save_if_needed("MyCoccinelle")
+show_drawing_and_save_if_needed("MyCoccinelle2")
