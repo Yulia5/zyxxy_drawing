@@ -53,7 +53,8 @@ def __prepare_axes(ax, canvas_width,
 
   ax.grid(tick_step is not None)
   if tick_step is None:
-    ax.set_facecolor(find_colour_code(background_colour))
+    if background_colour is not None:
+      ax.set_facecolor(find_colour_code(background_colour))
   else:
     ax.set_xlabel("RULER FOR X's", fontsize=axes_label_font_size)
     ax.set_ylabel("RULER FOR Y's", fontsize=axes_label_font_size)
@@ -90,12 +91,11 @@ def create_canvas_and_axes(canvas_width,
                        'canvas_height'        : canvas_height, 
                        'make_symmetric'       : make_symmetric,
                        'tick_step'            : tick_step, 
-                       'background_colour'    : background_colour, 
                        'axes_label_font_size' : axes_label_font_size, 
                        'axes_tick_font_size'  : axes_tick_font_size}
 
   if axes is not None:
-    __prepare_axes(ax=axes, **params_for_axes)
+    __prepare_axes(ax=axes, background_colour=background_colour, **params_for_axes)
     return axes
 
   axis_width_add = 2 * margin_side

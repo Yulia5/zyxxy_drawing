@@ -7,7 +7,7 @@ from zyxxy_shape_class import Shape
 from zyxxy_colours import create_gradient_colours
 from zyxxy_utils import is_the_same_point
 
-def run_all_examples(): 
+def test_all_examples(): 
   import inspect
   import zyxxy_all_EXAMPLES
   
@@ -21,7 +21,7 @@ def run_all_examples():
   print(datetime.datetime.now())
   
 
-def run_all_drawings():
+def test_all_drawings():
   import os
   import types
   import importlib.machinery  
@@ -37,7 +37,7 @@ def run_all_drawings():
   print(datetime.datetime.now())
 
 n=0
-def check_rectangle():
+def test_rectangle():
   from zyxxy_shape_functions import draw_a_rectangle, clone_a_shape
   from zyxxy_canvas import create_canvas_and_axes
   from zyxxy_utils import is_the_same_contour #, is_the_same_point

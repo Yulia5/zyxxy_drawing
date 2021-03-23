@@ -1,14 +1,18 @@
 #import zyxxy_shape_demo  
 # import draw_Nowruz_postcard
 # import draw_a_cat_gif
+import draw_a_cat_with_gradient_fur
+
 from zyxxy_all_EXAMPLES import *
 
 #
 #example_animated_croc(filename="croccy")
 #example_Zyxxy_the_mouse()  
 #example_yellow_cat_animation(filename="yellowww_cat") 
+#example_yellow_cat() 
+#example_croc()
 
-# print("done")
+#example_penguins()
 
 #import draw_a_flag_of_Japan
 #import draw_a_flag_of_the_USA 
@@ -26,4 +30,4 @@ from zyxxy_all_EXAMPLES import *
 # import draw_a_cat_with_gradient_fur
 
 
-from zyxxy_tests import *; check_rectangle(); test_gradient(); run_all_examples(); run_all_drawings(); 
+#from zyxxy_tests import *; check_rectangle(); test_gradient(); run_all_examples(); run_all_drawings(); 

@@ -6,7 +6,7 @@ from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer, get_width, get_height
 from zyxxy_shape_functions import draw_a_circle, draw_a_square, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_a_crescent, draw_a_star
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_circle, build_a_zigzag
-from zyxxy_shape_class import shift_layer, rotate_layer, stretch_layer, get_all_polygons_in_layers
+from zyxxy_shape_class import shift_layer, rotate_layer, stretch_layer
 from zyxxy_utils import random_element, random_number
 
 #########################################################
@@ -138,16 +138,18 @@ def example_animation_for_Zyxxy_the_mouse(axes=None):
 #########################################################
 ## THE PENGUINS                                        ##
 #########################################################
-def example_penguins():
+def example_penguins(axes=None):
   
   def draw_half_circle(turn, **kwargs):
     draw_a_sector(angle_start=turn, angle_end=turn+6, **kwargs)
   #######################################################
   # Creating the canvas!                               ##  
-  axes = create_canvas_and_axes(canvas_width = 220,
-                                canvas_height = 120,
+  axes = create_canvas_and_axes(canvas_width = 320,
+                                canvas_height = 180,
                                 #tick_step = 10,
-                                background_colour = 'lightskyblue')
+                                model="https://i.pinimg.com/564x/fc/90/7d/fc907dc3638cfd64aa2c3ba56e216b92.jpg",
+                                background_colour = 'lightskyblue',
+                                axes=axes)
 
   #######################################################
   # Now let's draw the shapes!                         ##
@@ -174,34 +176,34 @@ def example_penguins():
   # body
   draw_a_circle(ax=axes, centre_x=60, centre_y=40, radius=20, colour='white')
   # feet
-  draw_half_circle(ax=axes, centre_x=55, centre_y=16, radius=6, colour='orangered', turn=5)
-  draw_half_circle(ax=axes, centre_x=65, centre_y=16, radius=6, colour='orangered', turn=7)
+  draw_half_circle(ax=axes, centre_x=54, centre_y=16, radius=6, colour='orangered', turn=8.5)
+  draw_half_circle(ax=axes, centre_x=66, centre_y=16, radius=6, colour='orangered', turn=9.5)
   # wings
-  draw_half_circle(ax=axes, centre_x=30, centre_y=60, radius=30, colour='black', turn=11)
-  draw_half_circle(ax=axes, centre_x=90, centre_y=60, radius=30, colour='black', turn=1)
+  draw_half_circle(ax=axes, centre_x=31, centre_y=60, radius=30, colour='black', turn=2)
+  draw_half_circle(ax=axes, centre_x=89, centre_y=60, radius=30, colour='black', turn=4)
   # head
   draw_a_circle(ax=axes, centre_x=60, centre_y=80, radius=15, colour='black')
   # eyes
   draw_a_circle(ax=axes, centre_x=55, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
   draw_a_circle(ax=axes, centre_x=65, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
   # beck
-  draw_a_triangle(ax=axes, tip_x=65, tip_y=72, height=10, width=8, colour='orangered', turn=10+1/2)
+  draw_a_sector(ax=axes, centre_x=58, centre_y=76, angle_start=0, angle_end=3, radius=6, stretch_x=1.5, turn=0.5, colour='orangered')
 
   # the penguin on the right
   # first foot 
-  draw_half_circle(ax=axes, centre_x=170, centre_y=16, radius=6, colour='orangered', turn=6)
+  draw_half_circle(ax=axes, centre_x=270, centre_y=16, radius=6, colour='orangered', turn=9)
   # body - white
-  draw_half_circle(ax=axes, centre_x=180, centre_y=50, radius=30, colour='white', turn=2)
+  draw_half_circle(ax=axes, centre_x=280, centre_y=50, radius=30, colour='white', turn=5)
   # second foot 
-  draw_half_circle(ax=axes, centre_x=180, centre_y=15, radius=6,  colour='orangered', turn=5)
+  draw_half_circle(ax=axes, centre_x=280, centre_y=15, radius=6,  colour='orangered', turn=8)
   # body - black
-  draw_half_circle(ax=axes, centre_x=190, centre_y=50, radius=30, colour='black', turn=2)
+  draw_half_circle(ax=axes, centre_x=290, centre_y=50, radius=30, colour='black', turn=5)
   # beck
-  draw_half_circle(ax=axes, centre_x=155, centre_y=75, radius=6, colour='orangered', turn=5 + 1/2)
+  draw_half_circle(ax=axes, centre_x=255, centre_y=75, radius=6, colour='orangered', turn=8 + 1/2)
   # head
-  draw_a_circle(ax=axes, centre_x=170, centre_y=80, radius=15, colour='black')
+  draw_a_circle(ax=axes, centre_x=270, centre_y=80, radius=15, colour='black')
   # an eye
-  draw_a_circle(ax=axes, centre_x=163, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  draw_a_circle(ax=axes, centre_x=263, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
   show_drawing_and_save_if_needed()
 
 
@@ -216,6 +218,7 @@ def example_yellow_cat(axes=None, cat_colour = 'Yellow', background_colour = 'Se
   axes = create_canvas_and_axes(canvas_width = 120,
                                 canvas_height = 120,
                                 background_colour = background_colour, 
+                                model = "https://i.pinimg.com/564x/40/9b/98/409b988980f55f10b588a21b28f15665.jpg",
                                 axes = axes,
                                 make_symmetric = 'x')
   #######################################################
@@ -350,6 +353,7 @@ def example_croc(axes=None):
   axes = create_canvas_and_axes(canvas_width = 190,
                                 canvas_height = 100,
                                 background_colour = 'PastelBlue', 
+                                model = "https://i.pinimg.com/564x/a5/b7/92/a5b792acaf4c776302be5bd79da8ddbd.jpg",
                                 axes = axes)
 
   #######################################################
