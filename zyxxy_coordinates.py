@@ -15,7 +15,7 @@
 ########################################################################
 
 import numpy as np
-from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point, my_default_vertices_qty_in_circle, full_turn_angle, conc_1_or_2_dim
+from zyxxy_utils import sin_hours, cos_hours, asin_hours, acos_hours, atan_hours, is_the_same_point, my_default_vertices_qty_in_circle, full_turn_angle, link_contours, add_a_left_mirror
 
 from scipy.optimize import fsolve
 from math import sqrt, ceil, floor
@@ -55,36 +55,6 @@ shape_names_params_dicts_definition = {
 ########################################################################
 
 sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle*full_turn_angle), cos_hours(a/my_default_vertices_qty_in_circle*full_turn_angle)] for a in range(my_default_vertices_qty_in_circle)]
-
-#####################################################
-## contours manipulation                           ##
-#####################################################
-
-#####################################################
-def link_contours(*arg):
-  result = np.empty((2, 0))
-  for _a in arg:
-    if isinstance(_a, np.ndarray):
-      a = _a
-    else:
-      a = np.array(_a, np.float64)
-    if (a.size == 0):
-      continue
-    if (result.size == 0):
-      result = a
-      continue
-    if is_the_same_point(p1=result[-1], p2=a[0]):
-      result = conc_1_or_2_dim(result[:-1], a)
-    else:
-      result = conc_1_or_2_dim(result, a)
-  return result
-
-#####################################################
-def add_a_left_mirror(contour, mirror_x=0):
-  reverse_contour = np.copy(contour[::-1, :])
-  reverse_contour[:, 0] = 2 * mirror_x - reverse_contour[:, 0]
-  result = link_contours(reverse_contour, contour)
-  return result
 
 #####################################################
 #####################################################

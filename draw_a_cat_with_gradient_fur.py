@@ -2,14 +2,15 @@
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_functions import draw_a_rectangle, draw_a_circle, draw_a_smile, draw_a_polygon, draw_a_segment
 from zyxxy_shape_class import shift_layer
-from zyxxy_shape_style import set_default_line_style, set_default_outline_style
+from zyxxy_shape_style import set_default_line_style#, set_default_outline_style
 from zyxxy_colours import create_gradient_colours
 from zyxxy_coordinates import build_an_egg, build_an_arc, link_contours
+from zyxxy_utils import is_contour_V_symmetric, conc_contours, remove_contour_points
 import numpy as np
 
 #######################################################
 # Creating the canvas!                               ##
-ax = create_canvas_and_axes(  canvas_width = 30,
+ax = create_canvas_and_axes(  canvas_width = 29,
                               canvas_height = 40,
                               make_symmetric = True,
                               #tick_step = 2,
@@ -17,8 +18,8 @@ ax = create_canvas_and_axes(  canvas_width = 30,
                               title = "Gradient Cat",
                               background_colour='aliceblue')
 
-set_default_outline_style(linewidth=7*2)
-set_default_line_style(linewidth=7)
+#set_default_outline_style(linewidth=8, joinstyle="round")#, colour=None)
+set_default_line_style(linewidth=7, joinstyle="round")
 
 body_height=25
 eye_y = 11
@@ -45,10 +46,23 @@ for e_start, p in enumerate(body_shape):
 for e_end, p in enumerate(body_shape):
   if p[1] < -2:
     break
+#
+assert(is_contour_V_symmetric(body_shape))
+# adding dummy 0th point
+# to match points 1 and -1, 2 and -2 etc.
+body_shape = conc_contours(body_shape[0:1, :], body_shape)
 
+# using the matching
 for lr in [-1, 1]:
-  body_shape[lr*e_start, :] = [-5.5 * lr, ear_height]
-  body_shape = np.delete(body_shape, np.arange(lr*(e_start+1), lr*e_end, lr), axis=0)
+  body_shape[e_start * lr, :] = [-1.5 * lr, ear_height]
+  range_to_remove = lr * np.arange(e_start+1, e_end+1) 
+  body_shape = remove_contour_points(contour=body_shape, range_to_remove=range_to_remove)
+
+# remove the dummy 0th point 
+body_shape = remove_contour_points(contour=body_shape, range_to_remove=[0])
+
+assert(is_contour_V_symmetric(body_shape))
+
 
 body_shape[:, 1] += body_height + body_bottom
 
@@ -57,7 +71,7 @@ body = draw_a_polygon(ax=ax, contour=body_shape)
 #gradient rectangles
 gradient_colours = create_gradient_colours(rgb_start=[0, 0, 255], rgb_end=(255, 0, 255))
 gradient_bottom = body_bottom - tail_coeff * tail_height
-grh = (ear_height + body_height + tail_coeff * tail_height) / len(gradient_colours)
+grh = (ear_height + body_height + tail_coeff * tail_height) / (len(gradient_colours) - 1)
 for i, gc in enumerate(gradient_colours):
   draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=body, colour=gc, outline_linewidth=0)
   draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=tail_shape, colour=gc, outline_linewidth=0)

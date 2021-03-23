@@ -36,7 +36,7 @@ def is_the_same_point(p1, p2):
   return (sqr_dist < tolerance)
 
 ##################################################################
-def conc_1_or_2_dim(a, b):
+def conc_contours(a, b):
   if a.ndim != b.ndim:
     raise Exception("Dimension number mismatch", a.ndim, "!=", b.ndim)
   if a.ndim == 1:
@@ -50,11 +50,47 @@ def is_the_same_contour(p1, p2, start_1=0, start_2=0, opposite_directions=False)
   if (p1.size == 0):
     return True
     
-  p1_modif = conc_1_or_2_dim(p1[start_1:-1], p1[:start_1])
-  p2_modif = conc_1_or_2_dim(p2[start_2:-1], p2[:start_2])
+  p1_modif = conc_contours(p1[start_1:-1], p1[:start_1])
+  p2_modif = conc_contours(p2[start_2:-1], p2[:start_2])
   if opposite_directions:
     p2_modif = p2_modif[::-1]
   result = is_the_same_point(p1=p1_modif, p2=p2_modif)
+  return result
+
+##################################################################
+def is_contour_V_symmetric(contour):
+  result = is_the_same_contour(contour[:, 0], -contour[::-1][:, 0])
+  return result
+
+##################################################################
+def remove_contour_points(contour, range_to_remove):
+  result = np.delete(contour, range_to_remove, axis=0)
+  return result
+
+#####################################################
+def link_contours(*arg):
+  result = np.empty((2, 0))
+  for _a in arg:
+    if isinstance(_a, np.ndarray):
+      a = _a
+    else:
+      a = np.array(_a, np.float64)
+    if (a.size == 0):
+      continue
+    if (result.size == 0):
+      result = a
+      continue
+    if is_the_same_point(p1=result[-1], p2=a[0]):
+      result = conc_contours(result[:-1], a)
+    else:
+      result = conc_contours(result, a)
+  return result
+
+#####################################################
+def add_a_left_mirror(contour, mirror_x=0):
+  reverse_contour = np.copy(contour[::-1, :])
+  reverse_contour[:, 0] = 2 * mirror_x - reverse_contour[:, 0]
+  result = link_contours(reverse_contour, contour)
   return result
 
 ##################################################################
