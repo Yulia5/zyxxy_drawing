@@ -85,6 +85,7 @@ def create_canvas_and_axes(canvas_width,
                            margin_side = my_default_display_params['margin_side'],
                            axes = None,
                            model = None,
+                           model_zoom = 1.,
                            outlines_colour = None):
 
   params_for_axes = {  'canvas_width'         : canvas_width,
@@ -154,7 +155,7 @@ def create_canvas_and_axes(canvas_width,
       __prepare_axes(ax=axes_model, **params_for_axes)
       model_title = "Original Drawing"
       image = filename_to_image(filename=model)
-      scaling_factor = min(canvas_width/image.shape[1], canvas_height/image.shape[0])
+      scaling_factor = model_zoom * min(canvas_width/image.shape[1], canvas_height/image.shape[0])
       # defining LB_position to center the model image
       LB_position=[axes_model.get_xlim()[0] + 0.5 * (canvas_width  - image.shape[1] * scaling_factor), 
                    axes_model.get_ylim()[0] + 0.5 * (canvas_height - image.shape[0] * scaling_factor)]

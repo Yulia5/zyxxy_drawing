@@ -354,20 +354,21 @@ def example_croc(axes=None):
                                 canvas_height = 100,
                                 background_colour = 'PastelBlue', 
                                 model = "https://i.pinimg.com/564x/a5/b7/92/a5b792acaf4c776302be5bd79da8ddbd.jpg",
+                                model_zoom = 1.7,
                                 axes = axes)
 
   #######################################################
   # Now let's draw the shapes!                         ##
   
-  left_body = 30
+  left_body = 45
   bottom_body = 30
   right_body = 120
-  right_head = 180
+  right_head = 170
   top_body = 50
   top_head = bottom_body+15
-  tail_right = 35 + left_body
-  tail_width = 10
-  centre_backside = 50
+  tail_right = 25 + left_body
+  tail_width = 15
+  centre_backside = 55
   r_nostrils = 3
   lip_y = 0.5 * (top_head + bottom_body)
   lip_r = 3 
@@ -376,7 +377,7 @@ def example_croc(axes=None):
   leg_width = 10
   leg_length = 15
   feet_height = 5
-  feel_length = 20
+  feel_length = 18
  
   #######################################################
   # Now let's draw the shapes!                         ## 
@@ -387,8 +388,8 @@ def example_croc(axes=None):
 
   leg_layer_nb = new_layer()
 
-  for shift, colour in [[0, 'green'], [-17, 'BrightGreen']]:
-    for x in [50, 100]:
+  for shift, colour in [[8, 'green'], [-5, 'BrightGreen']]:
+    for x in [left_body+10, left_body+55]:
       # draw a leg
       draw_a_rectangle(ax=axes, left=x+shift, top=bottom_body, height=leg_length, width=leg_width, colour=colour)
       # draw a feet
@@ -398,7 +399,7 @@ def example_croc(axes=None):
 
   body_layer_nb = new_layer()
 
-  draw_a_rectangle(ax=axes, left=left_body, bottom=bottom_body, height=top_body-bottom_body, width=right_body-left_body)
+  draw_a_rectangle(ax=axes, left=left_body-0.1, bottom=bottom_body, height=top_body-bottom_body, width=right_body-left_body+0.2)
 
   # backside
   backside_clip_contour = build_a_circle(radius=centre_backside-bottom_body) + [left_body, centre_backside]
@@ -409,7 +410,7 @@ def example_croc(axes=None):
                  angle_start=6, angle_end=12, clip_outline=backside_clip_contour)
 
   # tail
-  draw_a_rectangle(ax=axes, left=left_body, top=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body)
+  draw_a_rectangle(ax=axes, left=left_body-0.1, top=2*centre_backside-bottom_body, height=tail_width, width=tail_right-left_body+0.2)
 
   draw_a_sector(ax=axes, centre_x=tail_right, centre_y=2*centre_backside-bottom_body, radius=tail_width,angle_start=3, angle_end=6)
 
@@ -453,11 +454,11 @@ def example_croc(axes=None):
   # upper lip
   lipline_arc = build_an_arc(radius=lip_r, angle_start=6, angle_end=9) + [right_body-lip_r, lip_y+lip_r]
   lipline = link_contours([[right_head, lip_y]], lipline_arc)
-  draw_a_broken_line(ax=axes, contour=lipline, colour='green', linewidth=2)
+  draw_a_broken_line(ax=axes, contour=lipline, colour='green', linewidth=8)
 
   upper_jaw_diamond = [right_body-lip_r, lip_y+lip_r]
 
-  show_drawing_and_save_if_needed()
+  show_drawing_and_save_if_needed("croc")
 
   return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond
 

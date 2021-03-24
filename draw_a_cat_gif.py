@@ -11,6 +11,7 @@ ax = create_canvas_and_axes(  canvas_width = 30,
                               #tick_step = 2,
                               title = "Excited Cat",
                               model = 'https://i.pinimg.com/564x/de/21/fd/de21fdb9fa70d9d54ce7e4c0f07910d5.jpg',
+                              model_zoom = 1.3,
                               background_colour='aliceblue')
 
 #######################################################
