@@ -64,15 +64,14 @@ default_outlines_layer_nb = 501
 # Font sizes and adjustment needed to fit them
 my_default_font_sizes = {'title'      : 18/screen_zoom,
                          'axes_label' : 14/screen_zoom,
-                         'tick'       :  8/screen_zoom}
+                         'tick'       : 8/screen_zoom}
 
 # Figure sizes (in inches) and DPIs  
 # Figure size in pixels is DPI * figure size in inches
 
-my_default_display_params = {'max_figsize' : [10/screen_zoom, 11/screen_zoom],
-                             'dpi' : 50,
+my_default_display_params = {'max_figsize' : [6/screen_zoom, 4.5/screen_zoom],
                              'margin_side' : 0.5 }
-my_default_image_params = {'dpi'     : 100,
+my_default_image_params = {'dpi'     : 200,
                            'format'  : 'png'}
 
 my_default_animation_params = {'dpi'     : 70,

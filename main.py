@@ -16,6 +16,7 @@ from zyxxy_all_EXAMPLES import *
 #example_penguins()
 
 #import draw_a_flag_of_Japan
+#import draw_a_flag_of_Japanese_navy
 #import draw_a_flag_of_the_USA 
 #import draw_a_flag_of_Belgium
 #import draw_a_flag_of_Cuba
@@ -25,7 +26,7 @@ from zyxxy_all_EXAMPLES import *
 
 #import drawn_a_Coccinelle
 
-import drawn_blue_green_madala
+import drawn_blue_green_mandala
 
 #from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); test_all_drawings(); 
 

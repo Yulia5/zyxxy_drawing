@@ -30,8 +30,9 @@ from MY_zyxxy_SETTINGS import my_default_font_sizes, my_default_display_params, 
 
 USE_PLT_SHOW = True
 
-def __prepare_axes(ax, canvas_width,
-                       canvas_height, make_symmetric, axes_label_font_size, axes_tick_font_size, tick_step, background_colour=None):
+def __prepare_axes(ax, canvas_width, canvas_height, make_symmetric, tick_step, 
+                       title_font_size, axes_label_font_size, axes_tick_font_size, 
+                       title=None, background_colour=None):
 
   assert make_symmetric in ['x', 'y', True, False]
 
@@ -69,6 +70,9 @@ def __prepare_axes(ax, canvas_width,
   ax.set_xlim(left=left_x, right=right_x)
   ax.set_ylim(bottom=bottom_y, top=top_y)
   ax.set_aspect('equal')
+
+  if title is not None: 
+    ax.set_title(title, fontdict={'size': title_font_size})
     
 
 # create the axis, set their sizes, 
@@ -83,7 +87,7 @@ def create_canvas_and_axes(canvas_width,
                            title = "",
                            title_font_size = my_default_font_sizes['title'],
                            max_figsize = my_default_display_params['max_figsize'],
-                           dpi = my_default_display_params['dpi'],
+                           dpi = 100,
                            margin_side = my_default_display_params['margin_side'],
                            axes = None,
                            model = None,
@@ -95,10 +99,10 @@ def create_canvas_and_axes(canvas_width,
                        'make_symmetric'       : make_symmetric,
                        'tick_step'            : tick_step, 
                        'axes_label_font_size' : axes_label_font_size, 
-                       'axes_tick_font_size'  : axes_tick_font_size}
+                       'axes_tick_font_size'  : axes_tick_font_size,
+                       'title_font_size'      : title_font_size}
 
-  if axes is not None:
-    __prepare_axes(ax=axes, background_colour=background_colour, **params_for_axes)
+  if axes is not None: # only needed for demo and when called inside models
     return axes
 
   axis_width_add = 2 * margin_side
@@ -152,10 +156,15 @@ def create_canvas_and_axes(canvas_width,
   figure.set_size_inches(figsize)
   
   if model is not None:
+
+    # halve the font size
+    global my_default_font_sizes
+    for l in ['axes_label', 'tick', 'title']:
+      my_default_font_sizes[l] /= 2
+
     # handle the model drawing
     if isinstance(model, str):
-      __prepare_axes(ax=axes_model, **params_for_axes)
-      model_title = "Original Drawing"
+      __prepare_axes(ax=axes_model, title = "Original Drawing", **params_for_axes)
       image = filename_to_image(filename=model)
       scaling_factor = model_zoom * min(canvas_width/image.shape[1], canvas_height/image.shape[0])
       # defining LB_position to center the model image
@@ -168,7 +177,6 @@ def create_canvas_and_axes(canvas_width,
       USE_PLT_SHOW = False
       model(axes=axes_model) 
       USE_PLT_SHOW = True
-      model_title = "Completed Drawing"
       if outlines_colour is not None:
         set_outlines_colour(outlines_colour)
         set_diamond_size_factor(0)
@@ -176,11 +184,9 @@ def create_canvas_and_axes(canvas_width,
         model(axes=axes)
         USE_PLT_SHOW = True
         set_outlines_colour(None)
-      __prepare_axes(ax=axes_model, **params_for_axes)
-    axes_model.set_title(model_title, fontdict={'size': title_font_size})
+      __prepare_axes(ax=axes_model, title = "Completed Drawing", **params_for_axes)
  
-  __prepare_axes(ax=axes, background_colour=background_colour, **params_for_axes)
-  axes.set_title(title, fontdict={'size': title_font_size})
+  __prepare_axes(ax=axes, title=title, background_colour=background_colour, **params_for_axes)
   set_diamond_size_factor(value=(tick_step is not None))
 
   return axes
@@ -219,7 +225,7 @@ def show_drawing_and_save_if_needed(save=True,
                            nb_of_frames = None,
                            block=True):
 
-  if save:
+  if save and USE_PLT_SHOW:
     if filename is None:
       frame = inspect.stack()[1]
       module = inspect.getmodule(frame[0])
@@ -230,10 +236,10 @@ def show_drawing_and_save_if_needed(save=True,
           filename = filename[len(prefix_):] # remove the prefix
 
     figure = plt.gcf()
-    current_dpi = figure.get_dpi() 
-
+    
     if (animation_func is None) != (nb_of_frames is None):
       raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
+
     if animation_func is None:
       if (filename is not None) and (filename != ""):
         last_dot_position = filename.rfind(".")
@@ -243,6 +249,7 @@ def show_drawing_and_save_if_needed(save=True,
         plt.savefig(fname="images_videos/"+filename, 
                     format = filename[last_dot_position+1:],
                     dpi = dpi4saving)
+        
     else:
       figure.set_dpi(animation_file_dpi) 
       writer = animation.writers[animation_writer](fps=animation_FPS)
@@ -256,7 +263,7 @@ def show_drawing_and_save_if_needed(save=True,
                                       repeat=animation_repeat)
       if (filename is not None) and (filename != ""):
         anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
-    figure.set_dpi(current_dpi) 
+    figure.set_dpi(100) 
 
   if not is_running_tests():
     plt.show(block=(block and USE_PLT_SHOW))

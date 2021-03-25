@@ -9,7 +9,7 @@ axes = create_canvas_and_axes(canvas_width = 30,
                               canvas_height = 20,
                               tick_step = 2,
                               title = "My first Zyxxy drawing",
-                              model = example_japanese_flag,
+                              #model = example_japanese_flag,
                               outlines_colour = "cyan"
                               )
 

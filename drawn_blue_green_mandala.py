@@ -23,7 +23,7 @@ distance_circles = 31
 distance_triangles = 27
 crescents_qty = 40
 
-set_default_outline_style(linewidth=5)
+set_default_outline_style(linewidth=3)
 
 layers_1 = new_layers_outline_behind()
 
@@ -40,10 +40,18 @@ for i in range(crescents_qty):
 layers_3 = new_layers_outline_behind()
 set_default_patch_style(colour="yellow")
 
-for i in range(8):
-  triangles = [draw_a_triangle(ax=ax, tip_x=0, tip_y=distance_triangles, height=8, width=3, turn=6) for _ in range(4)]
+for i in range(1):#8):
+  triangles = [draw_a_triangle(ax=ax, tip_x=0, tip_y=distance_triangles, height=8, width=3.5, turn=6) for _ in range(4)]
   for t, angle in enumerate([-0.19, -0.1, 0.1, 0.19]):
     triangles[t].rotate(turn=angle, diamond_override=[0,0])
+
+  big_triangles = [draw_a_triangle(ax=ax, tip_x=0, tip_y=distance_triangles, height=8, width=7, turn=6) for _ in range(4)]
+  for t, lr in enumerate([-1, 1]):
+    print(lr*1.5)
+    big_triangles[t].rotate(turn=-lr*1.5)
+    big_triangles[t].rotate(turn=lr*1.5, diamond_override=[0,0])
+
+
 
 
 show_drawing_and_save_if_needed()
