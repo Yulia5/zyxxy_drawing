@@ -8,13 +8,13 @@ ax_side= 12
 
 #######################################################
 # Creating the canvas!                               ##
-axes = create_canvas_and_axes(canvas_width = ax_side,
+create_canvas_and_axes(canvas_width = ax_side,
                               canvas_height = ax_side+3,
                               tick_step = 1,
                               title = "Pythagoras Puzzle")
 
-a_square = draw_a_square(ax=axes, side=5, centre_x=ax_side/2, centre_y=ax_side/2, colour='crimson', turn=atan_hours(3/4))
-triangle_1 = draw_a_polygon(ax=axes, contour=[[0, 3], [0, 0], [4, 0]], colour='dodgerblue')
+a_square = draw_a_square(side=5, centre_x=ax_side/2, centre_y=ax_side/2, colour='crimson', turn=atan_hours(3/4))
+triangle_1 = draw_a_polygon(contour=[[0, 3], [0, 0], [4, 0]], colour='dodgerblue')
 
 triangle_2 = clone_a_shape(triangle_1)
 triangle_2.shift(shift=[0, 8])

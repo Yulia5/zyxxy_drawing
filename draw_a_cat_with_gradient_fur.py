@@ -10,7 +10,7 @@ import numpy as np
 
 #######################################################
 # Creating the canvas!                               ##
-ax = create_canvas_and_axes(  canvas_width = 29,
+create_canvas_and_axes(  canvas_width = 29,
                               canvas_height = 40,
                               make_symmetric = True,
                               #tick_step = 2,
@@ -35,7 +35,7 @@ tail_arc_1[:, 0] *= 5
 tail_arc_1[:, 1] *= tail_height
 
 tail_shape = link_contours(tail_arc_1, tail_arc_1[::-1, :] * tail_coeff) + [5, body_bottom]
-tail = draw_a_polygon(ax=ax, contour=tail_shape)
+tail = draw_a_polygon(contour=tail_shape)
 
 # body shape
 body_shape = build_an_egg(power=5, height_widest_point=-15, width=20, height=-body_height)
@@ -66,29 +66,29 @@ assert(is_contour_V_symmetric(body_shape))
 
 body_shape[:, 1] += body_height + body_bottom
 
-body = draw_a_polygon(ax=ax, contour=body_shape)
+body = draw_a_polygon(contour=body_shape)
 
 #gradient rectangles
 gradient_colours = create_gradient_colours(rgb_start=[0, 0, 255], rgb_end=(255, 0, 255))
 gradient_bottom = body_bottom - tail_coeff * tail_height
 grh = (ear_height + body_height + tail_coeff * tail_height) / (len(gradient_colours) - 1)
 for i, gc in enumerate(gradient_colours):
-  draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=body, colour=gc, outline_linewidth=0)
-  draw_a_rectangle(ax=ax, width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=tail_shape, colour=gc, outline_linewidth=0)
+  draw_a_rectangle(width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=body, colour=gc, outline_linewidth=0)
+  draw_a_rectangle(width=30, height=grh, centre_x=0, centre_y=gradient_bottom+i*grh, opacity=1, clip_outline=tail_shape, colour=gc, outline_linewidth=0)
 
 # a vertical line
-draw_a_segment(ax=ax, start_x=0, start_y=eye_y, turn=6, length=1.5)
+draw_a_segment(start_x=0, start_y=eye_y, turn=6, length=1.5)
 
 for lr in [-1, 1]:
   # an eye
-  draw_a_circle(ax=ax, centre_x=lr*3, centre_y=eye_y, radius=1, colour='black')
+  draw_a_circle(centre_x=lr*3, centre_y=eye_y, radius=1, colour='black')
 
   # mouth
-  draw_a_smile(ax=ax, centre_x=lr*aw/2, centre_y=eye_y-1.5, width=aw, depth=0.5)
+  draw_a_smile(centre_x=lr*aw/2, centre_y=eye_y-1.5, width=aw, depth=0.5)
 
   # whiskers
-  draw_a_smile(ax=ax, centre_x=lr*(6+whiskers_length/2), centre_y=eye_y-0.5, width=whiskers_length, depth=-0.5)
-  s2 = draw_a_smile(ax=ax, centre_x=lr*(6+whiskers_length/2), centre_y=eye_y+0.8, width=whiskers_length, depth=-0.5)
+  draw_a_smile(centre_x=lr*(6+whiskers_length/2), centre_y=eye_y-0.5, width=whiskers_length, depth=-0.5)
+  s2 = draw_a_smile(centre_x=lr*(6+whiskers_length/2), centre_y=eye_y+0.8, width=whiskers_length, depth=-0.5)
   s2.rotate(turn=-lr/2, diamond_override=[lr*5, eye_y+0.5])
 
 shift_layer(shift=[0, -4], layer_nbs=[])
