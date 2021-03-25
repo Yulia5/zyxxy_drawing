@@ -234,11 +234,14 @@ def show_drawing_and_save_if_needed(save=True,
     if filename is None:
       frame = inspect.stack()[1]
       module = inspect.getmodule(frame[0])
-      filename = ntpath.basename(module.__file__)
-      filename = filename[:-3] # to remove ".py"
-      for prefix_ in ["draw_", "drawn_"]:
-        if filename.startswith(prefix_):
-          filename = filename[len(prefix_):] # remove the prefix
+      caller_filename = ntpath.basename(module.__file__)
+      if caller_filename == "zyxxy_all_EXAMPLES.py":
+        filename = frame.function
+      else:
+        caller_filename = caller_filename[:-3] # to remove ".py"
+        for prefix_ in ["draw_", "drawn_"]:
+          if filename.startswith(prefix_):
+            filename = caller_filename[len(prefix_):] # remove the prefix
 
     figure = plt.gcf()
     
@@ -271,5 +274,5 @@ def show_drawing_and_save_if_needed(save=True,
         anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
       figure.set_dpi(100) 
 
-  if not is_running_tests():
+  if USE_PLT_SHOW and not is_running_tests():
     plt.show(block=(block and USE_PLT_SHOW))

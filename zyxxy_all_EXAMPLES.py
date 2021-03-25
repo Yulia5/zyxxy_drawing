@@ -98,6 +98,7 @@ def example_Zyxxy_the_mouse(axes=None):
   axes = create_canvas_and_axes(canvas_width = 12,
                                 canvas_height = 10, 
                                 title = "Hello, I am Zyxxy!", 
+                                model="https://i.pinimg.com/564x/35/4c/5c/354c5c04a1f72100ca1b110007730257.jpg",
                                 axes = axes)
 
   set_default_line_style(linewidth=2)
@@ -113,17 +114,17 @@ def example_Zyxxy_the_mouse(axes=None):
   draw_a_segment(start_x=6, start_y=3, turn=8, length=2)
 
   # let's draw the head of the mouse
-  draw_a_triangle(ax=axes, tip_x=6, tip_y=1, height=6, width=6, colour='plum')
+  draw_a_triangle(tip_x=6, tip_y=1, height=6, width=6, colour='plum')
   # ... and the nose, using a triangle with the same tip
-  draw_a_triangle(ax=axes, tip_x=6, tip_y=1, height=1, width=1, colour='black')
+  draw_a_triangle(tip_x=6, tip_y=1, height=1, width=1, colour='black')
   # ... and the ears
-  draw_a_circle(ax=axes, centre_x=3, centre_y=7, radius=2, colour='plum')
-  draw_a_circle(ax=axes, centre_x=9, centre_y=7, radius=2, colour='plum')
+  draw_a_circle(centre_x=3, centre_y=7, radius=2, colour='plum')
+  draw_a_circle(centre_x=9, centre_y=7, radius=2, colour='plum')
   # ... and the eyes, white circles with black circles on top
-  left_eye_white = draw_a_circle(ax=axes, centre_x=5, centre_y=5, radius=0.8, colour='white')
-  right_eye_white= draw_a_circle(ax=axes, centre_x=7, centre_y=5, radius=0.8, colour='white')
-  left_eye_black = draw_a_circle(ax=axes, centre_x=5, centre_y=5, radius=0.5, colour='black')
-  right_eye_black= draw_a_circle(ax=axes, centre_x=7, centre_y=5, radius=0.5, colour='black')
+  left_eye_white = draw_a_circle(centre_x=5, centre_y=5, radius=0.8, colour='white')
+  right_eye_white= draw_a_circle(centre_x=7, centre_y=5, radius=0.8, colour='white')
+  left_eye_black = draw_a_circle(centre_x=5, centre_y=5, radius=0.5, colour='black')
+  right_eye_black= draw_a_circle(centre_x=7, centre_y=5, radius=0.5, colour='black')
 
   show_drawing_and_save_if_needed()
 
@@ -144,10 +145,11 @@ def example_penguins(axes=None):
     draw_a_sector(angle_start=turn, angle_end=turn+6, **kwargs)
   #######################################################
   # Creating the canvas!                               ##  
-  axes = create_canvas_and_axes(canvas_width = 320,
+  create_canvas_and_axes(canvas_width = 320,
                                 canvas_height = 180,
+                                title = "Penguin Conversation",
                                 #tick_step = 10,
-                                model="https://i.pinimg.com/564x/fc/90/7d/fc907dc3638cfd64aa2c3ba56e216b92.jpg",
+                                #model="https://i.pinimg.com/564x/fc/90/7d/fc907dc3638cfd64aa2c3ba56e216b92.jpg",
                                 background_colour = 'lightskyblue',
                                 axes=axes)
 
@@ -155,55 +157,55 @@ def example_penguins(axes=None):
   # Now let's draw the shapes!                         ##
   # snowflakes
   for s in range(150):
-    draw_a_star(ax=axes, centre_x=random_number(max = get_width(axes)), 
+    draw_a_star(centre_x=random_number(max = get_width(axes)), 
                        centre_y=random_number(max = get_height(axes)), 
                        radius_1=1, radius_2=3, ends_qty=8, colour='aliceblue')
 
   # ice
   ice_colours = ['aliceblue', 'steelblue', 'skyblue']
   for s in range(1500):
-    draw_a_triangle(ax=axes, 
-                  tip_x=random_number(max = get_width(axes)), 
-                  tip_y=0.2*random_number(max = get_height(axes)),
-                  height=random_number(30), 
-                  width=random_number(15), 
-                  turn=random_element(range(2, 11)),
-                  colour = random_element(ice_colours)) 
+    draw_a_triangle(tip_x=random_number(max = get_width(axes)), 
+                    tip_y=0.2*random_number(max = get_height(axes)),
+                    height=random_number(30), 
+                    width=random_number(15), 
+                    turn=random_element(range(2, 11)),
+                    colour = random_element(ice_colours)) 
 
   # penguins!
 
   # the penguin on the left
   # body
-  draw_a_circle(ax=axes, centre_x=60, centre_y=40, radius=20, colour='white')
+  draw_a_circle(centre_x=60, centre_y=40, radius=20, colour='white')
   # feet
-  draw_half_circle(ax=axes, centre_x=54, centre_y=16, radius=6, colour='orangered', turn=8.5)
-  draw_half_circle(ax=axes, centre_x=66, centre_y=16, radius=6, colour='orangered', turn=9.5)
+  draw_half_circle(centre_x=54, centre_y=16, radius=6, colour='orangered', turn=8.5)
+  draw_half_circle(centre_x=66, centre_y=16, radius=6, colour='orangered', turn=9.5)
   # wings
-  draw_half_circle(ax=axes, centre_x=31, centre_y=60, radius=30, colour='black', turn=2)
-  draw_half_circle(ax=axes, centre_x=89, centre_y=60, radius=30, colour='black', turn=4)
+  draw_half_circle(centre_x=31, centre_y=60, radius=30, colour='black', turn=2)
+  draw_half_circle(centre_x=89, centre_y=60, radius=30, colour='black', turn=4)
   # head
-  draw_a_circle(ax=axes, centre_x=60, centre_y=80, radius=15, colour='black')
+  draw_a_circle(centre_x=60, centre_y=80, radius=15, colour='black')
   # eyes
-  draw_a_circle(ax=axes, centre_x=55, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
-  draw_a_circle(ax=axes, centre_x=65, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  draw_a_circle(centre_x=55, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  draw_a_circle(centre_x=65, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
   # beck
-  draw_a_sector(ax=axes, centre_x=58, centre_y=76, angle_start=0, angle_end=3, radius=6, stretch_x=1.5, turn=0.5, colour='orangered')
+  draw_a_sector(centre_x=58, centre_y=76, angle_start=0, angle_end=3, radius=6, stretch_x=1.5, turn=0.5, colour='orangered')
 
   # the penguin on the right
   # first foot 
-  draw_half_circle(ax=axes, centre_x=270, centre_y=16, radius=6, colour='orangered', turn=9)
+  draw_half_circle(centre_x=270, centre_y=16, radius=6, colour='orangered', turn=9)
   # body - white
-  draw_half_circle(ax=axes, centre_x=280, centre_y=50, radius=30, colour='white', turn=5)
+  draw_half_circle(centre_x=280, centre_y=50, radius=30, colour='white', turn=5)
   # second foot 
-  draw_half_circle(ax=axes, centre_x=280, centre_y=15, radius=6,  colour='orangered', turn=8)
+  draw_half_circle(centre_x=280, centre_y=15, radius=6,  colour='orangered', turn=8)
   # body - black
-  draw_half_circle(ax=axes, centre_x=290, centre_y=50, radius=30, colour='black', turn=5)
+  draw_half_circle(centre_x=290, centre_y=50, radius=30, colour='black', turn=5)
   # beck
-  draw_half_circle(ax=axes, centre_x=255, centre_y=75, radius=6, colour='orangered', turn=8 + 1/2)
+  draw_half_circle(centre_x=255, centre_y=75, radius=6, colour='orangered', turn=8 + 1/2)
   # head
-  draw_a_circle(ax=axes, centre_x=270, centre_y=80, radius=15, colour='black')
+  draw_a_circle(centre_x=270, centre_y=80, radius=15, colour='black')
   # an eye
-  draw_a_circle(ax=axes, centre_x=263, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+  draw_a_circle(centre_x=263, centre_y=85, radius=3, colour=None, outline_colour='white', outline_linewidth=2)
+
   show_drawing_and_save_if_needed()
 
 
@@ -344,7 +346,8 @@ def example_yellow_cat_animation(axes=None, cat_colour='Yellow', background_colo
 #########################################################
 ## THE CROC                                            ##
 #########################################################
-def example_croc(axes=None):
+def example_croc(axes=None, 
+                 model = "https://i.pinimg.com/564x/a5/b7/92/a5b792acaf4c776302be5bd79da8ddbd.jpg"):
 
   #########################################################
   ## CREATING THE DRAWING!                               ##
@@ -353,7 +356,7 @@ def example_croc(axes=None):
   axes = create_canvas_and_axes(canvas_width = 190,
                                 canvas_height = 100,
                                 background_colour = 'PastelBlue', 
-                                model = "https://i.pinimg.com/564x/a5/b7/92/a5b792acaf4c776302be5bd79da8ddbd.jpg",
+                                model = model,
                                 model_zoom = 1.7,
                                 axes = axes)
 
@@ -462,10 +465,11 @@ def example_croc(axes=None):
 
   return leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond
 
+###################################################################################################
 
-def example_animated_croc(axes=None, filename=None):
+def example_animated_croc(axes=None):
 
-  leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond = example_croc(axes=axes)
+  leg_layer_nb, body_layer_nb, upper_jaw_layer_nb, eyelids, upper_jaw_diamond = example_croc(axes=axes, model=None)
 
   nb_blinks = 2
   blink_frames = 6
@@ -512,4 +516,4 @@ def example_animated_croc(axes=None, filename=None):
 
   total_frames = len(one_eyelid_blick) * nb_blinks + len(one_jaw_turn) * nb_jaw_openings + len(one_jump) * nb_jumps
 
-  show_drawing_and_save_if_needed(filename=filename, animation_func = animate, nb_of_frames =total_frames)
+  show_drawing_and_save_if_needed(animation_func=animate, nb_of_frames=total_frames)
