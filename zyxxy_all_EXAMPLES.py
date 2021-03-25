@@ -107,10 +107,10 @@ def example_Zyxxy_the_mouse(axes=None):
   # Let's start with the whiskers! They need to be behind the head, 
   # so we will need to move these lines before the line
   # that draws the head of the mouse!
-  draw_a_segment(axes, start_x=6, start_y=3, turn=3, length=2)
-  draw_a_segment(axes, start_x=6, start_y=3, turn=4, length=2)
-  draw_a_segment(axes, start_x=6, start_y=3, turn=9, length=2)
-  draw_a_segment(axes, start_x=6, start_y=3, turn=8, length=2)
+  draw_a_segment(start_x=6, start_y=3, turn=3, length=2)
+  draw_a_segment(start_x=6, start_y=3, turn=4, length=2)
+  draw_a_segment(start_x=6, start_y=3, turn=9, length=2)
+  draw_a_segment(start_x=6, start_y=3, turn=8, length=2)
 
   # let's draw the head of the mouse
   draw_a_triangle(ax=axes, tip_x=6, tip_y=1, height=6, width=6, colour='plum')

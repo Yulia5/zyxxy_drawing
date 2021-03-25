@@ -103,6 +103,7 @@ def create_canvas_and_axes(canvas_width,
                        'title_font_size'      : title_font_size}
 
   if axes is not None: # only needed for demo and when called inside models
+    plt.gcf().sca(axes)
     return axes
 
   axis_width_add = 2 * margin_side
@@ -175,12 +176,14 @@ def create_canvas_and_axes(canvas_width,
     else:
       global USE_PLT_SHOW
       USE_PLT_SHOW = False
+      plt.gcf().sca(axes_model)
       model(axes=axes_model) 
       USE_PLT_SHOW = True
       if outlines_colour is not None:
         set_outlines_colour(outlines_colour)
         set_diamond_size_factor(0)
         USE_PLT_SHOW = False
+        plt.gcf().sca(axes)
         model(axes=axes)
         USE_PLT_SHOW = True
         set_outlines_colour(None)
@@ -188,6 +191,8 @@ def create_canvas_and_axes(canvas_width,
  
   __prepare_axes(ax=axes, title=title, background_colour=background_colour, **params_for_axes)
   set_diamond_size_factor(value=(tick_step is not None))
+
+  plt.gcf().sca(axes)
 
   return axes
 
@@ -198,11 +203,11 @@ def create_canvas_and_axes(canvas_width,
 
 # assumes that there is only one set of axes - to be reviewed
 
-def default_animation_init():
+def __default_animation_init():
   # return the list of the shapes that are moved by animation
   return get_all_polygons_in_layers()
 
-def envelope_animate(i, anim_func):
+def __envelope_animate(i, anim_func):
   result = anim_func(i)
   if result is not None:
     return result
@@ -211,7 +216,7 @@ def envelope_animate(i, anim_func):
 
 def show_drawing_and_save_if_needed(save=True,
                            filename=None,
-                           dpi4saving = my_default_image_params['dpi'],
+                           #dpi4saving = my_default_image_params['dpi'], causes spurious image resizing
                            image_format = my_default_image_params['format'],
                            animation_file_dpi = my_default_animation_params['dpi'],
                            animation_interval = my_default_animation_params['interval'],
@@ -221,11 +226,11 @@ def show_drawing_and_save_if_needed(save=True,
                            animation_writer = my_default_animation_params['writer'],
                            animation_format = my_default_animation_params['format'],
                            animation_func = None,
-                           animation_init = default_animation_init,
+                           animation_init = __default_animation_init,
                            nb_of_frames = None,
                            block=True):
 
-  if save and USE_PLT_SHOW:
+  if save and USE_PLT_SHOW and not is_running_tests():
     if filename is None:
       frame = inspect.stack()[1]
       module = inspect.getmodule(frame[0])
@@ -247,15 +252,16 @@ def show_drawing_and_save_if_needed(save=True,
           filename += '.' + image_format
           last_dot_position = filename.rfind(".")
         plt.savefig(fname="images_videos/"+filename, 
-                    format = filename[last_dot_position+1:],
-                    dpi = dpi4saving)
-        
+                    format = filename[last_dot_position+1:]
+                    # , dpi = dpi4saving
+                    )
+        #figure.set_dpi(150)
     else:
       figure.set_dpi(animation_file_dpi) 
       writer = animation.writers[animation_writer](fps=animation_FPS)
       # writer = animation.FFMpegWriter(fps=animation_FPS) 
       anim = animation.FuncAnimation( fig=figure, 
-                                      func=partial(envelope_animate,   anim_func=animation_func), 
+                                      func=partial(__envelope_animate, anim_func=animation_func), 
                                       init_func=animation_init,  
                                       frames=nb_of_frames, 
                                       interval=animation_interval,
@@ -263,7 +269,7 @@ def show_drawing_and_save_if_needed(save=True,
                                       repeat=animation_repeat)
       if (filename is not None) and (filename != ""):
         anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
-    figure.set_dpi(100) 
+      figure.set_dpi(100) 
 
   if not is_running_tests():
     plt.show(block=(block and USE_PLT_SHOW))

@@ -19,6 +19,7 @@ from zyxxy_shape_class import Shape
 from functools import partial
 import zyxxy_coordinates
 from zyxxy_shape_style import raise_Exception_if_not_processed, extract_colour_etc_kwargs
+import matplotlib.pyplot as plt
 
 common_params_dict_definition = {'stretch_x' : 'stretch',
                                  'stretch_y' : 'stretch',
@@ -68,7 +69,10 @@ def get_diamond_label(shapename, original_label=None, available_arguments=None):
       raise Exception("In the arguments provided,", available_arguments, "there is more than one suitable candidate,", result[i1])
     return intersection_arguments[0]
 
-def draw_a_shape(ax, shapename, **kwargs):
+def draw_a_shape(shapename, ax=None, **kwargs):
+  if ax is None:
+    ax = plt.gcf().gca() # get current axes
+
   param_names_used = []
   # create a shape
   if isinstance(shapename, str):

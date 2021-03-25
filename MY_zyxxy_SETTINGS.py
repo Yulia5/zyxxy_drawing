@@ -58,12 +58,12 @@ my_default_colour_etc_settings = {
                                   'layer_nb' : 1000}}
 
 my_default_diamond_size = 0.015 
-default_outlines_width = 10 
+default_outlines_width = 5 
 default_outlines_layer_nb = 501       
 
 # Font sizes and adjustment needed to fit them
-my_default_font_sizes = {'title'      : 18/screen_zoom,
-                         'axes_label' : 14/screen_zoom,
+my_default_font_sizes = {'title'      : 16/screen_zoom,
+                         'axes_label' : 12/screen_zoom,
                          'tick'       : 8/screen_zoom}
 
 # Figure sizes (in inches) and DPIs  
