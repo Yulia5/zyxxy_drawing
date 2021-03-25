@@ -13,68 +13,68 @@ from zyxxy_utils import random_element, random_number
 ## THE FLAGS                                           ##
 #########################################################
 def example_japanese_flag(axes=None):
-  axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
-  draw_a_circle(ax=axes, centre_x=15, centre_y=10, radius=6, colour='crimson')   
+  create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
+  draw_a_circle(centre_x=15, centre_y=10, radius=6, colour='crimson')   
   show_drawing_and_save_if_needed()
 
 def example_belgian_flag(axes=None):
-  ax = create_canvas_and_axes(canvas_width=6, canvas_height=4, axes=axes)
-  draw_a_square(ax=ax, left=0, bottom=0, side=2, colour='black')
-  draw_a_square(ax=ax, left=0, bottom=2, side=2, colour='black')
-  draw_a_square(ax=ax, left=2, bottom=0, side=2, colour='yellow')
-  draw_a_square(ax=ax, left=2, bottom=2, side=2, colour='yellow')
-  draw_a_square(ax=ax, left=4, bottom=0, side=2, colour='red')
-  draw_a_square(ax=ax, left=4, bottom=2, side=2, colour='red')
+  create_canvas_and_axes(canvas_width=6, canvas_height=4, axes=axes)
+  draw_a_square(left=0, bottom=0, side=2, colour='black')
+  draw_a_square(left=0, bottom=2, side=2, colour='black')
+  draw_a_square(left=2, bottom=0, side=2, colour='yellow')
+  draw_a_square(left=2, bottom=2, side=2, colour='yellow')
+  draw_a_square(left=4, bottom=0, side=2, colour='red')
+  draw_a_square(left=4, bottom=2, side=2, colour='red')
   show_drawing_and_save_if_needed()
 
 def example_cuban_flag(axes=None):
-  ax = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
-  draw_a_rectangle(ax=ax, left=0, centre_y=10, width=30, height=4, colour='blue')
-  draw_a_rectangle(ax=ax, left=0, bottom=0, width=30, height=4, colour='blue')
-  draw_a_rectangle(ax=ax, left=0, top=20, width=30, height=4, colour='blue')
-  draw_a_triangle(ax=ax, tip_x=17, tip_y=10, width=20, height=17, colour='red', turn=9)
-  draw_a_star(ax=ax, centre_x=6, centre_y=10, radius_1=3, radius_2=1, ends_qty=5, colour='white') 
+  create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
+  draw_a_rectangle(left=0, centre_y=10, width=30, height=4, colour='blue')
+  draw_a_rectangle(left=0, bottom=0, width=30, height=4, colour='blue')
+  draw_a_rectangle(left=0, top=20, width=30, height=4, colour='blue')
+  draw_a_triangle(tip_x=17, tip_y=10, width=20, height=17, colour='red', turn=9)
+  draw_a_star(centre_x=6, centre_y=10, radius_1=3, radius_2=1, ends_qty=5, colour='white') 
   show_drawing_and_save_if_needed()
 
 def example_finnish_flag(axes=None): 
-  axes = create_canvas_and_axes(canvas_width=36, canvas_height=22, axes=axes)
-  draw_a_rectangle(ax=axes, centre_x=13, bottom=0, width=6, height=22, colour='midnightblue')
-  draw_a_rectangle(ax=axes, left=0, centre_y=11, width=36, height=6, colour='midnightblue')
+  create_canvas_and_axes(canvas_width=36, canvas_height=22, axes=axes)
+  draw_a_rectangle(centre_x=13, bottom=0, width=6, height=22, colour='midnightblue')
+  draw_a_rectangle(left=0, centre_y=11, width=36, height=6, colour='midnightblue')
   show_drawing_and_save_if_needed()
 
 def example_japanese_naval_flag(axes=None):
-  axes = create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
-  draw_a_circle(ax=axes, centre_x=12, centre_y=10, radius=6, colour='crimson')
+  create_canvas_and_axes(canvas_width=30, canvas_height=20, axes=axes)
+  draw_a_circle(centre_x=12, centre_y=10, radius=6, colour='crimson')
   for i in range(32):
     if i % 2 == 0:
-      draw_a_triangle(ax=axes, tip_x=12, tip_y=10, height=30, width=6, turn=12/32*i, colour='crimson')
+      draw_a_triangle(tip_x=12, tip_y=10, height=30, width=6, turn=12/32*i, colour='crimson')
   show_drawing_and_save_if_needed()
 
 def example_british_flag(axes=None):
-  ax = create_canvas_and_axes(canvas_width=18, canvas_height=12, axes=axes)
+  create_canvas_and_axes(canvas_width=18, canvas_height=12, axes=axes)
 
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=12, colour='navy')
+  draw_a_rectangle(centre_x=9, centre_y=6, width=18, height=12, colour='navy')
 
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=7)
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=7)
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=5)
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=5)
+  draw_a_rectangle(centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=7)
+  draw_a_rectangle(centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=7)
+  draw_a_rectangle(centre_x=9, centre_y=6, width=22, height=3, colour='white', turn=5)
+  draw_a_rectangle(centre_x=9, centre_y=6, width=22, height=1, colour='red', turn=5)
 
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=4, colour='white')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=4, height=12, colour='white')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=18, height=2, colour='red')
-  draw_a_rectangle(ax=ax, centre_x=9, centre_y=6, width=2, height=12, colour='red') 
+  draw_a_rectangle(centre_x=9, centre_y=6, width=18, height=4, colour='white')
+  draw_a_rectangle(centre_x=9, centre_y=6, width=4, height=12, colour='white')
+  draw_a_rectangle(centre_x=9, centre_y=6, width=18, height=2, colour='red')
+  draw_a_rectangle(centre_x=9, centre_y=6, width=2, height=12, colour='red') 
 
   show_drawing_and_save_if_needed()
 
 
 def example_us_flag(axes=None):
-  ax = create_canvas_and_axes(canvas_width = 19*13*2, canvas_height = 10*13*2, axes=axes)
+  create_canvas_and_axes(canvas_width = 19*13*2, canvas_height = 10*13*2, axes=axes)
 
   for stripe_nb in range(7):
-    draw_a_rectangle(ax=ax, centre_x=19*13, centre_y=10+2*20*stripe_nb, width=19*13*2, height=20, colour='red')
+    draw_a_rectangle(centre_x=19*13, centre_y=10+2*20*stripe_nb, width=19*13*2, height=20, colour='red')
     
-  draw_a_rectangle(ax=ax, centre_x=100, centre_y=190, width=200, height=140, colour='navy')   
+  draw_a_rectangle(centre_x=100, centre_y=190, width=200, height=140, colour='navy')   
 
   for row in range(9): # there are 9 rows of stars
     # let's define how many stars are in this row
@@ -87,18 +87,19 @@ def example_us_flag(axes=None):
       first_star_centre_x = 33 
     # centre_y=260-(row+1)*14 because we are counting star rows from the top
     for column in range(stars_qty):
-        draw_a_star(ax=ax, centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius_1=9, radius_2=3, ends_qty=5, colour='white') 
+        draw_a_star(centre_x=first_star_centre_x+column*34, centre_y=260-(row+1)*14, radius_1=9, radius_2=3, ends_qty=5, colour='white') 
 
   show_drawing_and_save_if_needed()              
 
 #########################################################
 ## ZYXXY THE MOUSE                                     ##
 #########################################################
-def example_Zyxxy_the_mouse(axes=None):
-  axes = create_canvas_and_axes(canvas_width = 12,
-                                canvas_height = 10, 
+def example_Zyxxy_the_mouse(axes=None, model="https://i.pinimg.com/564x/35/4c/5c/354c5c04a1f72100ca1b110007730257.jpg",
+                           block=False):
+  create_canvas_and_axes(canvas_width = 36,
+                                canvas_height = 36, 
                                 title = "Hello, I am Zyxxy!", 
-                                model="https://i.pinimg.com/564x/35/4c/5c/354c5c04a1f72100ca1b110007730257.jpg",
+                                model=model,
                                 axes = axes)
 
   set_default_line_style(linewidth=2)
@@ -108,33 +109,62 @@ def example_Zyxxy_the_mouse(axes=None):
   # Let's start with the whiskers! They need to be behind the head, 
   # so we will need to move these lines before the line
   # that draws the head of the mouse!
-  draw_a_segment(start_x=6, start_y=3, turn=3, length=2)
-  draw_a_segment(start_x=6, start_y=3, turn=4, length=2)
-  draw_a_segment(start_x=6, start_y=3, turn=9, length=2)
-  draw_a_segment(start_x=6, start_y=3, turn=8, length=2)
+  draw_a_segment(start_x=18, start_y=12, turn=3, length=6)
+  draw_a_segment(start_x=18, start_y=12, turn=4, length=6)
+  draw_a_segment(start_x=18, start_y=12, turn=9, length=6)
+  draw_a_segment(start_x=18, start_y=12, turn=8, length=6)
 
   # let's draw the head of the mouse
-  draw_a_triangle(tip_x=6, tip_y=1, height=6, width=6, colour='plum')
+  draw_a_triangle(tip_x=18, tip_y=6, height=18, width=18, colour='plum')
   # ... and the nose, using a triangle with the same tip
-  draw_a_triangle(tip_x=6, tip_y=1, height=1, width=1, colour='black')
+  draw_a_triangle(tip_x=18, tip_y=6, height=3, width=3, colour='black')
   # ... and the ears
-  draw_a_circle(centre_x=3, centre_y=7, radius=2, colour='plum')
-  draw_a_circle(centre_x=9, centre_y=7, radius=2, colour='plum')
+  draw_a_circle(centre_x=9, centre_y=24, radius=6, colour='plum')
+  draw_a_circle(centre_x=27, centre_y=24, radius=6, colour='plum')
   # ... and the eyes, white circles with black circles on top
-  left_eye_white = draw_a_circle(centre_x=5, centre_y=5, radius=0.8, colour='white')
-  right_eye_white= draw_a_circle(centre_x=7, centre_y=5, radius=0.8, colour='white')
-  left_eye_black = draw_a_circle(centre_x=5, centre_y=5, radius=0.5, colour='black')
-  right_eye_black= draw_a_circle(centre_x=7, centre_y=5, radius=0.5, colour='black')
+  left_eye_white = draw_a_circle(centre_x=15, centre_y=18, radius=2, colour='white')
+  right_eye_white= draw_a_circle(centre_x=21, centre_y=18, radius=2, colour='white')
+  left_eye_black = draw_a_circle(centre_x=15, centre_y=18, radius=1, colour='black')
+  right_eye_black= draw_a_circle(centre_x=21, centre_y=18, radius=1, colour='black')
 
-  show_drawing_and_save_if_needed()
+  show_drawing_and_save_if_needed(block=block)
 
   return left_eye_white, right_eye_white, left_eye_black, right_eye_black
 
 #########################################################
-def example_animation_for_Zyxxy_the_mouse(axes=None):
-  left_eye_white, right_eye_white, left_eye_black, right_eye_black = example_Zyxxy_the_mouse(axes=axes)
-  left_eye_black.clip(clip_outline = left_eye_white)
-  right_eye_black.clip(clip_outline = right_eye_white) # unfinished
+def example_animation_Zyxxy_the_mouse():
+  left_eye_white, right_eye_white, left_eye_black, right_eye_black = example_Zyxxy_the_mouse(model=None)
+  #left_eye_black.clip(clip_outline = left_eye_white)
+  #right_eye_black.clip(clip_outline = right_eye_white)
+
+  black_eyes = [left_eye_black, right_eye_black]
+
+  nb_shifts = 50
+  nb_rolls = 7
+
+  def animate(l):
+    # right
+    if 0 < l <= nb_shifts:
+      for eye in black_eyes:
+        eye.shift(shift=[1/nb_shifts, 0])
+        d = eye.diamond_coords
+      print(d)
+
+    # roll
+    r = l - nb_rolls
+    if 0 < r <= nb_rolls:
+      for eye in black_eyes:
+        eye.rotate(turn=3/nb_rolls, 
+                   diamond_override=eye.diamond_coords)
+
+    # up
+    u = r - nb_shifts
+    if 0 < u <= nb_shifts:
+      for eye in black_eyes:
+        eye.shift(shift=[0, 1/nb_shifts])
+
+  show_drawing_and_save_if_needed(animation_func = animate,
+    nb_of_frames = 1 + 2 * nb_shifts + nb_rolls, animation_interval=100)
 
 #########################################################
 ## THE PENGUINS                                        ##

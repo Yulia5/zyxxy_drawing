@@ -8,7 +8,8 @@ from zyxxy_all_EXAMPLES import *
 #example_croc()
 #
 #example_animated_croc(filename="croccy")
-example_Zyxxy_the_mouse()  
+#example_Zyxxy_the_mouse()  
+example_animation_Zyxxy_the_mouse()
 #example_yellow_cat_animation(filename="yellowww_cat") 
 #example_yellow_cat() 
 #example_croc()
