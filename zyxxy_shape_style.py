@@ -129,6 +129,14 @@ def new_layer():
     _default_arguments[fa]['layer_nb'] = new_layer_nb
   return new_layer_nb
 
+def new_layers_outline_behind():
+  args_for_layer = ["line", "patch", "outline"]
+  new_layer_nb = 1 + max([_default_arguments[fa]['layer_nb'] for fa in args_for_layer])
+  _default_arguments['outline']['layer_nb'] = new_layer_nb
+  for fa in ["line", "patch"]: 
+    _default_arguments[fa]['layer_nb'] = new_layer_nb+1
+  return new_layer_nb, new_layer_nb+1
+
 def set_default_line_style(**kwargs):
   _set_default_style(what='line', **kwargs)
 

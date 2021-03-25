@@ -14,6 +14,8 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+import inspect
+import ntpath
 import numpy as np
 from functools import partial
 from math import floor
@@ -201,7 +203,8 @@ def envelope_animate(i, anim_func):
   # return the list of the shapes that are moved by animation
   return get_all_polygons_in_layers()
 
-def show_drawing_and_save_if_needed(filename=None,
+def show_drawing_and_save_if_needed(save=True,
+                           filename=None,
                            dpi4saving = my_default_image_params['dpi'],
                            image_format = my_default_image_params['format'],
                            animation_file_dpi = my_default_animation_params['dpi'],
@@ -215,35 +218,45 @@ def show_drawing_and_save_if_needed(filename=None,
                            animation_init = default_animation_init,
                            nb_of_frames = None,
                            block=True):
-  figure = plt.gcf()
-  current_dpi = figure.get_dpi() 
 
-  if (animation_func is None) != (nb_of_frames is None):
-    raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
-  if animation_func is None:
-    if (filename is not None) and (filename != ""):
-      last_dot_position = filename.rfind(".")
-      if last_dot_position < 0:
-        filename += '.' + image_format
+  if save:
+    if filename is None:
+      frame = inspect.stack()[1]
+      module = inspect.getmodule(frame[0])
+      filename = ntpath.basename(module.__file__)
+      filename = filename[:-3] # to remove ".py"
+      for prefix_ in ["draw_", "drawn_"]:
+        if filename.startswith(prefix_):
+          filename = filename[len(prefix_):] # remove the prefix
+
+    figure = plt.gcf()
+    current_dpi = figure.get_dpi() 
+
+    if (animation_func is None) != (nb_of_frames is None):
+      raise Exception("Either both animation_func and nb_of_frames, or none, should be specified.")
+    if animation_func is None:
+      if (filename is not None) and (filename != ""):
         last_dot_position = filename.rfind(".")
-      plt.savefig(fname="images_videos/"+filename, 
-                  format = filename[last_dot_position+1:],
-                  dpi = dpi4saving)
-  else:
-    figure.set_dpi(animation_file_dpi) 
-    # writer = animation.writers[animation_writer](fps=animation_FPS)
-    writer = animation.FFMpegWriter(fps=animation_FPS) 
-    anim = animation.FuncAnimation( fig=figure, 
-                                    func=partial(envelope_animate, anim_func=animation_func), 
-                                    init_func=animation_init,  
-                                    frames=nb_of_frames, 
-                                    interval=animation_interval,
-                                    blit=animation_blit, 
-                                    repeat=animation_repeat)
-    if (filename is not None) and (filename != ""):
-      anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
-      return
-  figure.set_dpi(current_dpi) 
+        if last_dot_position < 0:
+          filename += '.' + image_format
+          last_dot_position = filename.rfind(".")
+        plt.savefig(fname="images_videos/"+filename, 
+                    format = filename[last_dot_position+1:],
+                    dpi = dpi4saving)
+    else:
+      figure.set_dpi(animation_file_dpi) 
+      writer = animation.writers[animation_writer](fps=animation_FPS)
+      # writer = animation.FFMpegWriter(fps=animation_FPS) 
+      anim = animation.FuncAnimation( fig=figure, 
+                                      func=partial(envelope_animate,   anim_func=animation_func), 
+                                      init_func=animation_init,  
+                                      frames=nb_of_frames, 
+                                      interval=animation_interval,
+                                      blit=animation_blit, 
+                                      repeat=animation_repeat)
+      if (filename is not None) and (filename != ""):
+        anim.save("images_videos/"+filename+'.'+animation_format, writer=writer)
+    figure.set_dpi(current_dpi) 
 
   if not is_running_tests():
     plt.show(block=(block and USE_PLT_SHOW))

@@ -25,6 +25,7 @@ from zyxxy_all_EXAMPLES import *
 
 #import drawn_a_Coccinelle
 
+import drawn_blue_green_madala
 
 #from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); test_all_drawings(); 
 

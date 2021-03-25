@@ -239,8 +239,11 @@ def update_visibility(side, switch_on):
     current_slider = specific_widgets_by_side[side][current_slider_nb]
     current_slider.ax.set_visible(switch_on)
     if switch_on:
+      print(current_slider.valmax)
       for attr_name, attr_value in spec_param_dict[param_name].items():
         setattr(current_slider, attr_name, attr_value)
+        print(attr_name, attr_value)
+      print(current_slider.valmax)
       current_slider.val = specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name]
       current_slider.label.set_text(param_name) 
     else:
