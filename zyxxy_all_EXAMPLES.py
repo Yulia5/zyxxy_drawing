@@ -129,42 +129,42 @@ def example_Zyxxy_the_mouse(axes=None, model="https://i.pinimg.com/564x/35/4c/5c
 
   show_drawing_and_save_if_needed(block=block)
 
-  return left_eye_white, right_eye_white, left_eye_black, right_eye_black
+  eyes = {'left'  : {'black':left_eye_black,  'white':left_eye_white}, 
+          'right' : {'black':right_eye_black, 'white':right_eye_white}}
+
+  return eyes
 
 #########################################################
 def example_animation_Zyxxy_the_mouse():
-  left_eye_white, right_eye_white, left_eye_black, right_eye_black = example_Zyxxy_the_mouse(model=None)
-  #left_eye_black.clip(clip_outline = left_eye_white)
-  #right_eye_black.clip(clip_outline = right_eye_white)
+  eyes = example_Zyxxy_the_mouse(model=None)
 
-  black_eyes = [left_eye_black, right_eye_black]
+  for eye in eyes.values():
+    eye['black'].clip(clip_outline = eye['white'])
 
-  nb_shifts = 50
-  nb_rolls = 7
+  black_eyes = [eye['black'] for eye in eyes.values()]
+
+  nb_shifts = 20
+  nb_rolls = 33
 
   def animate(l):
     # right
     if 0 < l <= nb_shifts:
-      for eye in black_eyes:
-        eye.shift(shift=[1/nb_shifts, 0])
-        d = eye.diamond_coords
-      print(d)
+      for beye in black_eyes:
+        beye.shift(shift=[1/nb_shifts, 0])
 
     # roll
-    r = l - nb_rolls
-    if 0 < r <= nb_rolls:
-      for eye in black_eyes:
-        eye.rotate(turn=3/nb_rolls, 
-                   diamond_override=eye.diamond_coords)
+    if nb_shifts < l <= nb_rolls + nb_shifts:
+      for eye in eyes.values():
+        eye['black'].rotate(turn=3/nb_rolls, 
+                            diamond_override=eye['white'].diamond_coords)
 
     # up
-    u = r - nb_shifts
-    if 0 < u <= nb_shifts:
-      for eye in black_eyes:
-        eye.shift(shift=[0, 1/nb_shifts])
+    if nb_rolls + nb_shifts < l <= nb_rolls + nb_shifts * 2:
+      for beye in black_eyes:
+        beye.shift(shift=[0, 1/nb_shifts])
 
   show_drawing_and_save_if_needed(animation_func = animate,
-    nb_of_frames = 1 + 2 * nb_shifts + nb_rolls, animation_interval=100)
+    nb_of_frames = 1 + 2 * nb_shifts + nb_rolls, animation_interval=1000/24)
 
 #########################################################
 ## THE PENGUINS                                        ##
