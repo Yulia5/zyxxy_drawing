@@ -240,7 +240,7 @@ def show_drawing_and_save_if_needed(save=True,
       else:
         caller_filename = caller_filename[:-3] # to remove ".py"
         for prefix_ in ["draw_", "drawn_"]:
-          if filename.startswith(prefix_):
+          if caller_filename.startswith(prefix_):
             filename = caller_filename[len(prefix_):] # remove the prefix
 
     figure = plt.gcf()

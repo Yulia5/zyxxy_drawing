@@ -141,6 +141,9 @@ def random_element(list_to_choose_from):
 ## TRIGONOMETRY HELPERS                                         ## 
 ##################################################################
 
+def calc_Pythagoras(a, b):
+  return math.sqrt(a * a + b * b)
+
 # auxiliary functions to define sin and cos of angles measured in hours
 def sin_hours(turn):
   return math.sin(turn / full_turn_angle * (2 * math.pi))
