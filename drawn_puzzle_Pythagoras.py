@@ -1,5 +1,5 @@
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_utils import atan_hours, wait_for_enter, is_running_tests, random_integer_number, calc_Pythagoras
+from zyxxy_utils import atan_hours, wait_for_enter, random_integer_number, calc_Pythagoras
 from zyxxy_shape_functions import draw_a_square, clone_a_shape, draw_a_polygon
 import matplotlib.pyplot as plt
 from MY_zyxxy_SETTINGS import my_default_font_sizes
@@ -49,7 +49,6 @@ header_txts[0].set_text("PART I: All Triangles Together -> A Rectangle")
 header_txts[1].set_text("Area Of Blue Rectangle = " + str("???"))
 header_txts[2].set_text("Area Of Red Square = " + str("???"))
 
-show_drawing_and_save_if_needed(block=False)
 wait_for_enter()
 
 #######################################################
@@ -70,4 +69,4 @@ header_txts[0].set_text("PART II: A Square + 4 Triangles Together")
 header_txts[1].set_text(" -> A Bigger Square")
 header_txts[2].set_text("Area Of The Big Mixed Colour Square = " + str("???"))
 
-plt.show(block = not is_running_tests())
+wait_for_enter()

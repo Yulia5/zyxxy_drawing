@@ -104,6 +104,7 @@ def create_canvas_and_axes(canvas_width,
 
   if axes is not None: # only needed for demo and when called inside models
     plt.gcf().sca(axes)
+    __prepare_axes(ax=axes, **params_for_axes)
     return axes
 
   axis_width_add = 2 * margin_side

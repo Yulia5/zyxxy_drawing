@@ -23,18 +23,18 @@ from zyxxy_all_EXAMPLES import *
 #import draw_a_flag_of_Cuba
 #import draw_a_flag_of_the_UK
 #import draw_a_flag_of_Finland
-import drawn_Pythagoras_Puzzle
+#import drawn_puzzle_Pythagoras
+
+#import drawn_puzzle_circle
 
 #import drawn_a_Coccinelle
 
 #import drawn_blue_green_mandala
 
-from zyxxy_tests import *; #test_rectangle(); test_gradient(); test_all_examples(); 
-test_all_drawings(); 
-
-import zyxxy_canvas, datetime
-
-#zyxxy_canvas.is_running_tests(True)
+import zyxxy_utils, datetime
+#zyxxy_utils.is_running_tests(True)
+#from zyxxy_tests import *; #test_rectangle(); test_gradient(); test_all_examples(); 
+#test_all_drawings();
 
 print(datetime.datetime.now())
 

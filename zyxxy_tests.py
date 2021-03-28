@@ -1,6 +1,3 @@
-
-import zyxxy_canvas
-zyxxy_canvas.is_running_tests(True)
 import datetime, pytest
 import matplotlib.pyplot as plt
 from zyxxy_shape_class import Shape

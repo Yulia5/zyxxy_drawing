@@ -195,7 +195,7 @@ def build_an_arc(angle_start, angle_end, radius=1):
   return result
 
 # an arc with different speeds ####################################
-def build_an_arc_multispeed(angle_start, angle_end, speed_x, width, height):
+def build_a_squiggle(angle_start, angle_end, speed_x, width, height):
   if angle_start > angle_end:
     angle_start, angle_end = angle_end, angle_start
 

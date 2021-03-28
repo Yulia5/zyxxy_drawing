@@ -65,6 +65,8 @@ style_widgets_side_by_shapetype = {side : {st : {'text' : []} for st in shape_ty
 shape_switchers = {side : None for side in sides}
 buttons = {side : None for side in sides}
 
+TURN_OFF_XY_UPDATE = False
+
 ##########################################################################################
 def fill_in_specific_inputs_values_by_shapename_widgets_values_by_side_by_shapename():
   global specific_inputs_values_by_shapename
@@ -209,6 +211,9 @@ def get_common_kwarg_key(shapename, common_label):
 ##########################################################################################
 def update_shape_form_given_side(_, side):
 
+  if TURN_OFF_XY_UPDATE:
+    return
+
   shapename = active_shapename[side]
   _shape = get_active_shape(side=side)
 
@@ -239,19 +244,18 @@ def update_visibility(side, switch_on):
     current_slider = specific_widgets_by_side[side][current_slider_nb]
     current_slider.ax.set_visible(switch_on)
     if switch_on:
-      print(current_slider.valmax)
       for attr_name, attr_value in spec_param_dict[param_name].items():
         setattr(current_slider, attr_name, attr_value)
-        print(attr_name, attr_value)
-      print(current_slider.valmax)
-      current_slider.val = specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name]
+      current_slider.set_val(specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name])
       current_slider.label.set_text(param_name) 
+      current_slider.ax.set_xlim(current_slider.valmin, current_slider.valmax)
     else:
       if current_slider.label.get_text() == param_name:
         specific_widgets_values_by_side_by_shapename[side][active_shapename[side]][param_name] = current_slider.val
   
   for i in range(get_max_specific_sliders() + current_slider_nb):
     specific_widgets_by_side[side][i].ax.set_visible(False)
+
   
   # style widgets visibility
   patch_or_line = get_active_shapetype(side=side)
@@ -265,7 +269,22 @@ def update_visibility(side, switch_on):
 ##########################################################################################
 def switch_active_shapename_given_side(label, side):
 
-  update_visibility(side=side, switch_on=False)
+  global TURN_OFF_XY_UPDATE
+  TURN_OFF_XY_UPDATE = True
+
+  if active_shapename[side] is not None:
+    update_visibility(side=side, switch_on=False)
+  else:
+    for patch_or_line in shape_types:
+      _shape = shapes_by_side_by_shapetype[side][patch_or_line]
+      _shape.set_visible(False)
+      for key, sw_or_all_texts in style_widgets_side_by_shapetype[side][patch_or_line].items():
+        if key == "text":
+          for t in sw_or_all_texts:
+            t.set_visible(False)
+        else:
+          sw_or_all_texts.ax.set_visible(False)
+          
   active_shapename[side] = label
   update_visibility(side=side, switch_on=True)
 
@@ -274,7 +293,9 @@ def switch_active_shapename_given_side(label, side):
     shape_specific_label = get_diamond_label(shapename=active_shapename[side], original_label=diam_name)
     common_widgets_by_side[side][diam_name].label.set_text(shape_specific_label)
 
+  TURN_OFF_XY_UPDATE = False
   update_shape_form_given_side(None, side=side)
+
   fig.canvas.draw_idle()
 
 ##########################################################################################
@@ -414,11 +435,6 @@ def place_shapes_and_widgets(side):
     style_widgets = style_widgets_side_by_shapetype[side][st]
     kwargs_style = {key : get_value(style_widgets[key]) for key in style_widgets.keys() if key != 'text'}
     shapes_by_side_by_shapetype[side][st].set_style(**kwargs_style)
-
-  # Now switch off all the shapes' visibility
-  for shapename in shape_names_params_dicts_definition.keys():
-    active_shapename[side] = shapename
-    update_visibility(side=side, switch_on=False)
  
   # ... and  switch on those that need to be active!
   switch_active_shapename_given_side(label=my_default_demo_shapes[side], side=side)

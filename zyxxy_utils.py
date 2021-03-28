@@ -17,6 +17,7 @@
 import math
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 my_default_vertices_qty_in_circle = 72 
 tolerance = 0.000000001
@@ -177,5 +178,7 @@ def is_running_tests(val=None):
   return __is_running_tests
 
 def wait_for_enter(msg = "Press ENTER when you are ready ..."):
+  plt.show(block=False)
   if not is_running_tests():
     _ = input(msg)
+
