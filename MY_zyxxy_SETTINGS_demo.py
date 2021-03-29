@@ -26,12 +26,6 @@ figure_params = {'canvas_width' : 20,
                  'plot_gap' : 0.05,
                  'plot_bottom_gap' : 0.01}
 
-widget_params = {'radio_width' : 0.128,
-                 'radio_side_margin' : 0.01,
-                 'height' : 0.0239,
-                 'width' : 0.27,
-                 'gap' : 0.01}
-
 my_default_demo_shapes = {"left" : "a_triangle", "right" : "a_square"}
 
 my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'linewidth' : 5}, 
@@ -46,4 +40,4 @@ my_default_demo_style = {"left" : {"line"   : {"colour" : 'red', 'linewidth' : 5
 demo_style_widgets_value_ranges = {"colour"    : ['yellow', 'blue', 'red', 'green', 'black'],
                                    "layer_nb"  : [0, 3, 1, 1],
                                    "linewidth" : [0, 10, 1, 1], 
-                                   "opacity"  : [0, 1, 1, 0.1]}
+                                   "opacity"   : [0, 1, 1, 0.1]}

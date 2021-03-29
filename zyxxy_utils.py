@@ -24,6 +24,10 @@ tolerance = 0.000000001
 full_turn_angle = 12 # 12 for hours
 
 ##################################################################
+def is_integer(val):
+  return isinstance(val, (int, np.int64))
+
+##################################################################
 def is_number(val):
   return isinstance(val, (int, float, np.float64, np.int64))
 

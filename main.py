@@ -33,7 +33,7 @@ from zyxxy_all_EXAMPLES import *
 
 import zyxxy_utils, datetime
 #zyxxy_utils.is_running_tests(True)
-#from zyxxy_tests import *; #test_rectangle(); test_gradient(); test_all_examples(); 
+#from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); 
 #test_all_drawings();
 
 print(datetime.datetime.now())
