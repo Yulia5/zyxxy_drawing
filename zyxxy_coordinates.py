@@ -409,7 +409,8 @@ def build_a_wave(width, height, angle_start, nb_waves):
     contour[-1, 0] = added_end
   # now computing x's and normalizing them
   contour[:, 0] = np.cumsum(contour[:, 0])
-  contour[:, 0] *= width/ contour[-1, 0]
+  if not is_the_same_point(0, contour[-1, 0]):
+    contour[:, 0] *= width / contour[-1, 0]
   # adjust the starting point 
   contour -= contour[0, :]
 

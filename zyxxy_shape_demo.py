@@ -322,6 +322,8 @@ def place_shapes_and_widgets(side):
                                               w_bottom=new_bottom, 
                                               w_caption='Reset', 
                                               on_click_or_change=functools.partial(reset, side=side))
+
+  upd_shape_given_side = functools.partial(update_shape_form_given_side, side=side)
    
   _cpdd = [[key, value] for key, value in common_params_dict_definition.items()]
   for param_name, slider_range_name in _cpdd[::-1]:
@@ -330,13 +332,13 @@ def place_shapes_and_widgets(side):
                   w_left=w_left,
                   w_caption=param_name, 
                   s_vals=np.copy(slider_range[slider_range_name]), 
-                  on_click_or_change=functools.partial(update_shape_form_given_side, side=side))
+                  on_click_or_change=upd_shape_given_side)
 
   start_bottom_for_specific, common_widgets_by_side[side][flip_name], _ = add_a_check_button(
                   w_bottom=new_bottom, 
                   w_left=w_left, 
                   w_caption=flip_name, 
-                  on_click_or_change=functools.partial(update_shape_form_given_side, side=side))
+                  on_click_or_change=upd_shape_given_side)
 
   # ... and specific sliders
   w_bottom = start_bottom_for_specific
@@ -346,7 +348,7 @@ def place_shapes_and_widgets(side):
                   w_bottom=w_bottom,
                   w_caption="Dummy", #todo: add dummies
                   s_vals=[0, 1, 1/2, 1/2], 
-                  on_click_or_change=functools.partial(update_shape_form_given_side, side=side))
+                  on_click_or_change=upd_shape_given_side)
     specific_widgets_by_side[side] += [s_slider]
 
   # ... and style!

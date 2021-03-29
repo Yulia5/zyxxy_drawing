@@ -105,6 +105,9 @@ def add_a_check_button(w_left, w_bottom, w_caption, on_click_or_change=None):
   result = CheckButtons(w_axes, (w_caption, ), (False, ))
   resize_1_checkbox(a_checkbox=result, left=0.05, bottom=0.15, width=0.05, height=0.7)
 
+  if on_click_or_change is not None:
+    result.on_clicked(on_click_or_change)
+
   return new_bottom, result, None
 
 ##########################################################################################

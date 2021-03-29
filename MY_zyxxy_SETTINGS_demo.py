@@ -14,11 +14,13 @@
 ##  GNU General Public License for more details.
 ########################################################################
 
+import numpy as np
+
 demo_screen_zoom = 1/2
 
 figure_params = {'canvas_width' : 20, 
                  'canvas_height' : 16,
-                 'figsize' : [14 / demo_screen_zoom, 8 / demo_screen_zoom],
+                 'figsize' : np.array([14 / demo_screen_zoom, 8 / demo_screen_zoom]),
                  'dpi' : 75,
                  'tick_step' : 1,
                  'font_size' : 10/demo_screen_zoom,
