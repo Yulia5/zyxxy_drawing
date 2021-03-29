@@ -17,6 +17,7 @@
 from matplotlib.widgets import Slider, RadioButtons, CheckButtons, Button
 import matplotlib.pyplot as plt
 from MY_zyxxy_SETTINGS_widgets import widget_params
+from zyxxy_tests import is_the_same_point
 
 ##########################################################################################
 default_widget_sizes = {
@@ -78,7 +79,10 @@ def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=T
     added_text = plt.gcf().text(sax.get_position().xmin, new_bottom, w_caption)
     new_bottom += default_widget_sizes['height'] + default_widget_sizes['gap']
 
-  result.vline.set_linewidth(widget_params['slider_initline_linewidth'])
+  initline_linewidth = widget_params['slider_initline_linewidth']
+  if is_the_same_point(s_vals[0], s_vals[2]) or is_the_same_point(s_vals[1], s_vals[2]):
+    initline_linewidth *= 2
+  result.vline.set_linewidth(initline_linewidth)
   if on_click_or_change is not None:
     result.on_changed(on_click_or_change)
 
@@ -112,7 +116,12 @@ def set_slider_values(slider, val, valmin, valmax, valinit, valstep, label):
   slider.valmin = valmin
   slider.label.set_text(label)
   slider.ax.set_xlim(valmin, valmax)
-  slider.vline.set_data([valinit, valinit], [0, 1])
+  slider.vline.set_data([valinit, valinit], slider.ax.get_ylim())
+
+  initline_linewidth = widget_params['slider_initline_linewidth']
+  if is_the_same_point(valmin, valinit) or is_the_same_point(valmax, valinit):
+    initline_linewidth *= 2
+  slider.vline.set_linewidth(initline_linewidth)
 
 ##########################################################################################
 def get_widget_value(a_widget):
@@ -125,7 +134,7 @@ def get_widget_value(a_widget):
   raise Exception(type(a_widget), "is not handled")
 
 ##########################################################################################
-def reset(a_widget):
+def reset_widget(a_widget):
   if isinstance(a_widget, Slider):
     a_widget.reset()
   elif isinstance(a_widget, CheckButtons):

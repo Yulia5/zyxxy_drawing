@@ -23,7 +23,7 @@ from zyxxy_canvas import create_canvas_and_axes, is_running_tests
 from zyxxy_shape_class import Shape
 from zyxxy_coordinates import shape_names_params_dicts_definition, get_type_given_shapename
 from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
-from zyxxy_widgets import get_widget_value, set_slider_values, set_default_widget_width, add_a_button, add_a_check_button, add_a_slider, add_vertical_radio_buttons
+from zyxxy_widgets import get_widget_value, set_slider_values, set_default_widget_width, add_a_button, add_a_check_button, add_a_slider, add_vertical_radio_buttons, reset_widget
 
 from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
 from MY_zyxxy_SETTINGS_demo import figure_params, demo_style_widgets_value_ranges, my_default_demo_shapes, my_default_demo_style
@@ -233,9 +233,9 @@ def switch_active_shapename_given_side(label, side):
 ##########################################################################################
 def reset(_, side):
   for w in specific_widgets_by_side[side]:
-    reset(a_widget=w)
+    reset_widget(a_widget=w)
   for w in common_widgets_by_side[side].values():
-    reset(a_widget=w)
+    reset_widget(a_widget=w)
 
 ##################################################################################
 # create shapestyle widgets  
