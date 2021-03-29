@@ -147,7 +147,7 @@ class Shape:
           set_patch_style(_attr, **my_default_colour_etc_settings[attr_name])
 
       self.clip_patches = []
-      self.move_history = {'flip' : False, 'stretch_x' : 1., 'stretch_y' : 1., 'turn' : 0}
+      self.move_history = {zyxxy_coordinates.flip_name : False, 'stretch_x' : 1., 'stretch_y' : 1., 'turn' : 0}
       self.shape_kwargs = {}
       self.shapename = None
     else:
@@ -199,6 +199,7 @@ class Shape:
       self.shape_kwargs = kwargs
     else:
       contour = shapename # assume that it's an array of coordinates
+      # self.shapename = None - already set
 
     # updating the elements
     for what in [self.line, self.outline, self.patch]:
@@ -273,10 +274,10 @@ class Shape:
         shapename=self.shapename, 
         available_arguments=kwargs_common)
 
-    if common_keys_for_shape['diamond_x'] in kwargs_common:
+    if 'diamond_x' in common_keys_for_shape:
       processed_keys += [common_keys_for_shape['diamond_x']]
       shift[0] = kwargs_common[common_keys_for_shape['diamond_x']]
-    if common_keys_for_shape['diamond_y'] in kwargs_common:
+    if 'diamond_y' in common_keys_for_shape:
       processed_keys += [common_keys_for_shape['diamond_y']]
       shift[1] = kwargs_common[common_keys_for_shape['diamond_y']]
     self.shift(shift=shift)
@@ -358,7 +359,7 @@ class Shape:
       return xy
 
     self._move_xy(func=func)
-    self.move_history['flip'] = not self.move_history['flip']
+    self.move_history[zyxxy_coordinates.flip_name] = not self.move_history[zyxxy_coordinates.flip_name]
     self.move_history['turn'] =   - self.move_history['turn']
 
 ##################################################################

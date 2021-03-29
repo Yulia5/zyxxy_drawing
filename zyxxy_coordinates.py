@@ -57,7 +57,7 @@ def _get_diamond_label(shapename, original_label, available_arguments):
   # modify the result by adding the axis based on original_label, or find the right label
   if isinstance(result, str): 
     result += '_' + original_label[-1]
-    return result
+    return result if result in available_arguments else None
   
   i1 = 0 if original_label == 'diamond_x' else 1
   if isinstance(result[0], str):
@@ -69,7 +69,7 @@ def _get_diamond_label(shapename, original_label, available_arguments):
   else:
     intersection_arguments = [a for a in available_arguments if a in result[i1]]
     if len(intersection_arguments) == 0:
-      raise Exception("Among the arguments provided,", available_arguments, "there are no suitable candidates,", result[i1])
+      return None
     if len(intersection_arguments) > 1:
       raise Exception("In the arguments provided,", available_arguments, "there is more than one suitable candidate,", result[i1])
     return intersection_arguments[0]
@@ -81,7 +81,9 @@ def get_common_keys_for_shape(shapename, available_arguments=None):
   result = {key : key for key in keys if key not in ["diamond_x", "diamond_y"]}
 
   for key in ["diamond_x", "diamond_y"]:
-    result[key] = _get_diamond_label(shapename=shapename, original_label=key, available_arguments=available_arguments)
+    value = _get_diamond_label(shapename=shapename, original_label=key, available_arguments=available_arguments)
+    if value is not None:
+      result[key] = value
   
   return result
 
