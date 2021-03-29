@@ -57,7 +57,7 @@ def _get_diamond_label(shapename, original_label, available_arguments):
   # modify the result by adding the axis based on original_label, or find the right label
   if isinstance(result, str): 
     result += '_' + original_label[-1]
-    return result if result in available_arguments else None
+    return result if (available_arguments is None or result in available_arguments) else None
   
   i1 = 0 if original_label == 'diamond_x' else 1
   if isinstance(result[0], str):
@@ -123,56 +123,6 @@ shape_names_params_dicts_definition = {
 
 sin_cos_std = [[sin_hours(a/my_default_vertices_qty_in_circle*full_turn_angle), cos_hours(a/my_default_vertices_qty_in_circle*full_turn_angle)] for a in range(my_default_vertices_qty_in_circle)]
 
-#####################################################
-#####################################################
-# a rectangle ####################################################
-def build_a_rectangle_and_its_diamond(width, height, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None):
-
-  # checking that we the right number of inputs
-  how_many_are_defined = {'x' : (left is not None) + (centre_x is not None) + (right is not None), 'y' :  (bottom is not None) + (centre_y is not None) + (top is not None)}
-  errorMsg = ['One and only one ' + key + ' coordinate should be defined, but ' + str(value) + ' are defined' for key, value in how_many_are_defined.items() if value > 1]
-  if len(errorMsg) != 0:
-    raise Exception('; '.join(errorMsg))
-
-  presumed_diamond = [None, None]
-
-  # defining coordinates that are undefined - x
-  if left is not None:
-    centre_x = left + width / 2
-    right = left + width
-    presumed_diamond[0] = left
-  elif centre_x is not None:
-    left = centre_x - width / 2
-    right = centre_x + width / 2
-    presumed_diamond[0] = centre_x
-  elif right is not None:
-    left = right - width
-    centre_x = right - width / 2
-    presumed_diamond[0] = right 
-  else:
-    left, right = - width / 2, width / 2
-    presumed_diamond[0] = 0 
-
-  # defining coordinates that are undefined - y
-  if bottom is not None:
-    centre_y = bottom + height / 2
-    top = bottom + height
-    presumed_diamond[1] = bottom
-  elif centre_y is not None:
-    bottom = centre_y - height / 2
-    top = centre_y + height / 2
-    presumed_diamond[1] = centre_y
-  elif top is not None:
-    bottom = top - height
-    centre_y = top - height / 2 
-    presumed_diamond[1] = top
-  else:
-    bottom, top = - height / 2, height / 2
-    presumed_diamond[1] = 0
- 
-  contour_array = np.array([[left, bottom], [right, bottom], [right, top], [left, top]]) - presumed_diamond
-  return contour_array, presumed_diamond
-
 ############################################################################################################
 def init_shift(contour, left=None, centre_x=None, right=None, bottom=None, centre_y=None, top=None):
   # checking that we the right number of inputs
@@ -197,7 +147,6 @@ def init_shift(contour, left=None, centre_x=None, right=None, bottom=None, centr
 
   contour -= presumed_diamond
   return contour
-
 
 # a rectangle ######################################################
 def build_a_rectangle(height, width):
