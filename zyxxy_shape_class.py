@@ -224,7 +224,6 @@ class Shape:
         Shape._set_xy(what, new_contour)
 
 ##################################################################
-
   def update_shape_parameters(self, **kwargs):
     
     for key, value in kwargs.items():
@@ -243,17 +242,18 @@ class Shape:
     self.shift(shift=shift)
 
 ##################################################################
-
   def shift_shape_parameters(self, **kwargs):
     for key in kwargs.keys():
-      kwargs[key]+= self.shape_kwargs[key]
+      kwargs[key] += self.shape_kwargs[key]
     self.update_shape_parameters(**kwargs)
 
 ##################################################################
-
   def move(self, **kwargs_common):
-    if 'flip' in kwargs_common and kwargs_common['flip']:
-      self.flip()
+    processed_keys = []
+
+    if zyxxy_coordinates.flip_name in kwargs_common:
+      if kwargs_common[zyxxy_coordinates.flip_name]:
+        self.flip()
 
     stretch = [1., 1.]
     if 'stretch_x' in kwargs_common:
@@ -265,15 +265,23 @@ class Shape:
     if 'turn' in kwargs_common:
       self.rotate(turn=kwargs_common['turn'])
 
+    processed_keys += [arg_name for arg_name in [zyxxy_coordinates.flip_name, 'stretch_x', 'stretch_y', 'turn'] if arg_name in kwargs_common]
+
     shift = [0., 0.]
-    if 'diamond_x' in kwargs_common:
-      shift[0] = kwargs_common['diamond_x']
-    if 'diamond_y' in kwargs_common:
-      shift[1] = kwargs_common['diamond_y']
+
+    common_keys_for_shape = zyxxy_coordinates.get_common_keys_for_shape(
+        shapename=self.shapename, 
+        available_arguments=kwargs_common)
+
+    if common_keys_for_shape['diamond_x'] in kwargs_common:
+      processed_keys += [common_keys_for_shape['diamond_x']]
+      shift[0] = kwargs_common[common_keys_for_shape['diamond_x']]
+    if common_keys_for_shape['diamond_y'] in kwargs_common:
+      processed_keys += [common_keys_for_shape['diamond_y']]
+      shift[1] = kwargs_common[common_keys_for_shape['diamond_y']]
     self.shift(shift=shift)
 
-    raise_Exception_if_not_processed(kwarg_keys=kwargs_common.keys(), 
-    allowed_keys=['flip', 'stretch_x', 'stretch_y', 'turn', 'diamond_x', 'diamond_y'])
+    return processed_keys
 
 ##################################################################
 

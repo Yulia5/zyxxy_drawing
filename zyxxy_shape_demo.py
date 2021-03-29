@@ -21,8 +21,7 @@ import functools
 from zyxxy_utils import full_turn_angle
 from zyxxy_canvas import create_canvas_and_axes, is_running_tests
 from zyxxy_shape_class import Shape
-from zyxxy_coordinates import shape_names_params_dicts_definition, get_type_given_shapename
-from zyxxy_shape_functions import common_params_dict_definition, get_diamond_label
+from zyxxy_coordinates import shape_names_params_dicts_definition, get_type_given_shapename, get_common_keys_for_shape, common_params_dict_definition, flip_name
 from zyxxy_widgets import get_widget_value, set_slider_values, set_default_widget_width, add_a_button, add_a_check_button, add_a_slider, add_vertical_radio_buttons, reset_widget
 
 from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
@@ -137,10 +136,7 @@ def get_active_shape(side):
   return _shape
 
 ##########################################################################################
-def get_common_kwarg_key(shapename, common_label):
-  if common_label in ["diamond_x", "diamond_y"]:
-    return get_diamond_label(shapename=shapename, original_label=common_label)
-  return common_label
+  
 
 ##########################################################################################
 def update_shape_form_given_side(_, side):
@@ -148,17 +144,17 @@ def update_shape_form_given_side(_, side):
   if TURN_OFF_XY_UPDATE:
     return
 
-  shapename = active_shapename[side]
-  _shape = get_active_shape(side=side)
-
   kwargs_shape = {silder_.label.get_text() : silder_.val for silder_ in specific_widgets_by_side[side] if silder_.ax.get_visible()}
   
   _widgets_common = common_widgets_by_side[side]
-  kwargs_common= {key : get_widget_value(_widgets_common[key]) for key in _widgets_common.keys()}
-  kwargs_common2= {get_common_kwarg_key(shapename=shapename, common_label=key) : value for key, value in kwargs_common.items()}
+  common_keys_for_shape = get_common_keys_for_shape(shapename=active_shapename[side])
+  kwargs_common= {common_keys_for_shape[key] : get_widget_value(_widgets_common[key]) for key in _widgets_common.keys()}
 
+  print(kwargs_common)
+
+  _shape = get_active_shape(side=side)
   _shape.update_xy_by_shapename(active_shapename[side], **kwargs_shape)
-  _shape.adjust_the_diamond(**kwargs_common2)
+  _shape.adjust_the_diamond(**kwargs_common)
   _shape.move(**kwargs_common)
 
   fig.canvas.draw_idle()
@@ -221,9 +217,9 @@ def switch_active_shapename_given_side(label, side):
   update_visibility(side=side, switch_on=True)
 
   # update diamond labels
+  common_keys_for_shape = get_common_keys_for_shape(shapename=active_shapename[side])
   for diam_name in ["diamond_x", "diamond_y"]:
-    shape_specific_label = get_diamond_label(shapename=active_shapename[side], original_label=diam_name)
-    common_widgets_by_side[side][diam_name].label.set_text(shape_specific_label)
+    common_widgets_by_side[side][diam_name].label.set_text(common_keys_for_shape[diam_name])
 
   TURN_OFF_XY_UPDATE = False
   update_shape_form_given_side(None, side=side)
@@ -336,10 +332,10 @@ def place_shapes_and_widgets(side):
                   s_vals=np.copy(slider_range[slider_range_name]), 
                   on_click_or_change=functools.partial(update_shape_form_given_side, side=side))
 
-  start_bottom_for_specific, common_widgets_by_side[side]['flip'], _ = add_a_check_button(
+  start_bottom_for_specific, common_widgets_by_side[side][flip_name], _ = add_a_check_button(
                   w_bottom=new_bottom, 
                   w_left=w_left, 
-                  w_caption='flip_upside_down', 
+                  w_caption=flip_name, 
                   on_click_or_change=functools.partial(update_shape_form_given_side, side=side))
 
   # ... and specific sliders

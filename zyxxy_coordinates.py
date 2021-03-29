@@ -22,6 +22,71 @@ from math import sqrt, ceil, floor
 
 zyxxy_line_shapes = ['a_segment', 'a_smile', 'a_coil', 'an_arc', 'a_zigzag', 'a_wave']
 
+########################################################################
+
+common_params_dict_definition = {'stretch_x' : 'stretch',
+                                 'stretch_y' : 'stretch',
+                                 'turn' : 'turn',
+                                 'diamond_x' : 'half_width', 
+                                 'diamond_y' : 'half_height'}
+flip_name = 'flip_upside_down'
+
+bespoke_diamonds = { 'a_coil' : 'start',
+                     'a_wave' : 'start',
+                     'a_segment' : 'start',
+                     'a_zigzag' : 'start',
+                     'a_heart' : 'tip',
+                     'a_triangle' : 'tip',
+                     'an_elliptic_drop' : 'tip',
+                     'an_egg' : 'tip',
+                     'a_square' : [['left', 'centre_x', 'right'], ['bottom', 'centre_y', 'top']],
+                     'a_rectangle' : [['centre_x', 'left', 'right'], ['centre_y', 'bottom', 'top']]} 
+########################################################################
+
+def _get_diamond_label(shapename, original_label, available_arguments):
+  assert original_label in ["diamond_x", "diamond_y"]
+  # get the first part of the label, without the axis
+  if isinstance(shapename, str):   
+    if shapename in bespoke_diamonds:
+      result = bespoke_diamonds[shapename]
+    else:
+      result = 'centre'
+  else:
+    result = 'diamond'
+
+  # modify the result by adding the axis based on original_label, or find the right label
+  if isinstance(result, str): 
+    result += '_' + original_label[-1]
+    return result
+  
+  i1 = 0 if original_label == 'diamond_x' else 1
+  if isinstance(result[0], str):
+    return result[i1]
+  
+  # assume this is an array of arrays
+  if available_arguments is None:
+    return result[i1][0]
+  else:
+    intersection_arguments = [a for a in available_arguments if a in result[i1]]
+    if len(intersection_arguments) == 0:
+      raise Exception("Among the arguments provided,", available_arguments, "there are no suitable candidates,", result[i1])
+    if len(intersection_arguments) > 1:
+      raise Exception("In the arguments provided,", available_arguments, "there is more than one suitable candidate,", result[i1])
+    return intersection_arguments[0]
+
+
+########################################################################
+def get_common_keys_for_shape(shapename, available_arguments=None):
+  keys = [k for k in common_params_dict_definition.keys()] + [flip_name]
+  result = {key : key for key in keys if key not in ["diamond_x", "diamond_y"]}
+
+  for key in ["diamond_x", "diamond_y"]:
+    result[key] = _get_diamond_label(shapename=shapename, original_label=key, available_arguments=available_arguments)
+  
+  return result
+
+########################################################################
+
 def get_type_given_shapename(shapename):
   if shapename in zyxxy_line_shapes:
     return 'line'
@@ -293,7 +358,7 @@ def build_a_sector(angle_start, angle_end, radius, radius_2=0):
 
 # a drop #########################################################
 def build_an_elliptic_drop(width, height):
-  contour = build_an_arc_multispeed(angle_start=full_turn_angle/4, angle_end=full_turn_angle*3/4, speed_x=2.0, width=width, height=height*2)
+  contour = build_a_squiggle(angle_start=full_turn_angle/4, angle_end=full_turn_angle*3/4, speed_x=2.0, width=width, height=height*2)
   return contour
 
 # a heart (or an ice-cream) ########################################

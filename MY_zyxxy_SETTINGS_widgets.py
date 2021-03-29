@@ -19,4 +19,4 @@ widget_params = {'radio_width' : 0.128,
                  'height' : 0.0239,
                  'width' : 0.27,
                  'gap' : 0.01,
-                 'slider_initline_linewidth' : 5}
+                 'slider_initline_linewidth' : 10}

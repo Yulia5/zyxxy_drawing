@@ -21,53 +21,6 @@ import zyxxy_coordinates
 from zyxxy_shape_style import raise_Exception_if_not_processed, extract_colour_etc_kwargs
 import matplotlib.pyplot as plt
 
-common_params_dict_definition = {'stretch_x' : 'stretch',
-                                 'stretch_y' : 'stretch',
-                                 'turn' : 'turn',
-                                 'diamond_x' : 'half_width', 
-                                 'diamond_y' : 'half_height'}
-
-bespoke_diamonds = { 'a_coil' : 'start',
-                     'a_wave' : 'start',
-                     'a_segment' : 'start',
-                     'a_zigzag' : 'start',
-                     'a_heart' : 'tip',
-                     'a_triangle' : 'tip',
-                     'an_elliptic_drop' : 'tip',
-                     'an_egg' : 'tip',
-                     'a_square' : [['left', 'centre_x', 'right'], ['bottom', 'centre_y', 'top']],
-                     'a_rectangle' : [['centre_x', 'left', 'right'], ['centre_y', 'bottom', 'top']]} 
-
-def get_diamond_label(shapename, original_label=None, available_arguments=None):
-  # get the first part of the label, without the axis
-  if isinstance(shapename, str):   
-    if shapename in bespoke_diamonds:
-      result = bespoke_diamonds[shapename]
-    else:
-      result = 'centre'
-  else:
-    result = 'diamond'
-
-  # modify the result by adding the axis based on original_label, or find the right label
-  assert original_label in ['diamond_x', 'diamond_y']
-  if isinstance(result, str): 
-    result += '_' + original_label[-1]
-    return result
-  
-  i1 = 0 if original_label == 'diamond_x' else 1
-  if isinstance(result[0], str):
-    return result[i1]
-  
-  # assume this is an array of arrays
-  if available_arguments is None:
-    return result[i1][0]
-  else:
-    intersection_arguments = [a for a in available_arguments if a in result[i1]]
-    if len(intersection_arguments) == 0:
-      raise Exception("Among the arguments provided,", available_arguments, "there are no suitable candidates,", result[i1])
-    if len(intersection_arguments) > 1:
-      raise Exception("In the arguments provided,", available_arguments, "there is more than one suitable candidate,", result[i1])
-    return intersection_arguments[0]
 
 def draw_a_shape(shapename, ax=None, **kwargs):
   if ax is None:
@@ -101,22 +54,7 @@ def draw_a_shape(shapename, ax=None, **kwargs):
   _shape.adjust_the_diamond(**kwargs)
 
   # apply common arguments
-  def get_common_kwargs(kwargsss):
-    common_keys = {key : key for key in common_params_dict_definition.keys() if not key.startswith('diamond_')}
-    for dk in ['diamond_x', 'diamond_y']:
-      common_keys[dk] = get_diamond_label(shapename=shapename, original_label=dk, available_arguments=kwargs.keys())
-  
-    used_keys = []
-    common_kwargs = {}
-    for key, value in common_keys.items():
-      if value in kwargsss.keys():
-        common_kwargs[key] = kwargsss[value]
-        used_keys.append(value)
-    return used_keys, common_kwargs
-
-  kwargs_common = {}
-  used_common_keys, kwargs_common = get_common_kwargs(kwargsss=kwargs)
-  _shape.move(**kwargs_common)
+  used_common_keys = _shape.move(**kwargs)
   param_names_used += used_common_keys
 
   if 'clip_outline' in kwargs:
