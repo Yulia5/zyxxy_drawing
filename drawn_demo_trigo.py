@@ -21,7 +21,7 @@ from zyxxy_utils import full_turn_angle, sin_hours, cos_hours
 from zyxxy_canvas import create_canvas_and_axes, is_running_tests
 from MY_zyxxy_SETTINGS_demo import figure_params
 from MY_zyxxy_SETTINGS_widgets import widget_params
-from zyxxy_shape_functions import draw_a_circle, draw_a_segment, draw_a_sector, draw_a_wave
+from zyxxy_shape_functions import draw_a_circle, draw_a_broken_line, draw_a_sector, draw_a_wave
 from zyxxy_shape_style import set_default_line_style, set_default_outline_style, set_diamond_size_factor
 
 plt.rcParams.update({'font.size': figure_params['font_size']})
@@ -63,7 +63,7 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes_tick_font_size=figure_params['font_size'],
                             axes=ax)
 
-colour = {'angle' : 'violet', 'sinus' : 'blue', 'cosinus' : 'red'}
+colour = {'angle' : 'violet', 'sinus' : 'dodgerblue', 'cosinus' : 'blueviolet'}
 angle = 1
 dot_coords = [sin_hours(angle), cos_hours(angle)]
 values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
@@ -76,39 +76,36 @@ colors = colour.values()
 lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
 labels = [k + ('(' + str(angle) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys()]
 
+sin_angle, cos_angle = sin_hours(angle), cos_hours(angle)
 
 draw_a_circle(centre_x=0, centre_y=0, radius=1)
 
 draw_a_sector(centre_x=0, centre_y=0, radius=.2, angle_start=0, angle_end=angle, colour=colour['angle'])
-draw_a_segment(start_x=0, start_y=0, length=1, turn=angle)
+draw_a_broken_line(contour=[[0, 0], [sin_angle, cos_angle]], colour='crimson')
 
 # cos
-set_default_line_style(colour=colour['cosinus'])
-draw_a_segment(start_x=0, start_y=0, length=cos_hours(angle), turn=full_turn_angle/4)
+draw_a_broken_line(contour=[[0, 0], [sin_angle, 0]], colour=colour['cosinus'])
+draw_a_broken_line(contour=[[sin_angle, 0], [sin_angle, cos_angle]], colour=colour['sinus'])
+draw_a_broken_line(contour=[[sin_angle, max(0, cos_angle)], [sin_angle, start_trigo]], colour='black')
 set_default_line_style(colour=colour['sinus'])
-draw_a_segment(start_x=cos_hours(angle), start_y=0, length=sin_hours(angle), turn=0)
-set_default_line_style(colour='black')
-draw_a_segment(start_x=cos_hours(angle), start_y=max(0, sin_hours(angle)), length=start_trigo-max(0, sin_hours(angle)), turn=0)
-set_default_line_style(colour=colour['cosinus'])
 draw_a_wave(start_x=start_trigo+angle/wave_factor, start_y=1, width=-angle/wave_factor, height=2, angle_start=3, nb_waves=angle/full_turn_angle)
+draw_a_circle(centre_x=start_trigo, centre_y=cos_angle, radius=.1, colour=colour['sinus'])
 
 # sin
-set_default_line_style(colour=colour['sinus'])
-draw_a_segment(start_x=0, start_y=0, length=sin_hours(angle), turn=0)
+draw_a_broken_line(contour=[[0, 0], [0, cos_angle]], colour=colour['sinus'])
+draw_a_broken_line(contour=[[0, cos_angle], [sin_angle, cos_angle]], colour=colour['cosinus'])
+draw_a_broken_line(contour=[[max(0, sin_angle), cos_angle], [start_trigo, cos_angle]], colour='black')
 set_default_line_style(colour=colour['cosinus'])
-draw_a_segment(start_x=0, start_y=sin_hours(angle), length=cos_hours(angle), turn=full_turn_angle/4)
-set_default_line_style(colour='black')
-draw_a_segment(start_x=max(0, cos_hours(angle)), start_y=sin_hours(angle), length=start_trigo-max(0, cos_hours(angle)), turn=full_turn_angle/4)
 
-set_default_line_style(colour=colour['sinus'])
+set_default_line_style(colour=colour['cosinus'])
 sinus_wave = draw_a_wave(start_x=start_trigo+angle/wave_factor, start_y=0, width=-angle/wave_factor, height=2, angle_start=0, nb_waves=angle/full_turn_angle)
 sinus_wave.flip()
 sinus_wave.rotate(turn=9, diamond_override=[0, 0])
+draw_a_circle(centre_x=sin_angle, centre_y=start_trigo, radius=.1, colour=colour['cosinus'])
 
 # point
-draw_a_circle(centre_x=dot_coords[0], centre_y=dot_coords[1], radius=.1, colour='black')
-draw_a_circle(centre_x=start_trigo, centre_y=sin_hours(angle), radius=.1, colour=colour['sinus'])
-draw_a_circle(centre_x=cos_hours(angle), centre_y=start_trigo, radius=.1, colour=colour['cosinus'])
+draw_a_circle(centre_x=sin_angle, centre_y=cos_angle, radius=.1, colour='black')
+
 
 # a legend
 plt.legend(lines, labels, loc='upper right') 
