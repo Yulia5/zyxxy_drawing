@@ -21,7 +21,7 @@ from zyxxy_canvas import create_canvas_and_axes, is_running_tests
 from zyxxy_widgets import add_a_slider
 from MY_zyxxy_SETTINGS_demo import figure_params
 from MY_zyxxy_SETTINGS_widgets import widget_params
-from zyxxy_shape_functions import draw_a_circle, draw_a_broken_line, draw_a_sector, draw_a_wave, draw_a_square
+from zyxxy_shape_functions import draw_a_circle, draw_a_broken_line, draw_a_sector, draw_a_wave, draw_a_square, draw_a_segment
 from zyxxy_shape_style import set_default_line_style, set_default_outline_style, set_diamond_size_factor
 
 plt.rcParams.update({'font.size': figure_params['font_size']})
@@ -63,10 +63,11 @@ wave_factor = 6
 set_default_outline_style(linewidth=3)
 set_default_line_style(linewidth=3)
 
-
 segments = [None for _ in range(7)]
 
 draw_a_circle(centre_x=0, centre_y=0, radius=1)
+
+draw_a_segment(start_x=0, start_y=0, length=20, turn=6, colour='green')
 
 sector = draw_a_sector(centre_x=0, centre_y=0, radius=.2, angle_start=0, angle_end=0, colour=colour['angle'])
 segments[0] = draw_a_broken_line(contour=[[0, 0]], colour=colour['hypothenuse'])
@@ -77,7 +78,7 @@ set_default_outline_style(linewidth=0)
 segments[1] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
 segments[2] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
 segments[3] = draw_a_broken_line(contour=[[0, 0]], colour='black')
-wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'])#, turn=9, flip_upside_down=True)
+wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'], flip_upside_down=True)
 dot_sinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['sinus'])
 square_sinus = draw_a_square(centre_x=0, centre_y=0, side=.2, colour=colour['sinus'])
 
@@ -111,9 +112,12 @@ def change_angle(angle):
 
   dot_sinus.shift_to( [sin_angle, start_trigo])
   square_sinus.shift_to( [0, start_trigo+angle/wave_factor])
+  wave_sinus.rotate(turn=-9)
   wave_sinus.shift_to([0, 0])
-  wave_sinus.update_shape_parameters(angle_start=angle, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
-  wave_sinus.shift_to([sin_angle, start_trigo])
+  wave_sinus.update_shape_parameters(angle_start=0, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
+  wave_sinus.shift_to([0, start_trigo+angle/wave_factor])
+  wave_sinus.flip()
+  wave_sinus.stretch(stretch_x=1, stretch_y=-1)
 
   dot_cosinus.shift_to( [start_trigo, cos_angle])
   square_cosinus.shift_to( [start_trigo+angle/wave_factor, 1])
