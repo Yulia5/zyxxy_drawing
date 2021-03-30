@@ -36,25 +36,18 @@ canvas_height = 3.5 * 2
 # Creating the canvas!
 ##########################################################################################
 
-def get_max_specific_sliders():
-  max_specific_sliders = 1
-  return max_specific_sliders
-
 def get_demo_rax_bottom():
-  max_widget_qty = get_max_specific_sliders() 
-  demo_rax_bottom = max_widget_qty * (widget_params['height'] + widget_params['gap']) 
+  demo_rax_bottom = 1 * (widget_params['height'] + widget_params['gap']) 
   demo_rax_bottom += figure_params['plot_bottom_gap']
   return demo_rax_bottom
 
 plot_ax_left   = figure_params['plot_gap']
-plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap'] + 0.2
+plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap'] + 0.1
 ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
-
-print([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
 
 set_diamond_size_factor(value=0.)
 
-create_canvas_and_axes(canvas_width=canvas_width,
+ax = create_canvas_and_axes(canvas_width=canvas_width,
                             canvas_height=canvas_height, 
                             tick_step=figure_params['tick_step'],
                             title="Try Out Shapes",
@@ -64,7 +57,7 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes_tick_font_size=figure_params['font_size'],
                             axes=ax)
 
-colour = {'angle' : 'violet', 'sinus' : 'dodgerblue', 'cosinus' : 'blueviolet'}
+colour = {'angle' : 'violet', 'sinus' : 'dodgerblue', 'cosinus' : 'blueviolet', 'hypothenuse' : 'crimson'}
 
 start_trigo = 1.5
 wave_factor = 6
@@ -77,7 +70,7 @@ segments = [None for _ in range(7)]
 draw_a_circle(centre_x=0, centre_y=0, radius=1)
 
 sector = draw_a_sector(centre_x=0, centre_y=0, radius=.2, angle_start=0, angle_end=0, colour=colour['angle'])
-segments[0] = draw_a_broken_line(contour=[[0, 0]], colour='crimson')
+segments[0] = draw_a_broken_line(contour=[[0, 0]], colour=colour['hypothenuse'])
 
 set_default_outline_style(linewidth=0)
 
@@ -125,19 +118,21 @@ def change_angle(angle):
   wave_cosinus.update_shape_parameters(angle_start=3-angle, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
   wave_cosinus.shift_to([start_trigo, cos_angle])
 
-angle = 16
-change_angle(angle=angle)
+  # a legend
+  values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
+  colors = colour.values()
+  lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
+  labels = [k + ('(' + str(angle) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys() if k!='hypothenuse'] + ['hypothenuse']
 
-dot_coords = [sin_hours(angle), cos_hours(angle)]
-values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
-colors = colour.values()
-lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
-labels = [k + ('(' + str(angle) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys()]
+  nb_legend_lines = 4 if 0 <= angle <= 3 else 3
+  ax.legend(lines[:nb_legend_lines], labels[:nb_legend_lines], loc='upper right') 
 
-# a legend
-plt.legend(lines, labels, loc='upper right') 
 
-add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_caption='angle', s_vals=[0, 36, 0, 0.2], on_click_or_change=change_angle)
+init_angle = 7
+
+add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_caption='angle', s_vals=[0, 36, init_angle, 1])#, on_click_or_change=change_angle)
+
+change_angle(angle=init_angle)
 
 
 fig.set_dpi(figure_params['dpi']) 
