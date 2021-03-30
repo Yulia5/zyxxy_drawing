@@ -64,7 +64,7 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes=ax)
 
 colour = {'angle' : 'violet', 'sinus' : 'blue', 'cosinus' : 'red'}
-angle = 0
+angle = 1
 dot_coords = [sin_hours(angle), cos_hours(angle)]
 values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
 start_trigo = 1.5
