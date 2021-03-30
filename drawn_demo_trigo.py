@@ -16,13 +16,12 @@
 
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-import numpy as np
 from zyxxy_utils import full_turn_angle, sin_hours, cos_hours
 from zyxxy_canvas import create_canvas_and_axes, is_running_tests
 from zyxxy_widgets import add_a_slider
 from MY_zyxxy_SETTINGS_demo import figure_params
 from MY_zyxxy_SETTINGS_widgets import widget_params
-from zyxxy_shape_functions import draw_a_circle, draw_a_broken_line, draw_a_sector, draw_a_wave
+from zyxxy_shape_functions import draw_a_circle, draw_a_broken_line, draw_a_sector, draw_a_wave, draw_a_square
 from zyxxy_shape_style import set_default_line_style, set_default_outline_style, set_diamond_size_factor
 
 plt.rcParams.update({'font.size': figure_params['font_size']})
@@ -78,8 +77,9 @@ set_default_outline_style(linewidth=0)
 segments[1] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
 segments[2] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
 segments[3] = draw_a_broken_line(contour=[[0, 0]], colour='black')
-wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'], turn=9, flip_upside_down=True)
+wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'])#, turn=9, flip_upside_down=True)
 dot_sinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['sinus'])
+square_sinus = draw_a_square(centre_x=0, centre_y=0, side=.2, colour=colour['sinus'])
 
 # sin
 segments[4] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
@@ -87,6 +87,7 @@ segments[5] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
 segments[6] = draw_a_broken_line(contour=[[0, 0]], colour='black')
 wave_cosinus = draw_a_wave(start_x=start_trigo+0, start_y=0, width=1, height=2, angle_start=3, nb_waves=1, colour=colour['cosinus'])
 dot_cosinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['cosinus'])
+square_cosinus = draw_a_square(centre_x=0, centre_y=0, side=.2, colour=colour['cosinus'])
 
 # point
 dot = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour='black')
@@ -109,11 +110,13 @@ def change_angle(angle):
   dot.shift_to([sin_angle, cos_angle])
 
   dot_sinus.shift_to( [sin_angle, start_trigo])
+  square_sinus.shift_to( [0, start_trigo+angle/wave_factor])
   wave_sinus.shift_to([0, 0])
   wave_sinus.update_shape_parameters(angle_start=angle, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
   wave_sinus.shift_to([sin_angle, start_trigo])
 
   dot_cosinus.shift_to( [start_trigo, cos_angle])
+  square_cosinus.shift_to( [start_trigo+angle/wave_factor, 1])
   wave_cosinus.shift_to([0, 0])
   wave_cosinus.update_shape_parameters(angle_start=3-angle, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
   wave_cosinus.shift_to([start_trigo, cos_angle])
