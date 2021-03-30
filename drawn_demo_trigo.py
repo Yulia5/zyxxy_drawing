@@ -64,7 +64,7 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes=ax)
 
 colour = {'angle' : 'violet', 'sinus' : 'blue', 'cosinus' : 'red'}
-angle = 24 - 4.5
+angle = 0
 dot_coords = [sin_hours(angle), cos_hours(angle)]
 values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
 start_trigo = 1.5
@@ -74,7 +74,7 @@ set_default_line_style(linewidth=3)
 
 colors = colour.values()
 lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
-labels = [k + ('(angle)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'hours') for k in colour.keys()]
+labels = [k + ('(' + str(angle) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys()]
 
 
 draw_a_circle(centre_x=0, centre_y=0, radius=1)
@@ -84,21 +84,21 @@ draw_a_segment(start_x=0, start_y=0, length=1, turn=angle)
 
 # cos
 set_default_line_style(colour=colour['cosinus'])
-draw_a_segment(start_x=0, start_y=0, length=cos_hours(angle), turn=0)
+draw_a_segment(start_x=0, start_y=0, length=cos_hours(angle), turn=full_turn_angle/4)
 set_default_line_style(colour=colour['sinus'])
-draw_a_segment(start_x=0, start_y=cos_hours(angle), length=dot_coords[0], turn=full_turn_angle/4)
+draw_a_segment(start_x=cos_hours(angle), start_y=0, length=sin_hours(angle), turn=0)
 set_default_line_style(colour='black')
-draw_a_segment(start_x=max(0, dot_coords[0]), start_y=cos_hours(angle), length=start_trigo-max(0, dot_coords[0]), turn=full_turn_angle/4)
+draw_a_segment(start_x=cos_hours(angle), start_y=max(0, sin_hours(angle)), length=start_trigo-max(0, sin_hours(angle)), turn=0)
 set_default_line_style(colour=colour['cosinus'])
 draw_a_wave(start_x=start_trigo+angle/wave_factor, start_y=1, width=-angle/wave_factor, height=2, angle_start=3, nb_waves=angle/full_turn_angle)
 
 # sin
 set_default_line_style(colour=colour['sinus'])
-draw_a_segment(start_x=0, start_y=0, length=dot_coords[0], turn=full_turn_angle/4)
+draw_a_segment(start_x=0, start_y=0, length=sin_hours(angle), turn=0)
 set_default_line_style(colour=colour['cosinus'])
-draw_a_segment(start_x=dot_coords[0], start_y=0, length=dot_coords[1], turn=0)
+draw_a_segment(start_x=0, start_y=sin_hours(angle), length=cos_hours(angle), turn=full_turn_angle/4)
 set_default_line_style(colour='black')
-draw_a_segment(start_x=dot_coords[0], start_y=max(0, dot_coords[1]), length=start_trigo-max(0, dot_coords[1]), turn=0)
+draw_a_segment(start_x=max(0, cos_hours(angle)), start_y=sin_hours(angle), length=start_trigo-max(0, cos_hours(angle)), turn=full_turn_angle/4)
 
 set_default_line_style(colour=colour['sinus'])
 sinus_wave = draw_a_wave(start_x=start_trigo+angle/wave_factor, start_y=0, width=-angle/wave_factor, height=2, angle_start=0, nb_waves=angle/full_turn_angle)
@@ -111,7 +111,7 @@ draw_a_circle(centre_x=start_trigo, centre_y=sin_hours(angle), radius=.1, colour
 draw_a_circle(centre_x=cos_hours(angle), centre_y=start_trigo, radius=.1, colour=colour['cosinus'])
 
 # a legend
-plt.legend(lines, labels, loc='upper right') #, prop={'size': 16})
+plt.legend(lines, labels, loc='upper right') 
 
 #draw_a_segment(start_x=0, start_y=dot_coords[0], length=dot_coords[1], turn=3)
 fig.set_dpi(figure_params['dpi']) 
