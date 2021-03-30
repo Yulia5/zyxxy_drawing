@@ -32,9 +32,9 @@ from zyxxy_all_EXAMPLES import *
 #import drawn_blue_green_mandala
 
 import zyxxy_utils, datetime
-#zyxxy_utils.is_running_tests(True)
-#from zyxxy_tests import *; test_rectangle(); test_gradient(); test_all_examples(); 
-#test_all_drawings();
+zyxxy_utils.is_running_tests(True)
+from zyxxy_tests import *; test_all_drawings(); test_rectangle(); test_gradient(); test_all_examples(); 
+
 
 print(datetime.datetime.now())
 

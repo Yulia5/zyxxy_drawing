@@ -144,8 +144,9 @@ def init_shift(contour, left=None, centre_x=None, right=None, bottom=None, centr
     presumed_diamond[1] *= 0
   elif top is not None:
     pass
-
+  
   contour -= presumed_diamond
+
   return contour
 
 # a rectangle ######################################################

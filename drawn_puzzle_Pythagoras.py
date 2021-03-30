@@ -32,15 +32,15 @@ triangle_2.shift(shift=[0, 15])
 
 triangle_3 = clone_a_shape(triangle_1)
 triangle_3.shift(shift=[15, 15])
-triangle_3.rotate(turn=1)
+triangle_3.turn(turn=1)
 
 triangle_4 = clone_a_shape(triangle_1)
 triangle_4.shift(shift=[15, 0])
-triangle_4.rotate(turn=11)
+triangle_4.turn(turn=11)
 
 #######################################################
 # Kian's code  that puts all triangles together into a blue rectangle goes here ...
-# Kian can use methods "shift" and "rotate", as above, to move TRIANGLES
+# Kian can use methods "shift" and "turn", as above, to move TRIANGLES
 # Hint: it only takes rotation by angles with integer values between 0 and 12
 # Full angle = 12, like on the clock
 #######################################################
@@ -55,11 +55,11 @@ wait_for_enter()
 #######################################################
 
 # turn the square by a magic angle, to make it easy to put together a big square
-a_square.rotate(turn = atan_hours(a/b))
+a_square.turn(turn = atan_hours(a/b))
 
 #######################################################
 # Kian's code that puts [all triangles] + [a square] => [a bigger square] goes here ...
-# Kian can use methods "shift" and "rotate", as above, to move TRIANGLES
+# Kian can use methods "shift" and "turn", as above, to move TRIANGLES
 # Hint: it only takes rotation by angles with integer values between 0 and 12
 # Full angle = 12, like on the clock
 #######################################################

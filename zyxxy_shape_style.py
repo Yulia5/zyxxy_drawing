@@ -73,11 +73,13 @@ def set_outlines_colour(val):
 
 ########################################################################
 
-def extract_colour_etc_kwargs(kwargs):
-  possible_keys = line_arg_types + patch_arg_types + ["outline_" + a for a in line_arg_types] + ["diamond_" + a for a in patch_arg_types]
- 
-  result = {key : value for key, value in kwargs.items() if key in possible_keys}
-  return result
+def get_admissible_style_arguments(shapetype):
+  d_args = ["diamond_" + a for a in patch_arg_types]
+  if shapetype == "line":
+    return line_arg_types + d_args
+  if shapetype == "patch":
+    return patch_arg_types + ["outline_" + a for a in line_arg_types] + d_args  
+  raise Exception(shapetype, "not recognised")
 
 def set_line_style(something, **kwargs):
 

@@ -60,6 +60,10 @@ def is_the_same_contour(p1, p2, start_1=0, start_2=0, opposite_directions=False)
   if opposite_directions:
     p2_modif = p2_modif[::-1]
   result = is_the_same_point(p1=p1_modif, p2=p2_modif)
+
+  if not result:
+    raise Exception("Not the same", p1, p2)
+
   return result
 
 ##################################################################
@@ -102,22 +106,35 @@ def add_a_left_mirror(contour, mirror_x=0):
 ## MOVEMENT HELPERS                                             ## 
 ##################################################################
 
-def rotate_point(point, diamond, turn):
-  if (diamond is None) or is_the_same_point(turn, 0.):
-    return point
+def get_rotation_matrix(turn):
   cos_turn = cos_hours(turn)
   sin_turn = sin_hours(turn)
-  diff_0 = point[0] - diamond[0]
-  diff_1 = point[1] - diamond[1]
-  return [diamond[0] + diff_0 * cos_turn + diff_1 * sin_turn,
-          diamond[1] - diff_0 * sin_turn + diff_1 * cos_turn] 
+  result = np.array([[ cos_turn, sin_turn],
+                     [-sin_turn, cos_turn]])
+  return result
 
+##################################################################
+def move_by_matrix(contour, diamond, matrix):
+  diff_array_T = np.transpose(contour - diamond)
+  result = np.transpose(np.matmul(matrix, diff_array_T)) + diamond
+  return result
+
+##################################################################
+def rotate_point(point, diamond, turn):
+  if is_the_same_point(turn, 0.):
+    return point
+  rotation_matrix = get_rotation_matrix(turn)
+  result = move_by_matrix(contour=point, diamond=diamond, matrix=rotation_matrix)
+  return result
+
+##################################################################
 def _stretch_something(what_to_stretch, diamond, stretch_coeff):
   if is_the_same_point(stretch_coeff, 1.):
     return what_to_stretch
   result = diamond + (what_to_stretch - diamond) * stretch_coeff
   return result
 
+##################################################################
 def stretch_something(what_to_stretch, diamond, stretch_coeff):
   if is_number(what_to_stretch[0]):
     result = np.array([_stretch_something(what_to_stretch=what_to_stretch[i], 

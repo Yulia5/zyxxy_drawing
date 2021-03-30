@@ -6,7 +6,7 @@ from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
 from zyxxy_shape_style import set_default_patch_style, set_default_outline_style, set_default_line_style, new_layer, get_width, get_height
 from zyxxy_shape_functions import draw_a_circle, draw_a_square, draw_a_triangle, draw_an_ellipse, draw_a_rectangle, draw_a_smile, draw_a_segment, draw_a_sector, draw_a_polygon, draw_a_broken_line, draw_a_crescent, draw_a_star
 from zyxxy_coordinates import build_an_arc, link_contours, build_a_circle, build_a_zigzag
-from zyxxy_shape_class import shift_layer, rotate_layer, stretch_layer
+from zyxxy_shape_functions import shift_layers, turn_layers, stretch_layers
 from zyxxy_utils import random_element, random_number
 
 #########################################################
@@ -155,7 +155,7 @@ def example_animation_Zyxxy_the_mouse():
     # roll
     if nb_shifts < l <= nb_rolls + nb_shifts:
       for eye in eyes.values():
-        eye['black'].rotate(turn=3/nb_rolls, 
+        eye['black'].turn(turn=3/nb_rolls, 
                             diamond_override=eye['white'].diamond_coords)
 
     # up
@@ -367,7 +367,7 @@ def example_yellow_cat_animation(axes=None, cat_colour='Yellow', background_colo
     # zoom
     z = s - nb_smile - 1
     if 0 < z <= nb_zoom:
-      stretch_layer(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90])
+      stretch_layers(stretch_x=zoom_factor, stretch_y=zoom_factor, diamond=[0, 90])
 
   show_drawing_and_save_if_needed(filename=filename, animation_func = animate,
     nb_of_frames = 2 * nb_eye_narrowing + 1 + nb_smile + 1 + nb_zoom + 1, animation_interval=100)
@@ -536,13 +536,13 @@ def example_animated_croc(axes=None):
     t = i - len(one_eyelid_blick) * nb_blinks
     if 0 <= t < len(one_jaw_turn) * nb_jaw_openings:
       t1 = t % len(one_jaw_turn)
-      rotate_layer(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
+      turn_layers(turn=one_jaw_turn[t1]*size_turn, diamond=upper_jaw_diamond, layer_nbs=[upper_jaw_layer_nb])
     # jump
     j = t - len(one_jaw_turn) * nb_jaw_openings
     if 0 <= j < len(one_jump) * nb_jumps:
       j1 = j % len(one_jump)
-      shift_layer(shift=[0, one_leg_lift[j1]*size_shift], layer_nbs=[leg_layer_nb])
-      shift_layer(shift=[0, one_jump[j1]*size_shift]    , layer_nbs=[body_layer_nb, upper_jaw_layer_nb])
+      shift_layers(shift=[0, one_leg_lift[j1]*size_shift], layer_nbs=[leg_layer_nb])
+      shift_layers(shift=[0, one_jump[j1]*size_shift]    , layer_nbs=[body_layer_nb, upper_jaw_layer_nb])
 
   total_frames = len(one_eyelid_blick) * nb_blinks + len(one_jaw_turn) * nb_jaw_openings + len(one_jump) * nb_jumps
 

@@ -112,11 +112,11 @@ def change_angle(angle):
 
   dot_sinus.shift_to( [sin_angle, start_trigo])
   square_sinus.shift_to( [0, start_trigo+angle/wave_factor])
-  wave_sinus.rotate(turn=-9)
+  wave_sinus.turn(turn=-9)
   wave_sinus.shift_to([0, 0])
   wave_sinus.update_shape_parameters(angle_start=0, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
   wave_sinus.shift_to([0, start_trigo+angle/wave_factor])
-  wave_sinus.flip()
+  wave_sinus.flip_upside_down()
   wave_sinus.stretch(stretch_x=1, stretch_y=-1)
 
   dot_cosinus.shift_to( [start_trigo, cos_angle])

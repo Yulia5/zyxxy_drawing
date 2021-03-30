@@ -1,7 +1,6 @@
 
 from zyxxy_canvas import create_canvas_and_axes, show_drawing_and_save_if_needed
-from zyxxy_shape_functions import draw_a_rectangle, draw_a_circle, draw_a_smile, draw_a_polygon, draw_a_segment
-from zyxxy_shape_class import shift_layer
+from zyxxy_shape_functions import draw_a_rectangle, draw_a_circle, draw_a_smile, draw_a_polygon, draw_a_segment, shift_layers
 from zyxxy_shape_style import set_default_line_style#, set_default_outline_style
 from zyxxy_colours import create_gradient_colours
 from zyxxy_coordinates import build_an_egg, build_an_arc, link_contours
@@ -89,8 +88,8 @@ for lr in [-1, 1]:
   # whiskers
   draw_a_smile(centre_x=lr*(6+whiskers_length/2), centre_y=eye_y-0.5, width=whiskers_length, depth=-0.5)
   s2 = draw_a_smile(centre_x=lr*(6+whiskers_length/2), centre_y=eye_y+0.8, width=whiskers_length, depth=-0.5)
-  s2.rotate(turn=-lr/2, diamond_override=[lr*5, eye_y+0.5])
+  s2.turn(turn=-lr/2, diamond_override=[lr*5, eye_y+0.5])
 
-shift_layer(shift=[0, -4], layer_nbs=[])
+shift_layers(shift=[0, -4])
 
-show_drawing_and_save_if_needed("gradient_cat")
+show_drawing_and_save_if_needed()

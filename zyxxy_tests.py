@@ -57,12 +57,15 @@ def test_rectangle():
   r0 = draw_a_rectangle(ax=axes, centre_x=5, centre_y=15, width=10, height=2, turn=0)
   r2 = clone_a_shape(r)
   r2.stretch(stretch_x=1/5, stretch_y=5)
-  r2.rotate(turn=3)
+  r2.turn(turn=3)
   r3 = draw_a_rectangle(ax=axes, left=0, top=16, width=10, height=2)
   r4 = draw_a_rectangle(ax=axes, right=10, bottom=14, width=10, height=2)
-  
+
   for other_r, kwargs in [[r0, {}], [r2, {'start_1':1}], [r3, {}], [r4, {}]]:
-    compare_contours(s1=r, s2=other_r, **kwargs)
+    try:
+      compare_contours(s1=r, s2=other_r, **kwargs)
+    except:
+      raise Exception(n, r.get_xy())
 
   # make sure shift works
   for other_r_init in [r, r3, r4]:
@@ -71,15 +74,15 @@ def test_rectangle():
     compare_contours(s1=r.get_xy() + [101, 202], s2=other_r)
 
   # make sure flipping works
-  r001 = clone_a_shape(r) ; r001.flip()
-  r301 = clone_a_shape(r3); r301.flip()
-  r401 = clone_a_shape(r4); r401.flip()
+  r001 = clone_a_shape(r) ; r001.flip_upside_down()
+  r301 = clone_a_shape(r3); r301.flip_upside_down()
+  r401 = clone_a_shape(r4); r401.flip_upside_down()
   compare_contours(r001.get_xy() + [0, 2], r301.get_xy())
   compare_contours(r001.get_xy() + [0,-2], r401.get_xy())
 
   # make sure rotation works
-  r31 = clone_a_shape(r3); r31.rotate(turn=6)
-  r41 = clone_a_shape(r4); r41.rotate(turn=6)
+  r31 = clone_a_shape(r3); r31.turn(turn=6)
+  r41 = clone_a_shape(r4); r41.turn(turn=6)
   compare_contours(r31.get_xy() + [20, -4], r41.get_xy())
 
   # make sure parameters update works

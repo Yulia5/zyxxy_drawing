@@ -150,11 +150,8 @@ def update_shape_form_given_side(_, side):
   common_keys_for_shape = get_common_keys_for_shape(shapename=active_shapename[side])
   kwargs_common= {common_keys_for_shape[key] : get_widget_value(_widgets_common[key]) for key in _widgets_common.keys()}
 
-  print(kwargs_common)
-
   _shape = get_active_shape(side=side)
   _shape.update_xy_by_shapename(active_shapename[side], **kwargs_shape)
-  _shape.adjust_the_diamond(**kwargs_common)
   _shape.move(**kwargs_common)
 
   fig.canvas.draw_idle()
