@@ -363,21 +363,17 @@ class Shape:
     self.move_history['turn'] =   - self.move_history['turn']
 
 ##################################################################
-
-  def raise_e(self):
-    self.exc = True
-
   def shift(self, shift):
     def func(xy):     
       xy += shift
       return xy
-
-    prior_xy = np.copy(self.get_xy())
     self._move_xy(func=func)
-    if self.exc:
-      raise Exception(prior_xy, shift, self.get_xy())
-
     self.update_diamond(new_diamond_coords = self.diamond_coords + shift)
+
+##################################################################
+  def shift_to(self, new_diamond_coords):
+    diamond_shift = new_diamond_coords - self.diamond_coords
+    self.shift(shift=diamond_shift)
 
 ##################################################################
 

@@ -19,6 +19,7 @@ from matplotlib.lines import Line2D
 import numpy as np
 from zyxxy_utils import full_turn_angle, sin_hours, cos_hours
 from zyxxy_canvas import create_canvas_and_axes, is_running_tests
+from zyxxy_widgets import add_a_slider
 from MY_zyxxy_SETTINGS_demo import figure_params
 from MY_zyxxy_SETTINGS_widgets import widget_params
 from zyxxy_shape_functions import draw_a_circle, draw_a_broken_line, draw_a_sector, draw_a_wave
@@ -46,7 +47,7 @@ def get_demo_rax_bottom():
   return demo_rax_bottom
 
 plot_ax_left   = figure_params['plot_gap']
-plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap']
+plot_ax_bottom = get_demo_rax_bottom() + figure_params['plot_bottom_gap'] + 0.2
 ax = plt.axes([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
 
 print([plot_ax_left, plot_ax_bottom, 1 - 2 * plot_ax_left, 1 - plot_ax_bottom])
@@ -64,54 +65,82 @@ create_canvas_and_axes(canvas_width=canvas_width,
                             axes=ax)
 
 colour = {'angle' : 'violet', 'sinus' : 'dodgerblue', 'cosinus' : 'blueviolet'}
-angle = 1
-dot_coords = [sin_hours(angle), cos_hours(angle)]
-values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
+
 start_trigo = 1.5
 wave_factor = 6
 set_default_outline_style(linewidth=3)
 set_default_line_style(linewidth=3)
 
+
+segments = [None for _ in range(7)]
+
+draw_a_circle(centre_x=0, centre_y=0, radius=1)
+
+sector = draw_a_sector(centre_x=0, centre_y=0, radius=.2, angle_start=0, angle_end=0, colour=colour['angle'])
+segments[0] = draw_a_broken_line(contour=[[0, 0]], colour='crimson')
+
+set_default_outline_style(linewidth=0)
+
+# cos
+segments[1] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
+segments[2] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
+segments[3] = draw_a_broken_line(contour=[[0, 0]], colour='black')
+wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'], turn=9)
+dot_sinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['sinus'])
+
+# sin
+segments[4] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
+segments[5] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
+segments[6] = draw_a_broken_line(contour=[[0, 0]], colour='black')
+wave_cosinus = draw_a_wave(start_x=start_trigo+0, start_y=0, width=1, height=2, angle_start=3, nb_waves=1, colour=colour['cosinus'])
+dot_cosinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['cosinus'])
+
+# point
+dot = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour='black')
+
+def change_angle(angle):
+
+  sin_angle, cos_angle = sin_hours(angle), cos_hours(angle)
+
+  segment_coords = [[[0, 0], [sin_angle, cos_angle]],
+                    [[0, 0], [0, cos_angle]],
+                    [[0, cos_angle], [sin_angle, cos_angle]],
+                    [[max(0, sin_angle), cos_angle], [start_trigo, cos_angle]],
+                    [[0, 0], [sin_angle, 0]],
+                    [[sin_angle, 0], [sin_angle, cos_angle]],
+                    [[sin_angle, max(0, cos_angle)], [sin_angle, start_trigo]]]
+  for i in range(7):
+    segments[i].update_xy_by_shapename(shapename=segment_coords[i])
+
+  sector.update_shape_parameters(angle_end=angle)
+  dot.shift_to([sin_angle, cos_angle])
+
+  dot_sinus.shift_to( [sin_angle, start_trigo])
+  wave_sinus.shift_to([sin_angle, start_trigo])
+  #wave_sinus.update_shape_parameters(width=angle/wave_factor) # , # nb_waves=angle/full_turn_angle
+  print(wave_sinus.diamond_coords)
+
+  dot_cosinus.shift_to( [start_trigo, cos_angle])
+  wave_cosinus.shift_to([start_trigo, cos_angle])
+  #wave_cosinus.update_shape_parameters(width=-angle/wave_factor, nb_waves=angle/full_turn_angle)
+  print(wave_cosinus.diamond_coords)
+
+angle = 12
+change_angle(angle=angle)
+
+dot_coords = [sin_hours(angle), cos_hours(angle)]
+values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
 colors = colour.values()
 lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
 labels = [k + ('(' + str(angle) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys()]
 
-sin_angle, cos_angle = sin_hours(angle), cos_hours(angle)
-
-draw_a_circle(centre_x=0, centre_y=0, radius=1)
-
-draw_a_sector(centre_x=0, centre_y=0, radius=.2, angle_start=0, angle_end=angle, colour=colour['angle'])
-draw_a_broken_line(contour=[[0, 0], [sin_angle, cos_angle]], colour='crimson')
-
-# cos
-draw_a_broken_line(contour=[[0, 0], [sin_angle, 0]], colour=colour['cosinus'])
-draw_a_broken_line(contour=[[sin_angle, 0], [sin_angle, cos_angle]], colour=colour['sinus'])
-draw_a_broken_line(contour=[[sin_angle, max(0, cos_angle)], [sin_angle, start_trigo]], colour='black')
-set_default_line_style(colour=colour['sinus'])
-draw_a_wave(start_x=start_trigo+angle/wave_factor, start_y=1, width=-angle/wave_factor, height=2, angle_start=3, nb_waves=angle/full_turn_angle)
-draw_a_circle(centre_x=start_trigo, centre_y=cos_angle, radius=.1, colour=colour['sinus'])
-
-# sin
-draw_a_broken_line(contour=[[0, 0], [0, cos_angle]], colour=colour['sinus'])
-draw_a_broken_line(contour=[[0, cos_angle], [sin_angle, cos_angle]], colour=colour['cosinus'])
-draw_a_broken_line(contour=[[max(0, sin_angle), cos_angle], [start_trigo, cos_angle]], colour='black')
-set_default_line_style(colour=colour['cosinus'])
-
-set_default_line_style(colour=colour['cosinus'])
-sinus_wave = draw_a_wave(start_x=start_trigo+angle/wave_factor, start_y=0, width=-angle/wave_factor, height=2, angle_start=0, nb_waves=angle/full_turn_angle)
-sinus_wave.flip()
-sinus_wave.rotate(turn=9, diamond_override=[0, 0])
-draw_a_circle(centre_x=sin_angle, centre_y=start_trigo, radius=.1, colour=colour['cosinus'])
-
-# point
-draw_a_circle(centre_x=sin_angle, centre_y=cos_angle, radius=.1, colour='black')
-
-
 # a legend
 plt.legend(lines, labels, loc='upper right') 
 
-#draw_a_segment(start_x=0, start_y=dot_coords[0], length=dot_coords[1], turn=3)
+add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_caption='angle', s_vals=[0, 36, 0, 0.2], on_click_or_change=change_angle)
+
+
 fig.set_dpi(figure_params['dpi']) 
-fig.set_size_inches(figure_params['figsize'] /2 )
+fig.set_size_inches(figure_params['figsize'] / 1.5 )
 if not is_running_tests():
   plt.show()
