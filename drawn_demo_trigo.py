@@ -125,17 +125,20 @@ def change_angle(angle):
   values =  {'angle' : angle, 'sinus' : sin_hours(angle), 'cosinus' : cos_hours(angle)}
   colors = colour.values()
   lines = [Line2D([0], [0], color=c, linewidth=3) for c in colors]
-  labels = [k + ('(' + str(angle) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys() if k!='hypothenuse'] + ['hypothenuse']
+  labels = [k + ('(' + str(round(angle, 1)) + 'h)' if k!= 'angle' else '') + '=' + str(round(values[k], 3)) + ('' if k!= 'angle' else 'h') for k in colour.keys() if k!='hypothenuse'] + ['hypothenuse']
 
   nb_legend_lines = 4 if 0 <= angle <= 3 else 3
   ax.legend(lines[:nb_legend_lines], labels[:nb_legend_lines], loc='upper right') 
 
+  plt.gcf().canvas.draw_idle()
 
-init_angle = 7
 
-add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_caption='angle', s_vals=[0, 36, init_angle, 1])#, on_click_or_change=change_angle)
+init_angle = 0
+
+slider = add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_caption='angle', s_vals=[0, 36, init_angle, 0.2], on_click_or_change=change_angle)
 
 change_angle(angle=init_angle)
+
 
 
 fig.set_dpi(figure_params['dpi']) 
