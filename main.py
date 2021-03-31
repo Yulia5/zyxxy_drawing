@@ -38,6 +38,6 @@ import zyxxy_utils, datetime
 
 print(datetime.datetime.now())
 
-import test # drawn_demo_trigo # zyxxy_shape_demo # 
+import drawn_demo_trigo # zyxxy_shape_demo # test # 
 
 print(datetime.datetime.now())

@@ -414,7 +414,7 @@ def build_a_wave(width, height, angle_start, nb_waves):
     contour[:, 0] *= width / contour[-1, 0]
   # adjust the starting point 
   contour -= contour[0, :]
-
+  assert is_the_same_point(contour[0, :], [0, 0])
   return contour
 
 ## a zigzag ###########################################################

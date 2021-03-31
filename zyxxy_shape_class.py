@@ -181,14 +181,16 @@ class Shape:
     
     method_to_call = getattr(zyxxy_coordinates, 'build_'+self.shapename)
     contour = method_to_call(**self.shape_kwargs)
+
     for what in [self.line, self.outline, self.patch]:
       if what is not None:
         Shape._set_xy(what, contour)
 
-    self._move_by_matrix_around_diamond() # correct for clipping contours
-
     shift = self.diamond_coords # self.shift will restore the value of self.diamond_coords
     self.update_diamond(new_diamond_coords=[0., 0.])
+
+    self._move_by_matrix_around_diamond() # correct for clipping contours
+
     self.shift(shift=shift)
 
 ##################################################################
