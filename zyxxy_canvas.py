@@ -22,7 +22,7 @@ from math import floor
 from matplotlib import animation
 import matplotlib.pyplot as plt
 
-from zyxxy_shape_style import set_diamond_size_factor, set_outlines_colour, find_colour_code
+from zyxxy_shape_style import set_diamond_size_factor, set_outlines_colour, find_colour_code, reset_default_colour_etc_settings
 from zyxxy_shape_class import get_all_polygons_in_layers
 from zyxxy_external_images import filename_to_image, show_image
 from zyxxy_utils import is_running_tests
@@ -93,6 +93,8 @@ def create_canvas_and_axes(canvas_width,
                            model = None,
                            model_zoom = 1.,
                            outlines_colour = None):
+
+  reset_default_colour_etc_settings()
 
   params_for_axes = {  'canvas_width'         : canvas_width,
                        'canvas_height'        : canvas_height, 

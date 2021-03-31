@@ -19,8 +19,7 @@ import numpy as np
 from matplotlib.pyplot import Polygon, gca
 import zyxxy_coordinates
 from zyxxy_utils import is_the_same_contour, move_by_matrix, get_rotation_matrix
-from zyxxy_shape_style import set_patch_style, set_line_style, get_diamond_size, format_arg_dict
-from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
+from zyxxy_shape_style import set_style, get_diamond_size, format_arg_dict
 from zyxxy_shape_style import raise_Exception_if_not_processed
 
 ##################################################################
@@ -106,12 +105,8 @@ class Shape:
 
       for attr_name in format_arg_dict.keys():
         _attr = getattr(self, attr_name)
-        if _attr is None:
-          continue
-        if "line" in attr_name:
-          set_line_style(_attr, **my_default_colour_etc_settings[attr_name])
-        else:
-          set_patch_style(_attr, **my_default_colour_etc_settings[attr_name])
+        if _attr is not None:
+          set_style(_attr, attr_name)
 
       self.clip_patches = []
       self.move_matrix = np.array([[1, 0],
@@ -145,10 +140,7 @@ class Shape:
       
       _kwargs = {key[len(prefix):] : value for key, value in kwargs.items() if key in keys_for_kwargs}
 
-      if "line" in attr_name:
-        set_line_style(_attr, **_kwargs)
-      else:
-        set_patch_style(_attr, **_kwargs)
+      set_style(_attr, attr_name, _kwargs)
 
       used_args += [prefix + k for k in _kwargs.keys()]
 

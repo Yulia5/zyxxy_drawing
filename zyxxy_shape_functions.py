@@ -19,7 +19,7 @@ from zyxxy_shape_class import Shape, get_all_shapes_in_layers
 from functools import partial
 import zyxxy_coordinates
 from zyxxy_shape_style import raise_Exception_if_not_processed, get_admissible_style_arguments
-import matplotlib.pyplot as plt
+
 
 ########################################################################
 def draw_a_shape(shapename, ax=None, **kwargs):
@@ -112,7 +112,7 @@ def shift_layers(shift, layer_nbs=[]):
 def turn_layers(turn, diamond, layer_nbs=[]):
   _shapes = get_all_shapes_in_layers(*layer_nbs)
   for shape in _shapes:
-    shape.rotate(turn=turn, diamond_override=diamond)
+    shape.turn(turn=turn, diamond_override=diamond)
 
 ########################################################################
 def stretch_layers(diamond, stretch_x=1., stretch_y=1., layer_nbs=[]):
