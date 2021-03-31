@@ -64,4 +64,4 @@ draw_a_crescent(ax=ax, width=2, depth_1=1, depth_2=1.5, centre_x=0, centre_y=12.
 
 draw_a_star(ax=ax, centre_x=-8, centre_y=18, radius_1=3, radius_2=1, ends_qty=8, colour='red')
 
-show_drawing_and_save_if_needed(filename="PopCat")
+show_drawing_and_save_if_needed()

@@ -66,9 +66,8 @@ def add_vertical_radio_buttons(w_left, w_bottom, w_caption, rb_options, active_o
   return new_bottom, result, added_text
 
 ##########################################################################################
-def add_a_slider(w_left, w_bottom, w_caption, s_vals, caption_in_the_same_line=True, on_click_or_change=None, **slider_qwargs):
-  _, sax = get_axes_for_widget(w_left=w_left, 
-                               w_bottom=w_bottom)
+def add_a_slider(w_left, w_bottom, w_caption, s_vals, w_width=None, caption_in_the_same_line=True, on_click_or_change=None, **slider_qwargs):
+  _, sax = get_axes_for_widget(w_left=w_left, w_bottom=w_bottom, w_width=w_width)
   label = w_caption if caption_in_the_same_line else ""
   result = Slider(ax=sax, label=label, valmin=s_vals[0], valmax=s_vals[1], valinit=s_vals[2], valstep=s_vals[3], color='black', **slider_qwargs)
 

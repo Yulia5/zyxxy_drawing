@@ -12,7 +12,7 @@ create_canvas_and_axes(canvas_width = 19*13*2,
                        title = "Flag Of The U.S.A.",
                        model = example_us_flag)
 
-set_diamond_size_factor(0.75)
+#set_diamond_size_factor(0.75)
 
 #######################################################
 # Now let's draw the shapes!                         ##

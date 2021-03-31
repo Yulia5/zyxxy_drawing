@@ -77,7 +77,6 @@ segments[1] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
 segments[2] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
 segments[3] = draw_a_broken_line(contour=[[0, 0]], colour='black')
 wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'], turn=3)
-print("!!!", wave_sinus.get_xy()[0],  wave_sinus.diamond_coords)
 
 dot_sinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['sinus'])
 square_sinus = draw_a_square(centre_x=0, centre_y=0, side=.2, colour=colour['sinus'])
@@ -113,10 +112,7 @@ def change_angle(angle):
   dot_sinus.shift_to( [sin_angle, start_trigo])
   square_sinus.shift_to( [0, start_trigo+angle/wave_factor])
   wave_sinus.update_shape_parameters(angle_start=0, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
-  print(wave_sinus.get_xy()[0],  wave_sinus.diamond_coords)
   wave_sinus.shift_to([0, start_trigo+angle/wave_factor])
-  print([sin_angle, start_trigo])
-  print(wave_sinus.get_xy()[0],  wave_sinus.diamond_coords)
 
   dot_cosinus.shift_to( [start_trigo, cos_angle])
   square_cosinus.shift_to( [start_trigo+angle/wave_factor, 1])
@@ -134,15 +130,11 @@ def change_angle(angle):
 
   plt.gcf().canvas.draw_idle()
 
-
 init_angle = 0
 
-slider = add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_caption='angle', s_vals=[0, 36, init_angle, 0.2], on_click_or_change=change_angle)
+slider = add_a_slider(w_left=plot_ax_left+.2, w_bottom=figure_params['plot_bottom_gap'], w_width=0.5, w_caption='angle', s_vals=[0, 24, init_angle, 0.2], on_click_or_change=change_angle)
 
-print("!!!!!!", wave_sinus.get_xy()[0],  wave_sinus.diamond_coords)
 change_angle(angle=init_angle)
-print("!!!!!!!!!!", wave_sinus.get_xy()[0],  wave_sinus.diamond_coords)
-
 
 fig.set_dpi(figure_params['dpi']) 
 fig.set_size_inches(figure_params['figsize'] / 1.5 )

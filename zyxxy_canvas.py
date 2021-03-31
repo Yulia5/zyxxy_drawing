@@ -231,11 +231,15 @@ def show_drawing_and_save_if_needed(save=True,
                            nb_of_frames = None,
                            block=True):
 
-  if save and USE_PLT_SHOW and not is_running_tests():
+  if save and USE_PLT_SHOW: # and not is_running_tests():
     if filename is None:
       frame = inspect.stack()[1]
       module = inspect.getmodule(frame[0])
-      caller_filename = ntpath.basename(module.__file__)
+      if module is not None:
+        caller_filename = ntpath.basename(module.__file__)
+      else:
+        curframe = inspect.currentframe()
+        caller_filename = inspect.getouterframes(curframe)[1].filename
       if caller_filename == "zyxxy_all_EXAMPLES.py":
         filename = frame.function
       else:
