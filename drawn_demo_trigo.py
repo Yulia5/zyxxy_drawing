@@ -76,7 +76,7 @@ set_default_outline_style(linewidth=0)
 segments[1] = draw_a_broken_line(contour=[[0, 0]], colour=colour['cosinus'])
 segments[2] = draw_a_broken_line(contour=[[0, 0]], colour=colour['sinus'])
 segments[3] = draw_a_broken_line(contour=[[0, 0]], colour='black')
-wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus']) #, turn=9, stretch_y=-1)
+wave_sinus = draw_a_wave(start_x=start_trigo, start_y=1, width=1, height=2, angle_start=0, nb_waves=1, colour=colour['sinus'], turn=9)#, stretch_y=-1)
 dot_sinus = draw_a_circle(centre_x=0, centre_y=0, radius=.1, colour=colour['sinus'])
 square_sinus = draw_a_square(centre_x=0, centre_y=0, side=.2, colour=colour['sinus'])
 
@@ -110,11 +110,8 @@ def change_angle(angle):
 
   dot_sinus.shift_to( [sin_angle, start_trigo])
   square_sinus.shift_to( [0, start_trigo+angle/wave_factor])
-  #wave_sinus.turn(turn=-9)
-  wave_sinus.update_shape_parameters(angle_start=0, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
-  wave_sinus.shift_to([0, start_trigo+angle/wave_factor])
-  #wave_sinus.flip_upside_down()
-  #wave_sinus.stretch(stretch_x=-1)
+  wave_sinus.update_shape_parameters(angle_start=angle, width=angle/wave_factor, nb_waves=angle/full_turn_angle)
+  wave_sinus.shift_to([sin_angle, start_trigo])
 
   dot_cosinus.shift_to( [start_trigo, cos_angle])
   square_cosinus.shift_to( [start_trigo+angle/wave_factor, 1])

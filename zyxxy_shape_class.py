@@ -18,11 +18,10 @@ import copy
 import numpy as np
 from matplotlib.pyplot import Polygon, gca
 import zyxxy_coordinates
-from zyxxy_utils import rotate_point, stretch_something, is_the_same_contour, move_by_matrix, get_rotation_matrix
+from zyxxy_utils import is_the_same_contour, move_by_matrix, get_rotation_matrix
 from zyxxy_shape_style import set_patch_style, set_line_style, get_diamond_size, format_arg_dict
 from MY_zyxxy_SETTINGS import my_default_colour_etc_settings
 from zyxxy_shape_style import raise_Exception_if_not_processed
-
 
 ##################################################################
 ## SHAPE                                                        ## 
@@ -186,7 +185,7 @@ class Shape:
       if what is not None:
         Shape._set_xy(what, contour)
 
-    self._move_by_matrix_around_diamond(matrix=self.move_matrix) # correct for clipping contours
+    self._move_by_matrix_around_diamond() # correct for clipping contours
 
     shift = self.diamond_coords # self.shift will restore the value of self.diamond_coords
     self.update_diamond(new_diamond_coords=[0., 0.])
@@ -317,16 +316,19 @@ class Shape:
     self.shift(shift=diamond_shift)
 
 ##################################################################
-  def _move_by_matrix_around_diamond(self, matrix, diamond_override=None):
+  def _move_by_matrix_around_diamond(self, matrix=None, diamond_override=None):
     
     diamond = self.diamond_coords if diamond_override is None else diamond_override
+
+    if matrix is None:
+      matrix = self.move_matrix
+    else:
+      self.move_matrix = np.matmul(matrix, self.move_matrix)
 
     what_to_move = self.get_what_to_move()
     for something in what_to_move:
       xy = move_by_matrix(contour=Shape._get_xy(something=something), diamond=diamond, matrix=matrix)
       Shape._set_xy(something=something, xy=xy)
-
-    self.move_matrix = np.matmul(matrix, self.move_matrix)
 
     if diamond_override is not None:
       self.diamond_coords = move_by_matrix(contour=self.diamond_coords, 
