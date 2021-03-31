@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 
 ########################################################################
 def draw_a_shape(shapename, ax=None, **kwargs):
+
   param_names_used = []
   # create a shape
   if isinstance(shapename, str):
@@ -49,8 +50,6 @@ def draw_a_shape(shapename, ax=None, **kwargs):
   else:
     _shape.update_xy_by_shapename(shapename=shapename)
 
-
-
   # apply common arguments
   common_keys_for_shape = zyxxy_coordinates.get_common_keys_for_shape(
         shapename=shapename, 
@@ -58,8 +57,12 @@ def draw_a_shape(shapename, ax=None, **kwargs):
   kwargs_common = {key : value for key, value in kwargs.items() if key in common_keys_for_shape.values()}
   allowed_keys += [v for v in common_keys_for_shape.values()]
 
+  
+  old_xy = _shape.get_xy().copy()
   # move
   _shape.move(**kwargs_common)
+
+  #raise Exception(old_xy, _shape.get_xy())
 
   if 'clip_outline' in kwargs:
     _shape.clip(clip_outline=kwargs['clip_outline'])

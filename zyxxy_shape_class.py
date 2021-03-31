@@ -67,7 +67,7 @@ class Shape:
         if init_patch is None:
           return None
         else:
-          result = Polygon(xy=dummy_xy)
+          result = Polygon(xy=dummy_xy, closed=init_patch.get_closed())
           result.update_from(other=init_patch)
           result.set_xy(np.copy(init_patch.get_xy()))
           init_patch.axes.add_patch(result)

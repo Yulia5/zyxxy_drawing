@@ -51,7 +51,9 @@ def conc_contours(a, b):
 
 ##################################################################
 def is_the_same_contour(p1, p2, start_1=0, start_2=0, opposite_directions=False):
-  assert p1.shape == p2.shape
+  if p1.shape != p2.shape:
+    raise Exception("Countour shapes mismatch", p1.shape, p2.shape, p1, p2)
+
   if (p1.size == 0):
     return True
     
